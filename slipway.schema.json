@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
+  "title": "Slipway Agents Configuration",
+  "description": "Agent-to-model configuration for slipway-agents. Each key under `agents` maps an agent name to its model assignment.",
+  "type": "object",
+  "required": ["version", "agents"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version of this config file.",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "examples": ["1.0.0"]
+    },
+    "agents": {
+      "type": "object",
+      "description": "Map of agent name → model assignment. Agent names must match the corresponding .md filename (orchestrator: slipway.md, subagents: subagents/<name>.md).",
+      "minProperties": 1,
+      "propertyNames": {
+        "enum": [
+          "slipway",
+          "drafting-table",
+          "hull-builder",
+          "inspector",
+          "groomer",
+          "rigger",
+          "shipwright",
+          "chronicler"
+        ]
+      },
+      "additionalProperties": {
+        "$ref": "#/definitions/AgentConfig"
+      }
+    }
+  },
+  "definitions": {
+    "AgentConfig": {
+      "type": "object",
+      "required": ["model"],
+      "additionalProperties": false,
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "Model identifier in provider/model-id format.",
+          "examples": [
+            "anthropic/claude-opus-4-6",
+            "anthropic/claude-sonnet-4-6",
+            "anthropic/claude-haiku-4-5",
+            "amazon-bedrock/us.anthropic.claude-opus-4-6",
+            "openai/gpt-4o"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable summary of what this agent does. Optional but recommended."
+        }
+      }
+    }
+  }
+}
