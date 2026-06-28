@@ -143,6 +143,12 @@ Full guide: [docs/guide/installation.md](docs/guide/installation.md)
 # Review docs without running the full pipeline
 @slipway review
 
+# Sprint grooming (Lead Dev, QA, DevOps lenses)
+@slipway groom this
+
+# Generate a phased implementation plan
+@slipway plan
+
 # Security audit only
 @slipway security audit
 

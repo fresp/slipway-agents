@@ -11,6 +11,8 @@ slipway-agents/
 ├── slipway.md                     # Orchestrator — routes between subagents
 ├── slipway.json                   # Model assignments — edit this to change models
 ├── slipway.schema.json            # JSON schema for slipway.json
+├── opencode.json                  # Plugin registration for OpenCode
+├── package.json                   # Root package — this is what gets published to npm
 ├── subagents/                     # One .md file per agent
 ├── skills/slipway/                # Skills invoked by agents
 │   └── bootstrap-from-prd/
@@ -122,7 +124,7 @@ Run `npm run typecheck` from the repo root before submitting a PR.
 
 There are no automated tests yet. Manual testing process:
 
-1. Install the plugin locally: `npm run build` from repo root, then point `opencode.json` to your local build.
+1. Install the plugin locally: `npm run build` from repo root (builds `packages/slipway-plugin/dist/`), then set the `plugin` field in your project's `opencode.json` to an absolute path to the repo root.
 2. Create a scratch project, run `@slipway I want to build [idea]`, and walk through the pipeline.
 3. Verify the agent table in `slipway.md` matches what actually ran.
 4. If you changed model assignments, verify the correct model is selected in the OpenCode session header.

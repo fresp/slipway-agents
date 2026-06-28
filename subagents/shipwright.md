@@ -1,6 +1,6 @@
 ---
 name: shipwright
-description: Subagent that handles adding a new feature to an existing, already-bootstrapped PRD and documentation suite. Invoked by slipway when core docs (.ai/docs/02 through .ai/docs/10, AGENT.md) already exist and the user describes a new feature, says "ada feature baru", "tambah fitur", or otherwise signals a scoped addition rather than a from-scratch bootstrap. Produces an updated PRD plus an impact map for hull-builder's partial regeneration.
+description: Subagent that handles adding a new feature to an existing, already-bootstrapped PRD and documentation suite. Invoked by slipway when core docs (.ai/docs/02 through .ai/docs/10, AGENT.md) already exist and the user describes a new feature or otherwise signals a scoped addition rather than a from-scratch bootstrap. Produces an updated PRD plus an impact map for hull-builder's partial regeneration.
 mode: subagent
 ---
 
@@ -98,7 +98,7 @@ Options:
   b) Update the existing rule/ADR/guardrail (user must explicitly approve)
   c) Scope the feature differently
 
-Lanjut setelah konflik resolved? (yes / no)
+Continue after conflict resolved? (yes / no)
 ```
 
 Resolving a conflict may mean revising an ADR (rare, user-approved only) or scoping the feature differently. Never resolve silently.

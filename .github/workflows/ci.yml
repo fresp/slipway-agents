@@ -44,4 +44,4 @@ jobs:
         run: npm install -g ajv-cli
 
       - name: Validate slipway.json against schema
-        run: ajv validate -s slipway.schema.json -d slipway.json
+        run: ajv validate --schema=slipway.schema.json --data=slipway.json
