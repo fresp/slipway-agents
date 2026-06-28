@@ -1,38 +1,76 @@
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "agents": {
     "slipway": {
       "model": "anthropic/claude-opus-4-6",
-      "description": "Primary orchestrator — routes the PRD pipeline, never generates content directly"
+      "fallback_model": "anthropic/claude-sonnet-4-6",
+      "description": "Primary orchestrator — routes the pipeline, enforces step order, never generates content directly"
     },
     "drafting-table": {
       "model": "anthropic/claude-sonnet-4-6",
+      "fallback_model": "anthropic/claude-haiku-4-5",
       "description": "Raw prompt / partial PRD → complete .ai/docs/01-prd.md"
     },
     "hull-builder": {
       "model": "anthropic/claude-sonnet-4-6",
+      "fallback_model": "anthropic/claude-haiku-4-5",
       "description": "Invokes bootstrap-from-prd skill → .ai/docs/02–10 + AGENT.md"
     },
     "inspector": {
-      "model": "anthropic/claude-sonnet-4-6",
-      "description": "Cross-doc validation + severity-ranked findings + plain-language summary"
+      "model": "anthropic/claude-opus-4-6",
+      "fallback_model": "anthropic/claude-sonnet-4-6",
+      "description": "Cross-doc validation + per-doc health score breakdown + severity-ranked findings"
     },
     "groomer": {
       "model": "anthropic/claude-sonnet-4-6",
-      "description": "Multi-role sprint grooming — Lead Dev, QA, and DevOps lenses"
+      "fallback_model": "anthropic/claude-haiku-4-5",
+      "description": "Multi-lens sprint grooming (Lead Dev, QA, DevOps) with cross-lens synthesis"
     },
     "rigger": {
       "model": "anthropic/claude-sonnet-4-6",
-      "description": "Phase and milestone breakdown → .ai/planning/"
+      "fallback_model": "anthropic/claude-haiku-4-5",
+      "description": "Phase/milestone breakdown → .ai/planning/ with S/M/L sizing and dependency graph"
     },
     "shipwright": {
       "model": "anthropic/claude-sonnet-4-6",
+      "fallback_model": "anthropic/claude-haiku-4-5",
       "description": "Update existing docs when a new feature is introduced (extend mode)"
+    },
+    "security-auditor": {
+      "model": "anthropic/claude-opus-4-6",
+      "fallback_model": "anthropic/claude-sonnet-4-6",
+      "description": "Auth, secrets, and attack surface audit — runs after inspector, before rigger"
+    },
+    "estimator": {
+      "model": "anthropic/claude-sonnet-4-6",
+      "fallback_model": "anthropic/claude-haiku-4-5",
+      "description": "Cost and time forecast per phase based on .ai/planning/ — runs after rigger, before build"
+    },
+    "schema-validator": {
+      "model": "anthropic/claude-sonnet-4-6",
+      "fallback_model": "anthropic/claude-haiku-4-5",
+      "description": "Post-implementation DB schema vs. 04-data-models.md consistency check"
     },
     "chronicler": {
       "model": "anthropic/claude-haiku-4-5",
-      "description": "Post-implementation doc sync — detect drift, patch docs incrementally"
+      "fallback_model": "anthropic/claude-sonnet-4-6",
+      "description": "Post-implementation doc sync — detect and classify drift (DRIFT / INTENTIONAL / UNKNOWN)"
+    }
+  },
+  "categories": {
+    "quick": {
+      "model": "anthropic/claude-haiku-4-5",
+      "description": "Trivial or pattern-matching tasks — fast and cheap"
+    },
+    "standard": {
+      "model": "anthropic/claude-sonnet-4-6",
+      "description": "Default for most generation and analysis tasks"
+    },
+    "deep": {
+      "model": "anthropic/claude-opus-4-6",
+      "fallback_model": "anthropic/claude-sonnet-4-6",
+      "description": "Reasoning-heavy tasks — validation, security audit, orchestration"
     }
   }
 }

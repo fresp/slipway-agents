@@ -2,63 +2,105 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
   "title": "Slipway Agents Configuration",
-  "description": "Agent-to-model configuration for slipway-agents. Each key under `agents` maps an agent name to its model assignment.",
+  "description": "Model configuration for slipway-agents pipeline. Edit this file to assign models per agent and per category. The slipway-agents plugin reads this file at OpenCode startup and enforces the assignments at runtime.",
   "type": "object",
   "required": ["version", "agents"],
-  "additionalProperties": false,
   "properties": {
-    "$schema": {
-      "type": "string"
-    },
     "version": {
       "type": "string",
-      "description": "Semantic version of this config file.",
-      "pattern": "^\\d+\\.\\d+\\.\\d+$",
-      "examples": ["1.0.0"]
+      "description": "Config schema version. Current: 1.1.0",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
     "agents": {
       "type": "object",
-      "description": "Map of agent name → model assignment. Agent names must match the corresponding .md filename (orchestrator: slipway.md, subagents: subagents/<name>.md).",
-      "minProperties": 1,
-      "propertyNames": {
-        "enum": [
-          "slipway",
-          "drafting-table",
-          "hull-builder",
-          "inspector",
-          "groomer",
-          "rigger",
-          "shipwright",
-          "chronicler"
-        ]
+      "description": "Model assignments per agent. Keys must match agent names exactly.",
+      "additionalProperties": {
+        "$ref": "#/definitions/agentConfig"
+      },
+      "properties": {
+        "slipway":          { "$ref": "#/definitions/agentConfig" },
+        "drafting-table":   { "$ref": "#/definitions/agentConfig" },
+        "hull-builder":     { "$ref": "#/definitions/agentConfig" },
+        "inspector":        { "$ref": "#/definitions/agentConfig" },
+        "groomer":          { "$ref": "#/definitions/agentConfig" },
+        "rigger":           { "$ref": "#/definitions/agentConfig" },
+        "shipwright":       { "$ref": "#/definitions/agentConfig" },
+        "security-auditor": { "$ref": "#/definitions/agentConfig" },
+        "estimator":        { "$ref": "#/definitions/agentConfig" },
+        "schema-validator": { "$ref": "#/definitions/agentConfig" },
+        "chronicler":       { "$ref": "#/definitions/agentConfig" }
+      }
+    },
+    "categories": {
+      "type": "object",
+      "description": "Fallback model pools by category. Used when an agent has no explicit model or when its primary model is unavailable.",
+      "properties": {
+        "quick": {
+          "$ref": "#/definitions/categoryConfig",
+          "description": "Fast, cheap models for pattern-matching and trivial tasks."
+        },
+        "standard": {
+          "$ref": "#/definitions/categoryConfig",
+          "description": "Default for most generation and analysis tasks."
+        },
+        "deep": {
+          "$ref": "#/definitions/categoryConfig",
+          "description": "Reasoning-heavy tasks — validation, security audit, orchestration."
+        }
       },
       "additionalProperties": {
-        "$ref": "#/definitions/AgentConfig"
+        "$ref": "#/definitions/categoryConfig"
       }
     }
   },
   "definitions": {
-    "AgentConfig": {
+    "agentConfig": {
       "type": "object",
+      "description": "Model configuration for a single agent.",
       "required": ["model"],
-      "additionalProperties": false,
       "properties": {
         "model": {
           "type": "string",
-          "description": "Model identifier in provider/model-id format.",
+          "description": "Primary model string in provider/model-id format. Example: anthropic/claude-sonnet-4-6",
           "examples": [
             "anthropic/claude-opus-4-6",
             "anthropic/claude-sonnet-4-6",
             "anthropic/claude-haiku-4-5",
             "amazon-bedrock/us.anthropic.claude-opus-4-6",
+            "google/gemini-2.5-pro",
             "openai/gpt-4o"
           ]
         },
+        "fallback_model": {
+          "type": "string",
+          "description": "Model to use if the primary model is unavailable. Uses the same provider/model-id format. If omitted, falls back to the category default."
+        },
         "description": {
           "type": "string",
-          "description": "Human-readable summary of what this agent does. Optional but recommended."
+          "description": "Human-readable note about this agent's role. Not used at runtime."
         }
-      }
+      },
+      "additionalProperties": false
+    },
+    "categoryConfig": {
+      "type": "object",
+      "description": "Model configuration for a category fallback pool.",
+      "required": ["model"],
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "Default model for this category."
+        },
+        "fallback_model": {
+          "type": "string",
+          "description": "Fallback if the category default is unavailable."
+        },
+        "description": {
+          "type": "string",
+          "description": "Human-readable note. Not used at runtime."
+        }
+      },
+      "additionalProperties": false
     }
   }
 }

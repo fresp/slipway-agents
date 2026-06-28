@@ -1,0 +1,16 @@
+{
+  "name": "slipway-agents-monorepo",
+  "private": true,
+  "version": "1.1.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=packages/slipway-plugin",
+    "typecheck": "npm run typecheck --workspace=packages/slipway-plugin",
+    "clean": "rm -rf packages/slipway-plugin/dist"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "name": "slipway-agents",
+  "version": "1.1.0",
+  "description": "PRD-to-engineering-docs pipeline agents for OpenCode. One orchestrator, ten specialized subagents, model enforcement via slipway.json.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/",
+    "../../subagents/",
+    "../../skills/",
+    "../../slipway.md",
+    "../../slipway.json",
+    "../../slipway.schema.json",
+    "../../README.md",
+    "../../LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "opencode",
+    "ai-agents",
+    "llm",
+    "developer-tools",
+    "prd",
+    "documentation",
+    "pipeline",
+    "subagents"
+  ],
+  "author": "fresp",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fresp/slipway-agents.git"
+  },
+  "homepage": "https://github.com/fresp/slipway-agents#readme",
+  "bugs": {
+    "url": "https://github.com/fresp/slipway-agents/issues"
+  },
+  "peerDependencies": {
+    "opencode-ai": ">=0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "opencode-ai": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
