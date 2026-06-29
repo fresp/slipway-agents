@@ -105,6 +105,11 @@
           "type": "string",
           "description": "Model to use if the primary model is unavailable. Uses the same provider/model-id format. If omitted, falls back to the category default."
         },
+        "mode": {
+          "type": "string",
+          "enum": ["primary", "subagent", "all"],
+          "description": "OpenCode agent mode. primary = appears in @ picker as main agent. subagent = invoked by orchestrator only."
+        },
         "description": {
           "type": "string",
           "description": "Human-readable note about this agent's role. Not used at runtime."

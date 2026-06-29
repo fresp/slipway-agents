@@ -7,6 +7,16 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.6.5] — 2026-06-29
+
+### Changed
+- `mode` per agent is now injected by the plugin from `slipway.json` instead of being hardcoded in agent frontmatters — edit `slipway.json` to change any agent's mode without touching `.md` files
+- Removed `mode:` field from all `subagents/*.md` frontmatters
+- `slipway.json` agent entries now include `"mode"` field (`"primary"` for `slipway`, `"subagent"` for all others)
+- `slipway.schema.json` updated to validate `mode` field with enum `["primary", "subagent", "all"]`
+
+---
+
 ## [0.6.1] — 2026-06-29
 
 ### Changed
@@ -248,6 +258,7 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
+[0.6.5]: https://github.com/fresp/slipway-agents/compare/v0.6.1...v0.6.5
 [0.6.1]: https://github.com/fresp/slipway-agents/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/fresp/slipway-agents/compare/v0.5.4...v0.6.0
 [0.5.4]: https://github.com/fresp/slipway-agents/compare/v0.5.3...v0.5.4

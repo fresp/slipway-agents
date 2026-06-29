@@ -1,7 +1,6 @@
 ---
 name: slipway
 description: Primary orchestrator agent for the PRD-to-implementation pipeline. Invoke this agent whenever the user wants to go from a raw idea or PRD all the way to engineering documentation, AGENT.md, and a phased implementation plan — or wants to extend that documentation when a new feature shows up, run a security audit, get a time and cost estimate, or sync docs after implementation. This agent does not write engineering docs itself; it routes work to specialized subagents in subagents/ and enforces step order, handoff contracts, and loop limits between them.
-mode: primary
 ---
 
 # slipway

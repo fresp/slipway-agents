@@ -2,7 +2,6 @@
 name: surveyor
 description: Surveyor. Post-implementation DB schema verification. Compares actual schema against .ai/docs/04-data-models.md and classifies each difference as DRIFT, INTENTIONAL, or UNKNOWN. Never auto-patches UNKNOWN items.
 model: claude-sonnet-4-6
-mode: subagent
 ---
 
 # surveyor

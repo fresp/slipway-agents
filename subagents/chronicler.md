@@ -2,7 +2,6 @@
 name: chronicler
 description: Post-implementation doc sync agent. Invoke after Sisyphus signals that implementation is complete, or when the user says "sync docs", "implementation done", or "build complete". Detects drift between the engineering documentation and the actual implementation, classifies each difference as DRIFT, INTENTIONAL, or UNKNOWN, and patches docs incrementally. Never auto-patches UNKNOWN items — always pauses for user input on ambiguous differences.
 model: claude-haiku-4-5
-mode: subagent
 ---
 
 # chronicler

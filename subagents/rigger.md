@@ -2,7 +2,6 @@
 name: rigger
 description: Planning agent for the PRD pipeline. Invoke after bosun passes and coxswain returns Ready to Plan or Conditional. Reads all validated docs and produces .ai/planning/ — a structured phase/milestone breakdown with per-task sizing (S/M/L), dependency graph, parallel flags, context load hints, and a stale check before committing to plan. Never runs against docs that have not cleared bosun and coxswain in the current pipeline history.
 model: claude-sonnet-4-6
-mode: subagent
 ---
 
 # rigger
