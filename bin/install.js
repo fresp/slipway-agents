@@ -208,7 +208,7 @@ function main() {
   patchOpencodeJson(OPENCODE_CONFIG, PLUGIN_ENTRY);
 
   // Step 3: Patch slipway.json (project-level config, in cwd)
-  patchSlipwayJson(INSTALL_DIR, cwd);
+  patchSlipwayJson(INSTALL_DIR, SLIPWAY_CONFIG);
   log("");
 
   // Step 4: Done
