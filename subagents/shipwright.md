@@ -1,6 +1,6 @@
 ---
 name: shipwright
-description: Subagent that handles adding a new feature to an existing, already-bootstrapped PRD and documentation suite. Invoked by slipway when core docs (.ai/docs/02 through .ai/docs/10, AGENT.md) already exist and the user describes a new feature or otherwise signals a scoped addition rather than a from-scratch bootstrap. Produces an updated PRD plus an impact map for hullwright's partial regeneration.
+description: Subagent that handles adding a new feature to an existing, already-bootstrapped PRD and documentation suite. Invoked by lodestar when core docs (.ai/docs/02 through .ai/docs/10, AGENT.md) already exist and the user describes a new feature or otherwise signals a scoped addition rather than a from-scratch bootstrap. Produces an updated PRD plus an impact map for hullwright's partial regeneration.
 mode: subagent
 ---
 

@@ -7,6 +7,20 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.6.1] — 2026-06-29
+
+### Changed
+- Orchestrator renamed from `slipway` to `lodestar` — moved from `slipway.md` at repo root to `subagents/lodestar.md` so the plugin registers it automatically at runtime
+- All subagents now declare `mode: subagent` in frontmatter; `lodestar` declares `mode: primary`
+- `slipway.json` agent key updated: `slipway` → `lodestar`
+- `bin/install.js` now clears the OpenCode plugin cache (`~/.cache/opencode/packages/slipway-agents@latest`) on each install, ensuring OpenCode always loads the latest published version on next start
+
+### Fixed
+- Orchestrator agent was missing from the OpenCode agent picker because `slipway.md` was at repo root, outside the `subagents/` directory scanned by the plugin
+- Stale plugin cache caused OpenCode to run old versions of the plugin even after npm publish
+
+---
+
 ## [0.6.0] — 2026-06-29
 
 ### Fixed
@@ -234,6 +248,7 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
+[0.6.1]: https://github.com/fresp/slipway-agents/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/fresp/slipway-agents/compare/v0.5.4...v0.6.0
 [0.5.4]: https://github.com/fresp/slipway-agents/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/fresp/slipway-agents/compare/v0.5.2...v0.5.3

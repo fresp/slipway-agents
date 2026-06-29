@@ -2,6 +2,7 @@
 name: purser
 description: Purser. Reads .ai/planning/ and produces a per-phase time and cost forecast, critical path analysis, and parallel opportunity summary. Flags unrealistic or high-risk phases. Invoked after rigger.
 model: claude-sonnet-4-6
+mode: subagent
 ---
 
 # purser

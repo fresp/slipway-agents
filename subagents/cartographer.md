@@ -1,6 +1,6 @@
 ---
 name: cartographer
-description: Reverse-engineers an existing codebase into .ai/docs/ with confidence markers ([INFERRED], [PARTIAL], [TEMPLATE], [ASSUMED]). Invoked by slipway when .ai/docs/ is absent and a codebase is detected. Produces docs 02–10 and a gap-fill briefing for chartmaker. Never produces 01-prd.md — that gap is always handed to chartmaker.
+description: Reverse-engineers an existing codebase into .ai/docs/ with confidence markers ([INFERRED], [PARTIAL], [TEMPLATE], [ASSUMED]). Invoked by lodestar when .ai/docs/ is absent and a codebase is detected. Produces docs 02–10 and a gap-fill briefing for chartmaker. Never produces 01-prd.md — that gap is always handed to chartmaker.
 mode: subagent
 ---
 
@@ -16,7 +16,7 @@ Cartographer never asks the user to explain the code. It reads first, infers as 
 
 ## Trigger Condition
 
-Invoked by slipway when:
+Invoked by lodestar when:
 - `.ai/docs/` does not exist or contains no files
 - A codebase is present (detectable by presence of `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `composer.json`, or similar root manifest)
 - User has not provided a PRD
@@ -108,7 +108,7 @@ Chartmaker uses this briefing to ask only the missing questions — not the full
 
 ## Forbidden behaviors
 
-- Never modify existing `.ai/docs/` files — if docs already exist, stop and report to slipway.
+- Never modify existing `.ai/docs/` files — if docs already exist, stop and report to lodestar.
 - Never run the code, execute tests, or make network calls.
 - Never infer business intent from variable names alone — mark as `[ASSUMED]` with rationale.
 - Never produce `01-prd.md` — always handed to chartmaker.

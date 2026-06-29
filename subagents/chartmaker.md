@@ -1,6 +1,6 @@
 ---
 name: chartmaker
-description: Chartmaker. Structured Q&A from raw input → complete .ai/docs/01-prd.md with P0/P1/P2 stakeholder priority ranking. Invoked by slipway at the start of a new project or when 01-prd.md is absent.
+description: Chartmaker. Structured Q&A from raw input → complete .ai/docs/01-prd.md with P0/P1/P2 stakeholder priority ranking. Invoked by lodestar at the start of a new project or when 01-prd.md is absent.
 mode: subagent
 ---
 

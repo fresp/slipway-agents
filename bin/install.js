@@ -142,6 +142,26 @@ function installSlipwayJson() {
   log(`Updated slipway.json: v${destConfig.version} → v${sourceConfig.version}`);
 }
 
+/**
+ * Clear the OpenCode plugin cache for slipway-agents@latest.
+ * This forces OpenCode to fetch the latest published version on next start
+ * instead of using a stale cached install.
+ */
+function clearPluginCache() {
+  const cachePath = path.join(os.homedir(), ".cache", "opencode", "packages", "slipway-agents@latest");
+  if (!fs.existsSync(cachePath)) {
+    log("Plugin cache not found — nothing to clear.");
+    return;
+  }
+  try {
+    fs.rmSync(cachePath, { recursive: true, force: true });
+    log("Plugin cache cleared — OpenCode will fetch the latest version on next start.");
+  } catch (e) {
+    warn(`Could not clear plugin cache at ${cachePath}: ${e.message}`);
+    warn("You can clear it manually: rm -rf ~/.cache/opencode/packages/slipway-agents@latest");
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
@@ -156,6 +176,9 @@ function main() {
   // Step 2: Copy slipway.json to ~/.config/opencode/slipway.json
   installSlipwayJson();
 
+  // Step 3: Clear OpenCode plugin cache so the latest version is fetched on next start
+  clearPluginCache();
+
   log("");
   log("Done. Restart OpenCode to activate the agents.");
   log("");
@@ -163,9 +186,9 @@ function main() {
   log(`  ${SLIPWAY_CONFIG}`);
   log("");
   log("Quick start:");
-  log("  @slipway I want to build [your idea here]");
+  log("  @lodestar I want to build [your idea here]");
   log("");
-  log("Full guide: https://github.com/fresp/slipway-agents/blob/main/docs/guide/installation.md");
+  log("Full guide: https://github.com/fresp/slipway-agents/blob/dev/docs/guide/installation.md");
 }
 
 main();
