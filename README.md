@@ -1,4 +1,6 @@
 # slipway-agents
+[![slipway-agents](https://github.com/fresp/slipway-agents/raw/dev/docs/slipway-agents.png)](https://github.com/fresp/slipway-agents/blob/dev/docs/slipway-agents.png)
+
 
 > PRD-to-engineering-docs pipeline agents for [OpenCode](https://opencode.ai).
 
