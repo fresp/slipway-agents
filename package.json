@@ -1,6 +1,6 @@
 {
   "name": "slipway-agents",
-  "version": "1.3.0",
+  "version": "0.3.0",
   "description": "PRD-to-engineering-docs pipeline agents for OpenCode. One orchestrator, ten specialized subagents, Stakeholder Priority planning, model enforcement via slipway.json.",
   "main": "packages/slipway-plugin/dist/index.js",
   "types": "packages/slipway-plugin/dist/index.d.ts",

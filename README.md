@@ -187,7 +187,7 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 // slipway.local.json — takes precedence over slipway.json
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "1.2.0",
+  "version": "0.3.0",
   "agents": {
     "slipway":          { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
     "inspector":        { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
@@ -214,7 +214,7 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 
 ---
 
-## What's new in v1.3.0
+## What's new in v0.3.0
 
 - **Stakeholder Priority (P0/P1/P2)** — drafting-table now assigns priority tiers to every functional requirement. Rigger uses these tiers to order phases (P0 must ship in Phase 1–2, P2 is deferred to `future-scope.md`). Inspector validates that every FR-ID has a priority tag.
 - **Proactive ADR conflict guard** — shipwright now runs a pre-flight scan against `08-architecture-decisions.md` before any Q&A, surfacing conflicts before feature scoping begins rather than mid-process.
@@ -224,7 +224,7 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 
 ---
 
-## What's new in v1.2.0
+## What's new in v0.2.0
 
 - **Runtime Capabilities in AGENT.md** — hull-builder now generates a `## Runtime Capabilities` section declaring exactly what tools the implementing agent is permitted to use (file write scope, bash commands, network policy, package installation) and what requires human confirmation before proceeding
 - **Escalation Protocol in AGENT.md** — AGENT.md now includes a structured `## Escalation Protocol` specifying when to halt vs. retry, the four-step escalation procedure, and a one-retry policy with explicit logging
@@ -235,7 +235,7 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 
 See [CHANGELOG.md](CHANGELOG.md) for the full list.
 
-## What's new in v1.1.0
+## What's new in v0.1.0
 
 - **Three new agents** — `security-auditor`, `estimator`, `schema-validator`
 - **Agent upgrades** — `inspector` (per-doc health scores, Opus model), `rigger` (S/M/L sizing, dependency graph, stale check), `groomer` (cross-lens synthesis), `chronicler` (DRIFT/INTENTIONAL/UNKNOWN classification)

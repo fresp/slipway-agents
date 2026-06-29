@@ -4,11 +4,14 @@
   "title": "Slipway Agents Configuration",
   "description": "Model configuration for slipway-agents pipeline. Edit this file to assign models per agent and per category. The slipway-agents plugin reads this file at OpenCode startup and enforces the assignments at runtime.",
   "type": "object",
-  "required": ["version", "agents"],
+  "required": [
+    "version",
+    "agents"
+  ],
   "properties": {
     "version": {
       "type": "string",
-      "description": "Config schema version. Current: 1.1.0",
+      "description": "Config schema version. Current: 0.1.0",
       "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
     "agents": {
@@ -18,17 +21,39 @@
         "$ref": "#/definitions/agentConfig"
       },
       "properties": {
-        "slipway":          { "$ref": "#/definitions/agentConfig" },
-        "drafting-table":   { "$ref": "#/definitions/agentConfig" },
-        "hull-builder":     { "$ref": "#/definitions/agentConfig" },
-        "inspector":        { "$ref": "#/definitions/agentConfig" },
-        "groomer":          { "$ref": "#/definitions/agentConfig" },
-        "rigger":           { "$ref": "#/definitions/agentConfig" },
-        "shipwright":       { "$ref": "#/definitions/agentConfig" },
-        "security-auditor": { "$ref": "#/definitions/agentConfig" },
-        "estimator":        { "$ref": "#/definitions/agentConfig" },
-        "schema-validator": { "$ref": "#/definitions/agentConfig" },
-        "chronicler":       { "$ref": "#/definitions/agentConfig" }
+        "slipway": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "drafting-table": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "hull-builder": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "inspector": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "groomer": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "rigger": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "shipwright": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "security-auditor": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "estimator": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "schema-validator": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "chronicler": {
+          "$ref": "#/definitions/agentConfig"
+        }
       }
     },
     "categories": {
@@ -57,7 +82,9 @@
     "agentConfig": {
       "type": "object",
       "description": "Model configuration for a single agent.",
-      "required": ["model"],
+      "required": [
+        "model"
+      ],
       "properties": {
         "model": {
           "type": "string",
@@ -85,7 +112,9 @@
     "categoryConfig": {
       "type": "object",
       "description": "Model configuration for a category fallback pool.",
-      "required": ["model"],
+      "required": [
+        "model"
+      ],
       "properties": {
         "model": {
           "type": "string",

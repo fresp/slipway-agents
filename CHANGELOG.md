@@ -7,7 +7,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [1.3.0] — 2026-06-29
+## [0.3.0] — 2026-06-29
 
 ### Added
 
@@ -36,7 +36,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [1.2.0] — 2026-06-29
+## [0.2.0] — 2026-06-29
 
 ### Added
 
@@ -66,7 +66,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [1.1.0] — 2026-06-28
+## [0.1.0] — 2026-06-28
 
 ### Added
 
@@ -109,7 +109,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [1.0.0] — 2026-05-01
+## [0.0.1] — 2026-05-01
 
 ### Added
 
@@ -132,13 +132,13 @@ Initial release of slipway-agents.
 - `groomer-lead-dev`, `groomer-qa`, `groomer-devops` — three specialist grooming lenses.
 
 **Configuration**
-- `slipway.json` — model assignments per agent (documentation-only in v1.0.0).
+- `slipway.json` — model assignments per agent (documentation-only in v0.0.0).
 - `slipway.schema.json` — JSON schema for config validation.
 
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
-[1.3.0]: https://github.com/fresp/slipway-agents/compare/v1.2.0...v1.3.0
-[1.2.0]: https://github.com/fresp/slipway-agents/compare/v1.1.0...v1.2.0
-[1.1.0]: https://github.com/fresp/slipway-agents/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/fresp/slipway-agents/releases/tag/v1.0.0
+[0.3.0]: https://github.com/fresp/slipway-agents/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/fresp/slipway-agents/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/fresp/slipway-agents/compare/v0.0.0...v0.1.0
+[0.0.1]: https://github.com/fresp/slipway-agents/releases/tag/v0.0.1
