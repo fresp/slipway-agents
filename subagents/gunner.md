@@ -131,7 +131,7 @@ Gate signal:   [PASS | CONDITIONAL | BLOCK]
 
 - **PASS** — zero Critical findings, zero or more Should-fix/Note findings. Orchestrator may proceed to `rigger`.
 - **CONDITIONAL** — zero Critical findings, one or more Should-fix findings that can be addressed in implementation rather than in docs. Orchestrator presents caveats to user before proceeding. Rigger embeds these as acceptance criteria in the relevant tasks.
-- **BLOCK** — one or more Critical findings. Orchestrator must not proceed to `rigger`. Route back to `hull-builder` (for doc-level gaps) or `chartmaker` (for PRD-level gaps) to resolve before re-running the security audit.
+- **BLOCK** — one or more Critical findings. Orchestrator must not proceed to `rigger`. Route back to `hullwright` (for doc-level gaps) or `chartmaker` (for PRD-level gaps) to resolve before re-running the security audit.
 
 ---
 

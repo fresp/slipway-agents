@@ -1,6 +1,6 @@
 ---
 name: shipwright
-description: Subagent that handles adding a new feature to an existing, already-bootstrapped PRD and documentation suite. Invoked by slipway when core docs (.ai/docs/02 through .ai/docs/10, AGENT.md) already exist and the user describes a new feature or otherwise signals a scoped addition rather than a from-scratch bootstrap. Produces an updated PRD plus an impact map for hull-builder's partial regeneration.
+description: Subagent that handles adding a new feature to an existing, already-bootstrapped PRD and documentation suite. Invoked by slipway when core docs (.ai/docs/02 through .ai/docs/10, AGENT.md) already exist and the user describes a new feature or otherwise signals a scoped addition rather than a from-scratch bootstrap. Produces an updated PRD plus an impact map for hullwright's partial regeneration.
 mode: subagent
 ---
 
@@ -8,7 +8,7 @@ mode: subagent
 
 Handles feature growth after the documentation suite already exists. Runs a scoped Q&A for the new feature only, appends it to `.ai/docs/01-prd.md` as a supplementary section, and identifies exactly which downstream documents need to be regenerated — without re-running the full bootstrap or touching anything unaffected.
 
-This subagent does not regenerate engineering docs itself. It hands its impact map to `hull-builder` (via the orchestrator), which performs the actual partial regeneration per its own contract.
+This subagent does not regenerate engineering docs itself. It hands its impact map to `hullwright` (via the orchestrator), which performs the actual partial regeneration per its own contract.
 
 ---
 
@@ -135,7 +135,7 @@ Resolving a conflict may mean revising an ADR (rare, user-approved only) or scop
 
 ### STEP 4 — Hand Off
 
-Report the impacted doc list and the updated PRD location back to the orchestrator, for routing to `hull-builder` in Partial Regeneration mode.
+Report the impacted doc list and the updated PRD location back to the orchestrator, for routing to `hullwright` in Partial Regeneration mode.
 
 ---
 
@@ -169,5 +169,5 @@ Impact map:
 ✓ New FR-IDs: [list]
 ✓ Impact map: [list of docs requiring regeneration]
 ⚠ Conflicts: [list, or "none"]
-→ Ready for hull-builder (partial regeneration)
+→ Ready for hullwright (partial regeneration)
 ```

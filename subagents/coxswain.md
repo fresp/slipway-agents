@@ -201,7 +201,7 @@ The orchestrator acts on the combined gate signal as follows:
 
 - **Ready to Plan** → proceed to rigger. Tell user: `✓ Grooming passed — ready for planning.`
 - **Conditional** → proceed to rigger. Present Conditional findings alongside bosun results so user has full picture. Rigger embeds Conditional findings as acceptance criteria caveats in affected tasks.
-- **Blocked** → do not proceed to rigger. Present Blocked findings. Route back to `hull-builder` (doc gaps) or `chartmaker` (PRD gaps) to resolve. After resolution, re-run bosun and then coxswain before continuing.
+- **Blocked** → do not proceed to rigger. Present Blocked findings. Route back to `hullwright` (doc gaps) or `chartmaker` (PRD gaps) to resolve. After resolution, re-run bosun and then coxswain before continuing.
 
 ---
 

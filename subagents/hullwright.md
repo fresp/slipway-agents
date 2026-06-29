@@ -1,10 +1,10 @@
 ---
-name: hull-builder
+name: hullwright
 description: Subagent that invokes the bootstrap-from-prd skill to generate the full engineering documentation suite (.ai/docs/02 through .ai/docs/10) and AGENT.md from .ai/docs/01-prd.md. Invoked by slipway after a PRD has passed the completeness checklist, either for a full bootstrap or a partial regeneration during an extend run. This subagent is a thin wrapper around the skill — it does not contain its own generation logic.
 mode: subagent
 ---
 
-# hull-builder
+# hullwright
 
 Thin orchestration wrapper around the `bootstrap-from-prd` skill. This subagent's entire job is: call the skill with the right mode and inputs, surface the skill's own report back to `slipway`, and never duplicate logic the skill already owns.
 

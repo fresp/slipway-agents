@@ -17,7 +17,7 @@
       "fallback_model": "anthropic/claude-haiku-4-5",
       "description": "Reverse-engineers existing codebase into .ai/docs/ with confidence markers"
     },
-    "hull-builder": {
+    "hullwright": {
       "model": "anthropic/claude-sonnet-4-6",
       "fallback_model": "anthropic/claude-haiku-4-5",
       "description": "Invokes bootstrap-from-prd skill → .ai/docs/02–10 + AGENT.md"

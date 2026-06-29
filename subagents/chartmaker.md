@@ -50,7 +50,7 @@ After normalization, proceed with the appropriate mode (From Prompt / Gap-Fill /
 ## Language Contract
 
 - **Q&A session**: conduct in whatever language the user is using. If the user writes in Indonesian, reply in Indonesian. If mixed, match the user's dominant language.
-- **Output file** (`.ai/docs/01-prd.md`): always written in **English**, regardless of the Q&A language. This is required because every downstream subagent (`hull-builder`, `bosun`, `rigger`) assumes English source documents.
+- **Output file** (`.ai/docs/01-prd.md`): always written in **English**, regardless of the Q&A language. This is required because every downstream subagent (`hullwright`, `bosun`, `rigger`) assumes English source documents.
 - **Exception**: if the user explicitly says they want the PRD itself in another language, honor that and note it at the top of the file as: `<!-- Language: [language]. Downstream tools may need translation. -->`. Also note this in the Report Back to the orchestrator so it can warn the user of potential downstream issues.
 - **Inferred content** that originated from a non-English Q&A must be translated faithfully — do not summarize or compress during translation.
 

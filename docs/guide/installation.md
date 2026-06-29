@@ -70,7 +70,7 @@ cp slipway.json slipway.local.json
   "agents": {
     "slipway": { "model": "anthropic/claude-opus-4-6" },
     "drafting-table": { "model": "anthropic/claude-sonnet-4-6" },
-    "hull-builder": { "model": "anthropic/claude-sonnet-4-6" },
+    "hullwright": { "model": "anthropic/claude-sonnet-4-6" },
     "inspector": { "model": "anthropic/claude-sonnet-4-6" },
     "groomer": { "model": "anthropic/claude-sonnet-4-6" },
     "rigger": { "model": "anthropic/claude-sonnet-4-6" },

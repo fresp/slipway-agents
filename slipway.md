@@ -18,7 +18,7 @@ This agent never generates engineering content directly. It decides **which suba
 | ----------------- | ---------------------------------- | ------------------------------------------------------------------------------------------- |
 | Chartmaker        | `subagents/chartmaker.md`          | Raw prompt / partial PRD → complete `.ai/docs/01-prd.md`                                    |
 | Cartographer      | `subagents/cartographer.md`        | Reverse-engineers existing codebase → `.ai/docs/02`–`10` with confidence markers            |
-| Hull Builder      | `subagents/hull-builder.md`        | Invokes the `bootstrap-from-prd` skill → `.ai/docs/02`–`10` + `AGENT.md`                   |
+| Hull Builder      | `subagents/hullwright.md`        | Invokes the `bootstrap-from-prd` skill → `.ai/docs/02`–`10` + `AGENT.md`                   |
 | Bosun         | `subagents/bosun.md`           | Cross-doc validation + per-doc health score breakdown + severity-ranked findings            |
 | Gunner  | `subagents/gunner.md`    | Auth, secrets, and attack surface audit — PASS / CONDITIONAL / BLOCK gate                   |
 | Coxswain           | `subagents/coxswain.md`             | Multi-lens sprint grooming (Lead Dev, QA, DevOps) + cross-lens synthesis                   |
@@ -113,7 +113,7 @@ Run this before anything else, every time the orchestrator is invoked.
 | ------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ----------------------------------------------- |
 | No `.ai/docs/` AND root manifest detected (`package.json` / `pyproject.toml` / `go.mod` / `Cargo.toml` / `composer.json`) | `reverse-engineer`      | `cartographer`                                  |
 | Raw idea, no PRD file, no `.ai/docs/01-prd.md` exists                                                                    | `bootstrap-from-prompt` | `chartmaker`                                |
-| `.ai/docs/01-prd.md` exists, but `.ai/docs/02-*.md` does not                                                             | `bootstrap-from-prd`    | `hull-builder` (brainstorm optional, see below) |
+| `.ai/docs/01-prd.md` exists, but `.ai/docs/02-*.md` does not                                                             | `bootstrap-from-prd`    | `hullwright` (brainstorm optional, see below) |
 | `.ai/docs/02-*.md` through `.ai/docs/10-*.md` already exist, user mentions a new feature or "add feature"                | `extend`                | `shipwright`                                    |
 | User explicitly asks to "review", "summarize", or "check consistency" with no mention of new features                    | `review-only`           | `bosun`                                     |
 | User says "groom this", "sprint grooming", "is this ready to build?", "dev/QA/DevOps review", "ready to build?"          | `grooming-only`         | `coxswain`                                       |
@@ -123,7 +123,7 @@ Run this before anything else, every time the orchestrator is invoked.
 | User says "estimate", "how long will this take", "cost estimate", "time forecast"                                         | `estimate-only`         | `purser`                                     |
 | User says "validate schema", "check schema", "schema drift"                                                               | `schema-validate`       | `surveyor`                              |
 
-If `.ai/docs/01-prd.md` exists but looks incomplete against the section checklist in `bootstrap-from-prd/SKILL.md`, still route to `chartmaker` first in **gap-fill mode** rather than straight to `hull-builder`.
+If `.ai/docs/01-prd.md` exists but looks incomplete against the section checklist in `bootstrap-from-prd/SKILL.md`, still route to `chartmaker` first in **gap-fill mode** rather than straight to `hullwright`.
 
 If signals conflict or none match, ask the user once which mode applies. Do not guess silently.
 
@@ -148,7 +148,7 @@ Call `chartmaker`.
 
 ### STEP 2 — Build Docs + AGENT.md
 
-Call `hull-builder`.
+Call `hullwright`.
 
 **Input handed to subagent:**
 - `.ai/docs/01-prd.md` (and any supplementary PRDs)
@@ -198,7 +198,7 @@ Call `coxswain`.
 **Gate logic based on combined readiness signal:**
 - **Ready to Plan** → proceed to STEP 4. Tell user: `✓ Grooming passed — ready for planning.`
 - **Conditional** → proceed to STEP 4. Present caveats alongside Bosun findings.
-- **Blocked** → do NOT proceed to STEP 4. Present Blocked findings and route back to `hull-builder` (for doc gaps) or `chartmaker` (for PRD gaps). After resolution, re-run Bosun (STEP 3) and Coxswain (STEP 3.5) before continuing.
+- **Blocked** → do NOT proceed to STEP 4. Present Blocked findings and route back to `hullwright` (for doc gaps) or `chartmaker` (for PRD gaps). After resolution, re-run Bosun (STEP 3) and Coxswain (STEP 3.5) before continuing.
 
 **Dynamic doc handling:** If coxswain recommends additional documents, present these to the user:
 
@@ -209,7 +209,7 @@ Grooming recommends generating additional docs:
 Generate these before planning? (yes / skip)
 ```
 
-If yes: re-invoke `hull-builder` for these specific docs only, then re-run `bosun` scoped to new docs, then continue to STEP 4.
+If yes: re-invoke `hullwright` for these specific docs only, then re-run `bosun` scoped to new docs, then continue to STEP 4.
 
 ---
 
@@ -228,7 +228,7 @@ The user's answer must be one of the two shown options only. If they reply with 
 
 Each optimize cycle:
 
-1. Re-invoke the subagent associated with the finding (`hull-builder` for doc content issues, `chartmaker` for PRD-level gaps).
+1. Re-invoke the subagent associated with the finding (`hullwright` for doc content issues, `chartmaker` for PRD-level gaps).
 2. Re-invoke `bosun` afterward to confirm the fix.
 3. Increment the optimize counter.
 
@@ -250,7 +250,7 @@ Call `gunner`.
 **Gate logic based on security audit gate signal:**
 - **PASS** → proceed to STEP 6.
 - **CONDITIONAL** → proceed to STEP 6. Present security caveats to user. Rigger embeds them as acceptance criteria in relevant tasks.
-- **BLOCK** → do NOT proceed to STEP 6. Present Critical security findings. Route back to `hull-builder` (doc gaps) or `chartmaker` (PRD gaps) to resolve. Re-run Bosun (STEP 3) and Gunner (STEP 5) before continuing.
+- **BLOCK** → do NOT proceed to STEP 6. Present Critical security findings. Route back to `hullwright` (doc gaps) or `chartmaker` (PRD gaps) to resolve. Re-run Bosun (STEP 3) and Gunner (STEP 5) before continuing.
 
 ---
 
@@ -332,7 +332,7 @@ Call `shipwright` directly. Brainstorm is not re-run from scratch — `shipwrigh
 
 ### STEP E2 — Targeted Rebuild
 
-Call `hull-builder` in **partial regeneration** mode, passing only the impacted doc list from E1.
+Call `hullwright` in **partial regeneration** mode, passing only the impacted doc list from E1.
 
 ### STEP E3 — Review
 

@@ -1,6 +1,6 @@
 ---
 name: bosun
-description: Bosun. Cross-doc validation against the full .ai/docs/ suite. Emits a per-doc health score (0–100) and a severity-ranked findings list. Invoked by slipway after hull-builder and after cartographer. Gate: score ≥ 70 (standard) or ≥ 60 (reverse-engineer mode, set by slipway).
+description: Bosun. Cross-doc validation against the full .ai/docs/ suite. Emits a per-doc health score (0–100) and a severity-ranked findings list. Invoked by slipway after hullwright and after cartographer. Gate: score ≥ 70 (standard) or ≥ 60 (reverse-engineer mode, set by slipway).
 model: claude-opus-4-6
 ---
 

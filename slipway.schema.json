@@ -30,7 +30,7 @@
         "cartographer": {
           "$ref": "#/definitions/agentConfig"
         },
-        "hull-builder": {
+        "hullwright": {
           "$ref": "#/definitions/agentConfig"
         },
         "bosun": {
