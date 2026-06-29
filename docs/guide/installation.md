@@ -71,7 +71,7 @@ cp slipway.json slipway.local.json
     "slipway":      { "model": "anthropic/claude-opus-4-6" },
     "chartmaker":   { "model": "anthropic/claude-sonnet-4-6" },
     "cartographer": { "model": "anthropic/claude-sonnet-4-6" },
-    "hull-builder": { "model": "anthropic/claude-sonnet-4-6" },
+    "hullwright": { "model": "anthropic/claude-sonnet-4-6" },
     "bosun":        { "model": "anthropic/claude-opus-4-6" },
     "gunner":       { "model": "anthropic/claude-opus-4-6" },
     "coxswain":     { "model": "anthropic/claude-sonnet-4-6" },

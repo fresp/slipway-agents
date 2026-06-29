@@ -27,7 +27,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 | `security-auditor` | `gunner` |
 | `schema-validator` | `surveyor` |
 
-`hull-builder`, `rigger`, `shipwright`, `chronicler` — unchanged.
+`hullwright`, `rigger`, `shipwright`, `chronicler` — unchanged.
 
 All internal cross-references, orchestrator routing, gate signal names, and model assignments updated to reflect new names. No functional changes — renames only.
 

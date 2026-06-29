@@ -18,7 +18,7 @@ slipway-agents takes a raw product idea or existing PRD and drives it through a 
 | **Input**            | `slipway`          | Detects mode: bootstrap, reverse-engineer, extend, or sync                         |
 | **Reverse-engineer** | `cartographer`     | Scans existing codebase → inferred docs 02–10 + gap-fill briefing for chartmaker   |
 | **PRD**              | `chartmaker`       | Structured Q&A → complete `01-prd.md` with P0/P1/P2 priority ranking              |
-| **Docs**             | `hull-builder`     | Invokes `bootstrap-from-prd` skill → docs `02`–`10` + `AGENT.md`                  |
+| **Docs**             | `hullwright`     | Invokes `bootstrap-from-prd` skill → docs `02`–`10` + `AGENT.md`                  |
 | **Review**           | `bosun`            | Cross-doc validation, per-doc health scores, severity-ranked findings 0–100        |
 | **Review**           | optimize loop      | Up to 2 cycles to resolve Critical findings before continuing                      |
 | **Security**         | `gunner`           | Auth, secrets, attack surface audit — PASS / CONDITIONAL / BLOCK gate              |
@@ -39,7 +39,7 @@ slipway-agents takes a raw product idea or existing PRD and drives it through a 
 | `slipway`      | Orchestrator — routes pipeline, enforces step order, never generates content      | `claude-opus-4-6`   |
 | `chartmaker`   | Raw prompt / partial PRD → complete `.ai/docs/01-prd.md` with P0/P1/P2 ranking   | `claude-sonnet-4-6` |
 | `cartographer` | Reverse-engineers existing codebase → `.ai/docs/` with confidence markers         | `claude-sonnet-4-6` |
-| `hull-builder` | Invokes `bootstrap-from-prd` skill → docs 02–10 + `AGENT.md`                     | `claude-sonnet-4-6` |
+| `hullwright` | Invokes `bootstrap-from-prd` skill → docs 02–10 + `AGENT.md`                     | `claude-sonnet-4-6` |
 | `bosun`        | Cross-doc validation + per-doc health score breakdown + severity-ranked findings  | `claude-opus-4-6`   |
 | `gunner`       | Auth, secrets, and attack surface audit across five lenses                        | `claude-opus-4-6`   |
 | `coxswain`     | Sprint grooming — Lead Dev, QA, DevOps, Complexity Audit lenses + synthesis       | `claude-sonnet-4-6` |
@@ -57,7 +57,7 @@ Model assignments live in [`slipway.json`](slipway.json) and are enforced at run
 
 | Skill                | Used by        | Purpose                                                        |
 | -------------------- | -------------- | -------------------------------------------------------------- |
-| `bootstrap-from-prd` | `hull-builder` | Generates the full 02–10 doc suite + `AGENT.md` from a PRD    |
+| `bootstrap-from-prd` | `hullwright` | Generates the full 02–10 doc suite + `AGENT.md` from a PRD    |
 | `groomer-lead-dev`   | `coxswain`     | Lead Dev lens — architecture, implementation risk, tech debt   |
 | `groomer-qa`         | `coxswain`     | QA lens — testability, edge cases, acceptance criteria gaps    |
 | `groomer-devops`     | `coxswain`     | DevOps/Cloud lens — infra, deployment, observability readiness |
@@ -75,7 +75,7 @@ A single pipeline run from a raw idea produces:
 │   ├── 02-technical-architecture.md        ┐
 │   ├── 03-service-boundaries.md            │
 │   ├── 04-data-models.md                   │
-│   ├── 05-api-specifications.md            ├─ hull-builder via bootstrap-from-prd skill
+│   ├── 05-api-specifications.md            ├─ hullwright via bootstrap-from-prd skill
 │   ├── 06-operational-flows.md             │
 │   ├── 07-engineering-standards.md         │
 │   ├── 08-architecture-decisions.md        │
@@ -197,7 +197,7 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
     "slipway":      { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
     "chartmaker":   { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
     "cartographer": { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
-    "hull-builder": { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
+    "hullwright": { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
     "bosun":        { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
     "gunner":       { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
     "coxswain":     { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
@@ -238,7 +238,7 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 
 ## What's new in v0.2.0
 
-- **Runtime Capabilities in AGENT.md** — hull-builder now generates a `## Runtime Capabilities` section declaring exactly what tools the implementing agent is permitted to use (file write scope, bash commands, network policy, package installation) and what requires human confirmation before proceeding
+- **Runtime Capabilities in AGENT.md** — hullwright now generates a `## Runtime Capabilities` section declaring exactly what tools the implementing agent is permitted to use (file write scope, bash commands, network policy, package installation) and what requires human confirmation before proceeding
 - **Escalation Protocol in AGENT.md** — AGENT.md now includes a structured `## Escalation Protocol` specifying when to halt vs. retry, the four-step escalation procedure, and a one-retry policy with explicit logging
 - **Verification fields on every task** — rigger task entries now include `Expected output` (the concrete artifact produced), `Verify command` (shell command to confirm completion), and `Test command` (scoped test suite)
 - **Implementation state tracking** — orchestrator now manages `.ai/implementation-state.md` tracking per-phase progress, blocked task log, and test results across sessions
