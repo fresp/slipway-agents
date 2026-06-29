@@ -1,27 +1,29 @@
 {
   "name": "slipway-agents",
-  "version": "0.4.4",
-  "description": "PRD-to-engineering-docs pipeline agents for OpenCode. One orchestrator, ten specialized subagents, Stakeholder Priority planning, model enforcement via slipway.json.",
+  "version": "0.4.5",
+  "description": "AI agent orchestration framework for OpenCode — PRD to engineering docs pipeline",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
     "slipway-agents": "bin/install.js"
   },
   "files": [
+    "dist/",
     "bin/",
     "subagents/",
     "skills/",
     "slipway.md",
     "slipway.json",
     "slipway.schema.json",
+    "opencode.json",
     "README.md",
     "LICENSE"
   ],
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "build": "npm run build --workspace=packages/slipway-plugin",
-    "typecheck": "npm run typecheck --workspace=packages/slipway-plugin",
-    "clean": "rm -rf packages/slipway-plugin/dist"
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build",
+    "clean": "rm -rf dist"
   },
   "keywords": [
     "opencode",
@@ -42,6 +44,9 @@
   "homepage": "https://github.com/fresp/slipway-agents#readme",
   "bugs": {
     "url": "https://github.com/fresp/slipway-agents/issues"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
   },
   "peerDependencies": {
     "opencode-ai": ">=0.1.0"

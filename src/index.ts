@@ -94,7 +94,6 @@ function buildAgentBlock(
  * Patch opencode.json with the agent block from slipway.json.
  * - Never removes existing keys.
  * - Merges agent entries: slipway entries overwrite, other entries preserved.
- * - Backs up the file before modifying.
  */
 function patchOpencodeConfig(
   opencodeConfigPath: string,

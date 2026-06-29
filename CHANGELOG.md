@@ -7,6 +7,20 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.4.5] — 2026-06-29
+
+### Changed
+- Consolidated monorepo into single package: plugin source moved from `packages/slipway-plugin/src/` to `src/` at root
+- `slipway-agents` now serves as both the agent framework and the OpenCode plugin — no separate `slipway-agents-plugin` package needed
+- Updated `package.json`: added `build`/`typecheck`/`prepublishOnly` scripts, `main` and `types` entries pointing to `dist/`, merged plugin devDependencies, removed `workspaces`
+- Added root `tsconfig.json` (previously only existed inside `packages/slipway-plugin/`)
+
+### Removed
+- `packages/` directory and monorepo workspace structure
+- `slipway-agents-plugin` as a separate npm package — functionality merged into `slipway-agents`
+
+---
+
 ## [0.4.0] — 2026-06-29
 
 ### Added
