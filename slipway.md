@@ -22,7 +22,7 @@ This agent never generates engineering content directly. It decides **which suba
 | Security Auditor  | `subagents/security-auditor.md`    | Auth, secrets, and attack surface audit — PASS / CONDITIONAL / BLOCK gate                   |
 | Groomer           | `subagents/groomer.md`             | Multi-lens sprint grooming (Lead Dev, QA, DevOps) + cross-lens synthesis                   |
 | Rigger            | `subagents/rigger.md`              | Phase/milestone breakdown → `.ai/planning/` with sizing, dep graph, stale check            |
-| Estimator         | `subagents/estimator.md`           | Time and cost forecast per phase based on `.ai/planning/`                                  |
+| Estimator         | `subagents/estimator.md`           | Time and cost forecast per phase based on `.ai/planning`                                  |
 | Shipwright        | `subagents/shipwright.md`          | Update existing docs when a new feature is introduced                                       |
 | Chronicler        | `subagents/chronicler.md`          | Post-implementation doc sync — classify drift, patch incrementally                         |
 | Schema Validator  | `subagents/schema-validator.md`    | Post-implementation DB schema vs `04-data-models.md` consistency check                     |
@@ -479,6 +479,53 @@ After each step completes, append to `.ai/docs/.pipeline-changelog.md` (never ov
 
 ---
 
+## Implementation State Tracking
+
+Sisyphus maintains `.ai/implementation-state.md` across the build run. The orchestrator reads this file when the user returns to a session to determine whether implementation is in progress and which task to resume from.
+
+```
+# Implementation State
+
+Last updated: [timestamp]
+Current phase: [phase number and name]
+Last completed task: [TASK-ID]
+Blocked tasks: [TASK-ID list, or "none"]
+Status: [in-progress | blocked | complete]
+
+## Phase progress
+| Phase | Status | Tasks done | Tasks remaining | Test result |
+|-------|--------|-----------|-----------------|-------------|
+| 1 — [name] | [pending | in-progress | done | blocked] | [N] | [N] | [pass | fail | n/a] |
+
+## Blocked task log
+[TASK-ID] — [timestamp] — [description of blocker] — [escalation taken]
+
+## Test results
+| Phase | Command | Result | Timestamp |
+|-------|---------|--------|-----------|
+| [name] | [command] | [pass | fail] | [timestamp] |
+```
+
+**Rules for the orchestrator:**
+- If `Status: blocked`, surface the blocked task log to the user before offering next steps.
+- If `Status: complete`, proceed to the sync pipeline (chronicler → schema-validator).
+- If `Status: in-progress` with no recent activity, ask the user whether to resume or restart from the last completed task.
+- This file is distinct from `.pipeline-state.md` — it tracks implementation progress, not planning pipeline progress. Do not merge them.
+
+---
+
+## Parallelism
+
+The `Parallel: true/false` flag on each task is a **planning signal, not an execution directive.**
+
+**In a single-agent context (Sisyphus running alone):** tasks are always executed sequentially, even when marked `Parallel: true`. The flag tells Sisyphus that parallel-flagged tasks have no data dependency on each other — if it needs to pause one and resume another it may do so without risk. It does not imply concurrent execution.
+
+**In a multi-agent context (omo.dev or equivalent runtime):** the orchestrator may dispatch `Parallel: true` tasks to separate agent instances concurrently. Each task's `Context load` list specifies exactly which files that agent needs — loading only those files keeps per-agent context bounded. The orchestrator must never dispatch tasks where `Parallel: false` to concurrent agents, as these tasks share a resource (same DB table, config file, or sequential dependency).
+
+**When in doubt, execute sequentially.** Parallel dispatch is a performance optimization, not a correctness requirement. A plan with correct sequential execution is always preferable to a parallel execution with a race condition.
+
+---
+
 ## PRD Changes Mid-Pipeline
 
 If the user edits or replaces `.ai/docs/01-prd.md` while a pipeline run is in progress:
@@ -530,6 +577,7 @@ Pipeline complete.
 ✓ Grooming: [Ready to Plan | Conditional] — Lead Dev: [R/C/B] | QA: [R/C/B] | DevOps: [R/C/B]
 ✓ .ai/planning/ (phase breakdown with sizing and dependency graph)
 ✓ Estimate: [total time range] — Critical path: [range]
+✓ Tests: [pass | N failures] — [command run, or "not yet run — implementation pending"]
 
 Optimize cycles used: [N]/2
 Total duration: [Xs across all steps]

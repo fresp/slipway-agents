@@ -90,6 +90,12 @@ Estimated critical path duration: [range based on task sizing]
 ## Groomer caveats carried forward
 [List of Conditional findings from groomer that must be resolved during build,
 embedded in the relevant task acceptance criteria below]
+
+## Test plan
+| Phase | Test command | Coverage scope |
+|-------|-------------|----------------|
+| 1 — [name] | `[command]` | [what this tests — e.g. data layer + one end-to-end flow] |
+| 2 — [name] | `[command]` | [what this tests] |
 ```
 
 ### Per-phase file format
@@ -116,6 +122,9 @@ embedded in the relevant task acceptance criteria below]
   - [ ] [Specific, testable criterion]
   - [ ] [Specific, testable criterion]
   - [ ] [Groomer caveat embedded here if applicable: "Groomer flagged: [issue] — resolve before marking complete"]
+- **Expected output:** [The concrete artifact this task produces — a file path, a passing test suite, a running endpoint. Must be unambiguous enough that Sisyphus can check it without re-reading acceptance criteria.]
+- **Verify command:** [Shell command that confirms the task is complete — e.g. `npm test src/auth/`, `curl -sf http://localhost:3000/health`, `prisma validate`. Write `[manual review required]` if no automated check is possible.]
+- **Test command:** [Test suite command scoped to this task's code — e.g. `npm test src/payments/`, `pytest tests/test_auth.py`. Write `[no automated tests — manual QA required]` if the task is infrastructure-only.]
 - **Functional requirement trace:** [FR-IDs from 01-prd.md that this task addresses]
 - **Notes:** [Any accepted Should-fix findings from inspector that affect this task]
 ```
@@ -188,6 +197,7 @@ When called by the orchestrator in `extend` mode (a new feature is being added t
 
 ## Forbidden behaviors
 
+- Never leave `Expected output`, `Verify command`, or `Test command` blank — write `[manual review required]` or `[no automated tests — manual QA required]` rather than omitting the field entirely.
 - Never run without first completing the stale check.
 - Never proceed with a stale plan without an explicit user choice.
 - Never leave a task without a size (S/M/L), parallel flag, or depends_on value.

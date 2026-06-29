@@ -273,12 +273,21 @@ Every rule in `AGENT.md` must derive from a generated document. Cite the source 
 8. **Development Strategy** — increment size, ordering preferences, forbidden abstraction patterns (from `07` forbidden patterns + ADRs)
 9. **Planning Rules** — acceptance criteria format, task decomposition rules, implementation order (from `10-planning-rules.md`)
 10. **Coding Rules** — stack conventions, env var prefix, persistence rules, security rules (from `07-engineering-standards.md`)
-11. **Decision Tree** — numbered checklist to run before changing code; items 1–4 are universal, remaining items derived from project ADRs
-12. **Forbidden Behaviors** — explicit never-do list derived from: ADRs + `03` "must never own" lists + `07` forbidden patterns + PRD Out of Scope
-13. **Definition Of Done** — binary checklist; items 1–5 and 7–8 are universal; item 6 is project-specific (e.g. external system compatibility)
-14. **Output Contract** — how to report completed work, plans, and uncertainty
-15. **Golden Rules** — 10–15 numbered one-liners; every rule must trace to an ADR or engineering standard; no invented rules
-16. **Prompt Contract** — what the agent may assume without being told each time
+11. **Runtime Capabilities** — what the agent is permitted to do at execution time. Generate from `07-engineering-standards.md` (stack + tooling), `09-topology-and-architecture-diagrams.md` (deployment targets), and `10-planning-rules.md` (constraints). If a capability is not addressed in any doc, default to the restrictive option and mark it as an assumption. Must include:
+    - **Permitted tools:** file read scope, file write scope, bash commands allowed (test runners, linters, migration tools, package managers), network policy, package installation policy
+    - **Prohibited actions:** paths off-limits for writing, commands never to run (e.g. `git push`, `DROP TABLE` in production, `rm -rf /`), secrets that must not be read or logged
+    - **Escalate before doing:** actions not prohibited but requiring human confirmation before proceeding (e.g. adding a new third-party service dependency, modifying CI/CD pipeline files, schema migrations that drop columns)
+12. **Escalation Protocol** — when and how to halt rather than guess. Must include:
+    - **Escalate immediately (halt task, do not proceed):** acceptance criterion is ambiguous and two interpretations would produce different schemas or API contracts; verify command fails after one retry with a consistent (non-flaky) failure; a dependency task's output is absent or malformed; completing the task would cross a Runtime Capabilities boundary
+    - **Escalation procedure:** (1) stop work, (2) write `Status: blocked` to `.ai/implementation-state.md` with the specific blocker description, (3) output a structured `⚠ Blocked` message with the reason, last action taken, and two or three concrete resolution options, (4) wait for user input — do not auto-resolve
+    - **Retry policy:** if verify command fails, retry once automatically and log the retry. If second attempt also fails, escalate — do not retry more than once without user input
+    - **What is NOT an escalation trigger:** minor code style choices, missing documentation comments, test fixtures that need to be created — make a reasonable decision and log it in implementation notes
+13. **Decision Tree** — numbered checklist to run before changing code; items 1–4 are universal, remaining items derived from project ADRs
+14. **Forbidden Behaviors** — explicit never-do list derived from: ADRs + `03` "must never own" lists + `07` forbidden patterns + PRD Out of Scope
+15. **Definition Of Done** — binary checklist; items 1–5 and 7–8 are universal; item 6 is project-specific (e.g. external system compatibility)
+16. **Output Contract** — how to report completed work, plans, and uncertainty
+17. **Golden Rules** — 10–15 numbered one-liners; every rule must trace to an ADR or engineering standard; no invented rules
+18. **Prompt Contract** — what the agent may assume without being told each time
 
 ---
 
