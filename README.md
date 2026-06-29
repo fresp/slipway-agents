@@ -192,7 +192,7 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 // slipway.local.json — takes precedence over slipway.json
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "agents": {
     "slipway":      { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
     "chartmaker":   { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
@@ -219,6 +219,11 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 - [`skills/slipway/bootstrap-from-prd/examples/managed-waba/`](skills/slipway/bootstrap-from-prd/examples/managed-waba) — full pipeline output for a multi-tenant WhatsApp Business Calling service (Kamailio → Asterisk → WebRTC, MongoDB + Redis, multi-tenant SIP gateway)
 
 ---
+
+## What's new in v0.5.0
+
+- **Single package** — the monorepo is gone. The standalone `slipway-agents-plugin` package has been merged into `slipway-agents`, which is now both the agent framework and the OpenCode plugin. Install one package, reference one plugin: `"plugin": ["slipway-agents@latest"]`.
+- **Pure runtime agent registration** — the plugin registers agents directly into the OpenCode runtime via `client.config.patch()` with zero disk writes. Agents load from the bundled `subagents/*.md` and pick up model assignments from `slipway.json` at startup.
 
 ## What's new in v0.4.0
 

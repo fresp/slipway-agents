@@ -7,17 +7,21 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [0.4.5] — 2026-06-29
+## [0.5.0] — 2026-06-29
 
 ### Changed
-- Consolidated monorepo into single package: plugin source moved from `packages/slipway-plugin/src/` to `src/` at root
-- `slipway-agents` now serves as both the agent framework and the OpenCode plugin — no separate `slipway-agents-plugin` package needed
-- Updated `package.json`: added `build`/`typecheck`/`prepublishOnly` scripts, `main` and `types` entries pointing to `dist/`, merged plugin devDependencies, removed `workspaces`
-- Added root `tsconfig.json` (previously only existed inside `packages/slipway-plugin/`)
+- Consolidated monorepo into a single package: plugin source moved from `packages/slipway-plugin/src/` to `src/` at root. `slipway-agents` now serves as both the agent framework and the OpenCode plugin — no separate `slipway-agents-plugin` package needed.
+- Updated `package.json`: added `build`/`typecheck`/`prepublishOnly` scripts, `main` and `types` entries pointing to `dist/`, removed `workspaces`. Added a root `tsconfig.json`.
+- Rewrote the plugin to use `client.config.patch()` for pure runtime agent registration — zero disk writes. Agents are loaded from the bundled `subagents/*.md` inside the npm package, and model assignments from `slipway.json` are injected at runtime alongside agent system prompts.
+- Bumped config-schema version to `0.5.0` across `slipway.json`, `slipway.schema.json`, and the example configs in the docs.
 
 ### Removed
 - `packages/` directory and monorepo workspace structure
 - `slipway-agents-plugin` as a separate npm package — functionality merged into `slipway-agents`
+- File-based patching of `opencode.json` on disk at startup
+
+### How it works
+Add `"plugin": ["slipway-agents@latest"]` to your project's `opencode.json`, restart OpenCode — agents appear automatically. Optionally add a `slipway.json` to control model assignments per agent.
 
 ---
 
@@ -182,6 +186,7 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
+[0.5.0]: https://github.com/fresp/slipway-agents/compare/v0.4.4...v0.5.0
 [0.4.0]: https://github.com/fresp/slipway-agents/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/fresp/slipway-agents/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/fresp/slipway-agents/compare/v0.1.0...v0.2.0
