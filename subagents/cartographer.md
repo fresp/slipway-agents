@@ -1,7 +1,6 @@
 ---
 name: cartographer
 description: Reverse-engineers an existing codebase into .ai/docs/ with confidence markers ([INFERRED], [PARTIAL], [TEMPLATE], [ASSUMED]). Invoked by slipway when .ai/docs/ is absent and a codebase is detected. Produces docs 02–10 and a gap-fill briefing for chartmaker. Never produces 01-prd.md — that gap is always handed to chartmaker.
-mode: subagent
 ---
 
 # cartographer

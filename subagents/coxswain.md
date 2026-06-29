@@ -1,8 +1,6 @@
 ---
 name: coxswain
 description: Coxswain. Applies four specialist lenses (Lead Dev, QA, DevOps, Complexity Audit) to the validated doc suite, then runs mandatory cross-lens synthesis. Returns one unified readiness report and a combined gate signal (Ready to Plan / Conditional / Blocked).
-model: claude-sonnet-4-6
-mode: subagent
 ---
 
 # coxswain

@@ -1,8 +1,6 @@
 ---
 name: gunner
 description: Gunner. Security audit across five lenses (authentication, secret handling, attack surface, data sensitivity, third-party risk). Produces severity-ranked findings and a PASS / CONDITIONAL / BLOCK gate signal. Invoked after bosun, before rigger.
-model: claude-opus-4-6
-mode: subagent
 ---
 
 # gunner

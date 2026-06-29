@@ -9,6 +9,8 @@ import * as os from "os";
 interface AgentConfig {
   model: string;
   fallback_model?: string;
+  mode?: string;
+  description?: string;
 }
 
 interface SlipwayConfig {
@@ -20,6 +22,7 @@ interface SlipwayConfig {
 interface AgentDefinition {
   prompt?: string;
   model?: string;
+  mode?: string;
   [key: string]: unknown;
 }
 
@@ -145,9 +148,14 @@ export default {
             prompt: systemPrompt,
           };
 
-          const modelOverride = slipwayConfig?.agents[agentName]?.model;
-          if (modelOverride) {
-            agentDef.model = modelOverride;
+          const agentConfig = slipwayConfig?.agents[agentName];
+
+          if (agentConfig?.model) {
+            agentDef.model = agentConfig.model;
+          }
+
+          if (agentConfig?.mode) {
+            agentDef.mode = agentConfig.mode;
           }
 
           input.agent[agentName] = agentDef;
