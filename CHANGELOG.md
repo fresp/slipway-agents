@@ -7,6 +7,36 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.4.0] — 2026-06-29
+
+### Added
+
+- `cartographer` — new subagent that reverse-engineers an existing codebase into `.ai/docs/` when no PRD exists. Performs a 4-pass scan (structure, architecture, data, conventions) and produces docs `02`–`10` with confidence markers (`[INFERRED]`, `[PARTIAL]`, `[TEMPLATE]`, `[ASSUMED]`). Hands gaps to chartmaker via a structured gap-fill briefing.
+- `reverse-engineer` mode — new pipeline mode triggered automatically when `.ai/docs/` is absent and a root manifest file (`package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `composer.json`) is detected. Pipeline: cartographer → chartmaker (gap-fill only) → bosun (60-point threshold) → gunner → standard pipeline.
+
+### Changed
+
+**Agent renames — nautical theme consistency**
+
+| Old name | New name |
+|---|---|
+| `drafting-table` | `chartmaker` |
+| `inspector` | `bosun` |
+| `groomer` | `coxswain` |
+| `estimator` | `purser` |
+| `security-auditor` | `gunner` |
+| `schema-validator` | `surveyor` |
+
+`hull-builder`, `rigger`, `shipwright`, `chronicler` — unchanged.
+
+All internal cross-references, orchestrator routing, gate signal names, and model assignments updated to reflect new names. No functional changes — renames only.
+
+**`bosun`** (was `inspector`) — added Cartographer Doc Handling section: rules for scoring docs with `[INFERRED]`/`[PARTIAL]`/`[TEMPLATE]`/`[ASSUMED]` markers, confidence review output block, and 60-point threshold override for reverse-engineer mode.
+
+**`slipway.md`** — `reverse-engineer` mode added to mode detection table (takes priority over bootstrap-from-prompt when a manifest is present). Full routing block added.
+
+---
+
 ## [0.3.0] — 2026-06-29
 
 ### Added
@@ -138,6 +168,7 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
+[0.4.0]: https://github.com/fresp/slipway-agents/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/fresp/slipway-agents/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/fresp/slipway-agents/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/fresp/slipway-agents/compare/v0.0.0...v0.1.0

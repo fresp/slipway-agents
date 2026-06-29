@@ -1,6 +1,6 @@
 # Installation
 
-slipway-agents is a plug-and-play PRD-to-engineering-docs pipeline for [OpenCode](https://opencode.ai). One orchestrator (`slipway`) coordinates seven specialized subagents through brainstorm → docs → review → grooming → planning — and an extend path for feature growth after the first run.
+slipway-agents is a plug-and-play PRD-to-engineering-docs pipeline for [OpenCode](https://opencode.ai). One orchestrator (`slipway`) coordinates eleven specialized subagents through brainstorm → engineering docs → security audit → planning → grooming → build → post-implementation sync — plus `cartographer` for reverse-engineering existing codebases when no PRD exists.
 
 ## Prerequisites
 
@@ -66,16 +66,20 @@ cp slipway.json slipway.local.json
 // slipway.local.json
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "agents": {
-    "slipway": { "model": "anthropic/claude-opus-4-6" },
-    "drafting-table": { "model": "anthropic/claude-sonnet-4-6" },
-    "hullwright": { "model": "anthropic/claude-sonnet-4-6" },
-    "inspector": { "model": "anthropic/claude-sonnet-4-6" },
-    "groomer": { "model": "anthropic/claude-sonnet-4-6" },
-    "rigger": { "model": "anthropic/claude-sonnet-4-6" },
-    "shipwright": { "model": "anthropic/claude-sonnet-4-6" },
-    "chronicler": { "model": "anthropic/claude-haiku-4-5" }
+    "slipway":      { "model": "anthropic/claude-opus-4-6" },
+    "chartmaker":   { "model": "anthropic/claude-sonnet-4-6" },
+    "cartographer": { "model": "anthropic/claude-sonnet-4-6" },
+    "hull-builder": { "model": "anthropic/claude-sonnet-4-6" },
+    "bosun":        { "model": "anthropic/claude-opus-4-6" },
+    "gunner":       { "model": "anthropic/claude-opus-4-6" },
+    "coxswain":     { "model": "anthropic/claude-sonnet-4-6" },
+    "rigger":       { "model": "anthropic/claude-sonnet-4-6" },
+    "purser":       { "model": "anthropic/claude-sonnet-4-6" },
+    "shipwright":   { "model": "anthropic/claude-sonnet-4-6" },
+    "surveyor":     { "model": "anthropic/claude-sonnet-4-6" },
+    "chronicler":   { "model": "anthropic/claude-haiku-4-5" }
   }
 }
 ```
@@ -146,7 +150,7 @@ Read the user's existing `opencode.json` (usually `~/.config/opencode/opencode.j
 
 ### Step 3: Configure models
 
-If the user chose a provider other than Anthropic, generate a `slipway.local.json` in the install directory with the correct model prefix for all 8 agents. Use the same model-tier logic as `slipway.json` (Opus for orchestrator, Sonnet for generation subagents, Haiku for chronicler) mapped to the target provider's equivalent tiers.
+If the user chose a provider other than Anthropic, generate a `slipway.local.json` in the install directory with the correct model prefix for all 12 agents. Use the same model-tier logic as `slipway.json` (Opus for `slipway`, `bosun`, `gunner`; Sonnet for all generation subagents; Haiku for `chronicler`) mapped to the target provider's equivalent tiers.
 
 ### Step 4: Verify
 
@@ -165,6 +169,10 @@ slipway will walk you through brainstorm → docs → review → grooming → pl
 To extend an existing project with a new feature:
 
   @slipway extend: [feature description]
+
+Already have code but no docs? Let cartographer map your codebase:
+
+  @slipway reverse-engineer
 
 To review existing docs without a full pipeline run:
 
