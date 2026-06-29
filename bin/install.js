@@ -186,7 +186,7 @@ function main() {
   log(`  ${SLIPWAY_CONFIG}`);
   log("");
   log("Quick start:");
-  log("  @lodestar I want to build [your idea here]");
+  log("  @slipway I want to build [your idea here]");
   log("");
   log("Full guide: https://github.com/fresp/slipway-agents/blob/dev/docs/guide/installation.md");
 }

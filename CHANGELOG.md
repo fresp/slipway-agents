@@ -10,9 +10,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [0.6.1] — 2026-06-29
 
 ### Changed
-- Orchestrator renamed from `slipway` to `lodestar` — moved from `slipway.md` at repo root to `subagents/lodestar.md` so the plugin registers it automatically at runtime
-- All subagents now declare `mode: subagent` in frontmatter; `lodestar` declares `mode: primary`
-- `slipway.json` agent key updated: `slipway` → `lodestar`
+- Orchestrator moved from `slipway.md` at repo root to `subagents/slipway.md` so the plugin registers it automatically at runtime
+- All subagents now declare `mode: subagent` in frontmatter; `slipway` declares `mode: primary`
+- `slipway.json` agent key confirmed as `"slipway"`
 - `bin/install.js` now clears the OpenCode plugin cache (`~/.cache/opencode/packages/slipway-agents@latest`) on each install, ensuring OpenCode always loads the latest published version on next start
 
 ### Fixed

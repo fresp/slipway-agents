@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/dev/slipway.schema.json",
   "version": "0.6.1",
   "agents": {
-    "lodestar": {
+    "slipway": {
       "model": "anthropic/claude-opus-4-6",
       "fallback_model": "anthropic/claude-sonnet-4-6",
       "description": "Primary orchestrator — routes the pipeline, enforces step order, never generates content directly"
