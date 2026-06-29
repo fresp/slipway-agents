@@ -164,7 +164,7 @@ slipway-agents is ready. To start a pipeline from a product idea:
 slipway will walk you through brainstorm → docs → review → grooming → planning.
 To extend an existing project with a new feature:
 
-  @slipway ada fitur baru: [feature description]
+  @slipway extend: [feature description]
 
 To review existing docs without a full pipeline run:
 
