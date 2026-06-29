@@ -7,6 +7,13 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.5.4] — 2026-06-29
+
+### Fixed
+- Republish: npm package 0.5.3 was published before the corrected `bin/install.js` was committed — it still bundled the old git-clone installer. 0.5.4 contains the correct installer that reads `slipway.json` from the bundled npm package instead of cloning the repo.
+
+---
+
 ## [0.5.3] — 2026-06-29
 
 ### Fixed
@@ -212,6 +219,7 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
+[0.5.4]: https://github.com/fresp/slipway-agents/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/fresp/slipway-agents/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/fresp/slipway-agents/compare/v0.5.0...v0.5.2
 [0.5.0]: https://github.com/fresp/slipway-agents/compare/v0.4.4...v0.5.0
