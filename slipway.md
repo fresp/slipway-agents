@@ -41,6 +41,20 @@ Hull Builder is the only subagent that invokes the `bootstrap-from-prd` skill di
 
 ---
 
+## Model Configuration
+
+Model assignments for every subagent are defined in `slipway.json` at the project root. The `slipway-agents` plugin reads this file at session startup and injects the assignments into OpenCode via `client.config.patch()`.
+
+**Resolution order** (per agent, at session startup):
+1. **Primary model** — `agents.[name].model` in `slipway.json`. Used if the model is available.
+2. **Fallback model** — `agents.[name].fallback_model`. Used if the primary model is unavailable.
+3. **Category fallback** — looked up from the `categories` block (`quick`, `standard`, `deep`). Used if both primary and fallback are unavailable.
+4. **Frontmatter model** — the `model:` field in each subagent's `.md` file. Used only if no `slipway.json` is found or the plugin is not loaded.
+
+If `slipway.json` is not present in the project root, the plugin exits silently and agents use their frontmatter models. To override models for a project without modifying `slipway.json`, create a `slipway.local.json` in the project root — it takes precedence over `slipway.json`.
+
+---
+
 ## Error Recovery and Retry
 
 Apply this protocol whenever a subagent returns an empty result, crashes, or fails its completion contract:
@@ -412,6 +426,8 @@ Inspector health score: [0–100 or "n/a"]
 Inspector history: [score1, score2, score3 — last 3 runs, oldest first]
 Security audit last run: [timestamp or "never"]
 Security audit last result: [PASS | CONDITIONAL | BLOCK | "never"]
+Estimator last run: [timestamp or "never"]
+Estimator last result: [completed | "never"]
 Groomer last run: [timestamp or "never"]
 Groomer last result: [Ready to Plan | Conditional | Blocked | "never"]
 Groomer Lead Dev: [Ready | Conditional | Blocked | "never"]
