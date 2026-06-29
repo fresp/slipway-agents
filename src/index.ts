@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import * as os from "os";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -16,25 +17,24 @@ interface SlipwayConfig {
   categories?: Record<string, { model: string; fallback_model?: string }>;
 }
 
-// OpenCode plugin client interface
-// client.config.patch() merges into the live OpenCode config at runtime
-interface OpenCodeClient {
-  config: {
-    patch: (config: Record<string, unknown>) => void;
-  };
-}
-
-// OpenCode plugin context
-interface PluginContext {
-  directory: string;
-  client: OpenCodeClient;
-  [key: string]: unknown;
-}
-
-// OpenCode agent definition shape
 interface AgentDefinition {
   system?: string;
   model?: string;
+  [key: string]: unknown;
+}
+
+interface Config {
+  agent?: Record<string, AgentDefinition>;
+  [key: string]: unknown;
+}
+
+interface Hooks {
+  config?: (input: Config) => Promise<void>;
+  [key: string]: unknown;
+}
+
+interface PluginInput {
+  directory: string;
   [key: string]: unknown;
 }
 
@@ -51,6 +51,13 @@ function getPackageSubagentsDir(): string {
 }
 
 /**
+ * Global OpenCode config directory: ~/.config/opencode/
+ */
+function getGlobalConfigDir(): string {
+  return path.join(os.homedir(), ".config", "opencode");
+}
+
+/**
  * Read all .md files from the bundled subagents/ directory.
  * Returns a map of agent-name → system prompt content.
  */
@@ -59,7 +66,7 @@ function loadAgentDefinitions(): Record<string, string> {
   const agents: Record<string, string> = {};
 
   if (!fs.existsSync(subagentsDir)) {
-    console.warn(`[slipway-agents] subagents/ directory not found at ${subagentsDir}`);
+    console.warn(`[slipway-agents] subagents/ not found at ${subagentsDir}`);
     return agents;
   }
 
@@ -72,27 +79,32 @@ function loadAgentDefinitions(): Record<string, string> {
   }
 
   console.log(
-    `[slipway-agents] Loaded ${files.length} agent definitions: ${files.map((f) => path.basename(f, ".md")).join(", ")}`
+    `[slipway-agents] Loaded ${files.length} agent definitions: ${files
+      .map((f) => path.basename(f, ".md"))
+      .join(", ")}`
   );
   return agents;
 }
 
 /**
- * Find and parse slipway.json from the user's project root.
+ * Load slipway.json from ~/.config/opencode/
  * slipway.local.json takes precedence if it exists.
  * Returns null if neither file is found — plugin works fine without it.
  */
-function loadSlipwayConfig(projectDir: string): SlipwayConfig | null {
+function loadSlipwayConfig(): SlipwayConfig | null {
+  const configDir = getGlobalConfigDir();
   const candidates = ["slipway.local.json", "slipway.json"];
 
   for (const filename of candidates) {
-    const filePath = path.join(projectDir, filename);
+    const filePath = path.join(configDir, filename);
     if (fs.existsSync(filePath)) {
       try {
         const raw = fs.readFileSync(filePath, "utf-8");
         const parsed = JSON.parse(raw) as SlipwayConfig;
         if (parsed.agents && typeof parsed.agents === "object") {
-          console.log(`[slipway-agents] Config loaded from ${filePath} (v${parsed.version})`);
+          console.log(
+            `[slipway-agents] Config loaded from ${filePath} (v${parsed.version})`
+          );
           return parsed;
         }
       } catch {
@@ -102,72 +114,50 @@ function loadSlipwayConfig(projectDir: string): SlipwayConfig | null {
   }
 
   console.log(
-    "[slipway-agents] No slipway.json found in project root — using default models from agent frontmatter"
+    "[slipway-agents] No slipway.json found in ~/.config/opencode/ — using default models from agent frontmatter"
   );
   return null;
-}
-
-/**
- * Build the agent patch object for client.config.patch().
- * Merges agent system prompts (from subagents/*.md) with model assignments (from slipway.json).
- */
-function buildAgentPatch(
-  agentDefinitions: Record<string, string>,
-  slipwayConfig: SlipwayConfig | null
-): Record<string, AgentDefinition> {
-  const patch: Record<string, AgentDefinition> = {};
-
-  for (const [agentName, systemPrompt] of Object.entries(agentDefinitions)) {
-    const agentDef: AgentDefinition = {
-      system: systemPrompt,
-    };
-
-    // Apply model from slipway.json if available for this agent
-    if (slipwayConfig?.agents[agentName]?.model) {
-      agentDef.model = slipwayConfig.agents[agentName].model;
-    }
-
-    patch[agentName] = agentDef;
-  }
-
-  return patch;
 }
 
 // ---------------------------------------------------------------------------
 // Plugin entry point
 // ---------------------------------------------------------------------------
 
-export const SlipwayPlugin = async (ctx: PluginContext) => {
-  const projectDir = ctx.directory ?? process.cwd();
-  const client = ctx.client;
-
-  // 1. Load agent system prompts from bundled subagents/
+export const SlipwayPlugin = async (_ctx: PluginInput): Promise<Hooks> => {
+  // Load both upfront — before the config hook fires
   const agentDefinitions = loadAgentDefinitions();
+  const slipwayConfig = loadSlipwayConfig();
 
   if (Object.keys(agentDefinitions).length === 0) {
-    console.warn("[slipway-agents] No agents loaded — plugin will not register any agents");
+    console.warn(
+      "[slipway-agents] No agents loaded — plugin will not register any agents"
+    );
     return {};
   }
 
-  // 2. Load model config from project's slipway.json (optional)
-  const slipwayConfig = loadSlipwayConfig(projectDir);
+  return {
+    config: async (input: Config) => {
+      input.agent ??= {};
 
-  // 3. Build agent patch
-  const agentPatch = buildAgentPatch(agentDefinitions, slipwayConfig);
+      for (const [agentName, systemPrompt] of Object.entries(agentDefinitions)) {
+        const agentDef: AgentDefinition = {
+          system: systemPrompt,
+        };
 
-  // 4. Inject into OpenCode runtime — zero disk writes
-  if (client?.config?.patch) {
-    client.config.patch({ agent: agentPatch });
-    console.log(
-      `[slipway-agents] Registered ${Object.keys(agentPatch).length} agents into OpenCode runtime`
-    );
-  } else {
-    console.warn(
-      "[slipway-agents] client.config.patch not available — agents may not be registered"
-    );
-  }
+        // Apply model from slipway.json if configured for this agent
+        const modelOverride = slipwayConfig?.agents[agentName]?.model;
+        if (modelOverride) {
+          agentDef.model = modelOverride;
+        }
 
-  return {};
+        input.agent[agentName] = agentDef;
+      }
+
+      console.log(
+        `[slipway-agents] Registered ${Object.keys(agentDefinitions).length} agents into OpenCode config`
+      );
+    },
+  };
 };
 
 export default SlipwayPlugin;
