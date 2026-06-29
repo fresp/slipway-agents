@@ -126,9 +126,35 @@ embedded in the relevant task acceptance criteria below]
 - **Expected output:** [The concrete artifact this task produces — a file path, a passing test suite, a running endpoint. Must be unambiguous enough that Sisyphus can check it without re-reading acceptance criteria.]
 - **Verify command:** [Shell command that confirms the task is complete — e.g. `npm test src/auth/`, `curl -sf http://localhost:3000/health`, `prisma validate`. Write `[manual review required]` if no automated check is possible.]
 - **Test command:** [Test suite command scoped to this task's code — e.g. `npm test src/payments/`, `pytest tests/test_auth.py`. Write `[no automated tests — manual QA required]` if the task is infrastructure-only.]
+- **Verify:**
+  - [Concrete condition that must be true after the task is complete — e.g. "returns 401 for unauthenticated requests", "file exists at path X", "all existing tests pass"]
+  - [Additional condition if needed — max 5 total]
 - **Functional requirement trace:** [FR-IDs from 01-prd.md that this task addresses]
 - **Notes:** [Any accepted Should-fix findings from inspector that affect this task]
 ```
+
+---
+
+## Verify field rules
+
+Every task must have at least one `Verify:` condition. Rules:
+
+- **Minimum 1, maximum 5 conditions per task.**
+- **Must be verifiable** — not "works correctly" but "returns 401 for unauthenticated requests" or "`prisma validate` exits 0".
+- **Scope-aware** — only check output from this specific task, not pre-existing behavior.
+- For refactor tasks: "all tests that passed before this task still pass after."
+- For new feature tasks: "behavior X occurs when condition Y is true."
+- For infrastructure tasks: use `[manual review required]` only if no automated check is possible — this should be rare.
+
+If the task spec from groomer is not detailed enough to write a concrete `Verify:` condition, **do not invent one**. Instead flag to the orchestrator:
+
+```
+⚠ Verify condition unclear for [TASK-ID]: [task name]
+Reason: [why the spec is insufficient — e.g. acceptance criteria says "handle errors" without specifying what handling means]
+Clarification needed: [specific question]
+```
+
+The orchestrator will surface this to the user before planning is committed.
 
 ---
 
@@ -217,7 +243,8 @@ Use Stakeholder Priority tags from `01-prd.md` to influence phase ordering:
 
 ## Forbidden behaviors
 
-- Never leave `Expected output`, `Verify command`, or `Test command` blank — write `[manual review required]` or `[no automated tests — manual QA required]` rather than omitting the field entirely.
+- Never leave `Expected output`, `Verify command`, `Test command`, or `Verify:` blank — write `[manual review required]` or `[no automated tests — manual QA required]` rather than omitting the field entirely.
+- Never invent a `Verify:` condition when the task spec is too vague to write a concrete one — flag to the orchestrator instead.
 - Never run without first completing the stale check.
 - Never proceed with a stale plan without an explicit user choice.
 - Never leave a task without a size (S/M/L), parallel flag, or depends_on value.
