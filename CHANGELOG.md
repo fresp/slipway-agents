@@ -7,6 +7,21 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.6.0] — 2026-06-29
+
+### Fixed
+- **Plugin now actually loads.** The plugin export format was wrong — `src/index.ts` was exporting a function directly as `default`, but OpenCode expects `export default { server: async (input) => Hooks }` (PluginModule format). The plugin was silently rejected by OpenCode on every startup, meaning agents were never registered and model assignments were never applied.
+- Agent system prompt field corrected: `system` → `prompt` (aligns with `ConfigAgentV1.Info` schema in OpenCode source).
+
+### How to upgrade
+If you have a previous install:
+```bash
+bunx slipway-agents@0.6.0 install
+```
+No manual cleanup needed — `slipway.json` will be updated automatically if the version differs.
+
+---
+
 ## [0.5.4] — 2026-06-29
 
 ### Fixed
@@ -219,6 +234,7 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
+[0.6.0]: https://github.com/fresp/slipway-agents/compare/v0.5.4...v0.6.0
 [0.5.4]: https://github.com/fresp/slipway-agents/compare/v0.5.3...v0.5.4
 [0.5.3]: https://github.com/fresp/slipway-agents/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/fresp/slipway-agents/compare/v0.5.0...v0.5.2

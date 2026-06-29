@@ -89,7 +89,7 @@ function loadAgentDefinitions(): Record<string, string> {
 /**
  * Load slipway.json from ~/.config/opencode/
  * slipway.local.json takes precedence if it exists.
- * Returns null if neither file is found — plugin works fine without it.
+ * Returns null if not found — plugin works fine without it.
  */
 function loadSlipwayConfig(): SlipwayConfig | null {
   const configDir = getGlobalConfigDir();
@@ -120,44 +120,43 @@ function loadSlipwayConfig(): SlipwayConfig | null {
 }
 
 // ---------------------------------------------------------------------------
-// Plugin entry point
+// Plugin export — OpenCode PluginModule format
+// { server: (input: PluginInput) => Promise<Hooks> }
 // ---------------------------------------------------------------------------
 
-export const SlipwayPlugin = async (_ctx: PluginInput): Promise<Hooks> => {
-  // Load both upfront — before the config hook fires
-  const agentDefinitions = loadAgentDefinitions();
-  const slipwayConfig = loadSlipwayConfig();
+export default {
+  server: async (_input: PluginInput): Promise<Hooks> => {
+    const agentDefinitions = loadAgentDefinitions();
+    const slipwayConfig = loadSlipwayConfig();
 
-  if (Object.keys(agentDefinitions).length === 0) {
-    console.warn(
-      "[slipway-agents] No agents loaded — plugin will not register any agents"
-    );
-    return {};
-  }
+    if (Object.keys(agentDefinitions).length === 0) {
+      console.warn(
+        "[slipway-agents] No agents loaded — plugin will not register any agents"
+      );
+      return {};
+    }
 
-  return {
-    config: async (input: Config) => {
-      input.agent ??= {};
+    return {
+      config: async (input: Config) => {
+        input.agent ??= {};
 
-      for (const [agentName, systemPrompt] of Object.entries(agentDefinitions)) {
-        const agentDef: AgentDefinition = {
-          prompt: systemPrompt,
-        };
+        for (const [agentName, systemPrompt] of Object.entries(agentDefinitions)) {
+          const agentDef: AgentDefinition = {
+            prompt: systemPrompt,
+          };
 
-        // Apply model from slipway.json if configured for this agent
-        const modelOverride = slipwayConfig?.agents[agentName]?.model;
-        if (modelOverride) {
-          agentDef.model = modelOverride;
+          const modelOverride = slipwayConfig?.agents[agentName]?.model;
+          if (modelOverride) {
+            agentDef.model = modelOverride;
+          }
+
+          input.agent[agentName] = agentDef;
         }
 
-        input.agent[agentName] = agentDef;
-      }
-
-      console.log(
-        `[slipway-agents] Registered ${Object.keys(agentDefinitions).length} agents into OpenCode config`
-      );
-    },
-  };
+        console.log(
+          `[slipway-agents] Registered ${Object.keys(agentDefinitions).length} agents into OpenCode config`
+        );
+      },
+    };
+  },
 };
-
-export default SlipwayPlugin;

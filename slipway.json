@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/dev/slipway.schema.json",
-  "version": "0.5.4",
+  "version": "0.6.0",
   "agents": {
     "slipway": {
       "model": "anthropic/claude-opus-4-6",
