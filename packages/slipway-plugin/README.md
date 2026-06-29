@@ -6,11 +6,20 @@ Part of the [slipway-agents](https://github.com/fresp/slipway-agents) framework 
 
 ---
 
-## What it does
+## How it works
 
-Without this plugin, model assignments in `slipway.json` are just documentation. This plugin makes them real: on OpenCode startup, it reads your `slipway.json` and injects the correct model per agent via `client.config.patch()` — so every agent in the pipeline always runs on the model you intended.
+On every OpenCode startup, the plugin:
 
-**Resolution order per agent:** `model` → `fallback_model` → category fallback → OpenCode default
+1. Looks for `slipway.local.json` in the project root, then `slipway.json`
+   (also checks `~/.config/opencode/` as fallback)
+2. Reads the `agents` block from the config
+3. Patches `~/.config/opencode/opencode.json` with an `agent` block containing
+   the correct `model` per agent
+4. OpenCode reads the `agent` block natively — no runtime injection needed
+
+This means model assignments take effect on the **next** OpenCode startup after
+the patch is written. The patch is idempotent — it only rewrites if the model
+assignments have changed.
 
 ---
 

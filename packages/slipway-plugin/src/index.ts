@@ -11,180 +11,164 @@ interface AgentConfig {
   description?: string;
 }
 
-interface CategoryConfig {
-  model: string;
-  fallback_model?: string;
-  description?: string;
-}
-
 interface SlipwayConfig {
   version: string;
   agents: Record<string, AgentConfig>;
-  categories?: Record<string, CategoryConfig>;
 }
 
-// Minimal OpenCode plugin surface — typed loosely since the SDK
-// may not be installed in all environments.
-interface OpenCodeClient {
-  config: {
-    patch: (config: Record<string, unknown>) => void;
-  };
-  models?: {
-    list: () => Promise<Array<{ id: string }>>;
-  };
-}
-
+// OpenCode plugin context — typed loosely since @opencode-ai/plugin
+// may not be installed in all environments
 interface PluginContext {
-  client: OpenCodeClient;
-  cwd: string;
+  directory: string;
+  [key: string]: unknown;
 }
 
 // ---------------------------------------------------------------------------
 // Config resolution
 // ---------------------------------------------------------------------------
 
-const CONFIG_FILENAMES = ["slipway.json", "slipway.local.json"];
+const CONFIG_FILENAMES = ["slipway.local.json", "slipway.json"];
 
-function findConfig(cwd: string): SlipwayConfig | null {
-  // slipway.local.json takes precedence over slipway.json
-  for (const filename of [...CONFIG_FILENAMES].reverse()) {
-    const candidate = path.join(cwd, filename);
-    if (fs.existsSync(candidate)) {
-      try {
-        const raw = fs.readFileSync(candidate, "utf-8");
-        const parsed = JSON.parse(raw) as SlipwayConfig;
-        console.log(`[slipway-agents] Loaded config from ${candidate}`);
-        return parsed;
-      } catch (err) {
-        console.warn(
-          `[slipway-agents] Failed to parse ${candidate}: ${String(err)}`
-        );
+/**
+ * Find slipway config — slipway.local.json takes precedence over slipway.json.
+ * Search order: directory passed by OpenCode (project root), then global config dir.
+ */
+function findSlipwayConfig(projectDir: string): { config: SlipwayConfig; source: string } | null {
+  const searchDirs = [
+    projectDir,
+    path.join(
+      process.env.HOME ?? process.env.USERPROFILE ?? "",
+      ".config",
+      "opencode"
+    ),
+  ];
+
+  for (const dir of searchDirs) {
+    for (const filename of CONFIG_FILENAMES) {
+      const candidate = path.join(dir, filename);
+      if (fs.existsSync(candidate)) {
+        try {
+          const raw = fs.readFileSync(candidate, "utf-8");
+          const parsed = JSON.parse(raw) as SlipwayConfig;
+          if (parsed.agents && typeof parsed.agents === "object") {
+            return { config: parsed, source: candidate };
+          }
+        } catch {
+          // skip malformed files
+        }
       }
     }
   }
   return null;
 }
 
-function resolveModel(
-  agentName: string,
-  agentConfig: AgentConfig,
-  availableModels: Set<string>,
-  categories: Record<string, CategoryConfig> | undefined
-): string | null {
-  // 1. Try primary model
-  if (availableModels.size === 0 || availableModels.has(agentConfig.model)) {
-    return agentConfig.model;
-  }
-
-  // 2. Try fallback_model
-  if (
-    agentConfig.fallback_model &&
-    availableModels.has(agentConfig.fallback_model)
-  ) {
-    console.warn(
-      `[slipway-agents] ${agentName}: primary model "${agentConfig.model}" not available, ` +
-        `using fallback "${agentConfig.fallback_model}"`
-    );
-    return agentConfig.fallback_model;
-  }
-
-  // 3. Try category fallback
-  if (categories) {
-    for (const [, categoryConfig] of Object.entries(categories)) {
-      if (availableModels.has(categoryConfig.model)) {
-        console.warn(
-          `[slipway-agents] ${agentName}: fallback model not available, ` +
-            `using category model "${categoryConfig.model}"`
-        );
-        return categoryConfig.model;
-      }
-      if (
-        categoryConfig.fallback_model &&
-        availableModels.has(categoryConfig.fallback_model)
-      ) {
-        console.warn(
-          `[slipway-agents] ${agentName}: using category fallback model "${categoryConfig.fallback_model}"`
-        );
-        return categoryConfig.fallback_model;
-      }
-    }
-  }
-
-  // 4. Cannot resolve — return primary and let OpenCode handle the error
-  console.warn(
-    `[slipway-agents] ${agentName}: could not verify model availability, ` +
-      `using configured primary "${agentConfig.model}"`
+/**
+ * Find the global opencode.json path.
+ */
+function findOpencodeConfig(): string {
+  return path.join(
+    process.env.HOME ?? process.env.USERPROFILE ?? "",
+    ".config",
+    "opencode",
+    "opencode.json"
   );
-  return agentConfig.model;
 }
 
-// ---------------------------------------------------------------------------
-// Plugin entry point
-// ---------------------------------------------------------------------------
+/**
+ * Build the `agent` block for opencode.json from slipway.json agents.
+ * Each agent entry gets a `model` field. fallback_model is not a native
+ * OpenCode concept — we resolve it here: if primary model looks like a
+ * provider/model string, use it directly.
+ */
+function buildAgentBlock(
+  agents: Record<string, AgentConfig>
+): Record<string, { model: string }> {
+  const result: Record<string, { model: string }> = {};
+  for (const [name, cfg] of Object.entries(agents)) {
+    result[name] = { model: cfg.model };
+  }
+  return result;
+}
 
-export async function activate(context: PluginContext): Promise<void> {
-  const { client, cwd } = context;
+/**
+ * Patch opencode.json with the agent block from slipway.json.
+ * - Never removes existing keys.
+ * - Merges agent entries: slipway entries overwrite, other entries preserved.
+ * - Backs up the file before modifying.
+ */
+function patchOpencodeConfig(
+  opencodeConfigPath: string,
+  agentBlock: Record<string, { model: string }>,
+  slipwayVersion: string
+): void {
+  let existing: Record<string, unknown> = {};
 
-  const config = findConfig(cwd);
+  if (fs.existsSync(opencodeConfigPath)) {
+    try {
+      existing = JSON.parse(fs.readFileSync(opencodeConfigPath, "utf-8"));
+    } catch {
+      console.warn(
+        `[slipway-agents] Could not parse ${opencodeConfigPath} — skipping agent block patch`
+      );
+      return;
+    }
+  }
 
-  if (!config) {
-    // No config file found — plugin is a no-op. Agents use their frontmatter models.
+  // Check if agent block is already up to date
+  const existingAgents = (existing.agent ?? {}) as Record<string, unknown>;
+  const firstAgent = Object.keys(agentBlock)[0];
+  if (
+    firstAgent &&
+    existingAgents[firstAgent] &&
+    (existingAgents[firstAgent] as { model?: string }).model === agentBlock[firstAgent].model
+  ) {
     console.log(
-      "[slipway-agents] No slipway.json found in project root — using agent frontmatter models."
+      `[slipway-agents] opencode.json agent block already up to date (slipway v${slipwayVersion})`
     );
     return;
   }
 
-  // Fetch available models if the client supports it
-  let availableModels = new Set<string>();
-  try {
-    if (client.models) {
-      const models = await client.models.list();
-      availableModels = new Set(models.map((m) => m.id));
-    }
-  } catch {
-    // Model listing is best-effort — if it fails, skip availability checks
-    console.warn(
-      "[slipway-agents] Could not fetch available models — skipping availability check"
-    );
-  }
+  // Merge: preserve existing agents, overwrite slipway agents
+  const mergedAgents = { ...existingAgents, ...agentBlock };
+  const updated = { ...existing, agent: mergedAgents };
 
-  // Build agent model overrides
-  const agentOverrides: Record<string, { model: string }> = {};
-  let overrideCount = 0;
+  fs.writeFileSync(
+    opencodeConfigPath,
+    JSON.stringify(updated, null, 2) + "\n",
+    "utf-8"
+  );
 
-  for (const [agentName, agentConfig] of Object.entries(config.agents)) {
-    const resolvedModel = resolveModel(
-      agentName,
-      agentConfig,
-      availableModels,
-      config.categories
-    );
-    if (resolvedModel) {
-      agentOverrides[agentName] = { model: resolvedModel };
-      overrideCount++;
-    }
-  }
+  console.log(
+    `[slipway-agents] Patched opencode.json with model assignments for ${Object.keys(agentBlock).length} agents (slipway v${slipwayVersion})`
+  );
+}
 
-  if (overrideCount === 0) {
-    console.log("[slipway-agents] No agent overrides to apply.");
-    return;
-  }
+// ---------------------------------------------------------------------------
+// Plugin entry point — correct OpenCode plugin export format
+// ---------------------------------------------------------------------------
 
-  // Inject into OpenCode runtime
-  try {
-    client.config.patch({ agents: agentOverrides });
+export const SlipwayPlugin = async (ctx: PluginContext) => {
+  const projectDir = ctx.directory ?? process.cwd();
+
+  const result = findSlipwayConfig(projectDir);
+
+  if (!result) {
     console.log(
-      `[slipway-agents] Applied model overrides for ${overrideCount} agents ` +
-        `(config version ${config.version})`
+      "[slipway-agents] No slipway.json found — using agent frontmatter models."
     );
-  } catch (err) {
-    console.error(
-      `[slipway-agents] Failed to apply config patch: ${String(err)}`
-    );
+    return {};
   }
-}
 
-export function deactivate(): void {
-  // Nothing to clean up — model overrides are session-scoped in OpenCode
-}
+  const { config, source } = result;
+  console.log(`[slipway-agents] Loaded config from ${source} (v${config.version})`);
+
+  const agentBlock = buildAgentBlock(config.agents);
+  const opencodeConfigPath = findOpencodeConfig();
+
+  patchOpencodeConfig(opencodeConfigPath, agentBlock, config.version);
+
+  // Return empty hooks object — this plugin's job is config patching, not hooking
+  return {};
+};
+
+export default SlipwayPlugin;

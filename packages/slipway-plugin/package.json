@@ -1,10 +1,13 @@
 {
   "name": "slipway-agents-plugin",
-  "version": "0.4.3",
-  "private": true,
-  "description": "Internal TypeScript plugin for slipway-agents model enforcement.",
+  "version": "0.4.4",
+  "description": "TypeScript plugin for slipway-agents model enforcement.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
