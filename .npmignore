@@ -1,8 +1,25 @@
-node_modules/
-packages/slipway-plugin/node_modules/
-packages/slipway-plugin/src/
-packages/slipway-plugin/README.md
-packages/slipway-plugin/tsconfig.json
+# Development source — not needed in published package
+src/
+*.ts
+!*.d.ts
+
+# Docs and meta — not needed by consumers
+docs/
+.github/
+CONTRIBUTING.md
+CLAUDE.md
+
+# Build artifacts
 *.log
+*.js.map
+*.d.ts.map
+
+# Git and local config
 .git/
 .claude/
+.env
+.env.local
+slipway.local.json
+
+# Dev dependencies artifacts
+node_modules/

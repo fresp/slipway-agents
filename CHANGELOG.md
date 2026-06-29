@@ -7,13 +7,16 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [0.5.1] — 2026-06-29
+## [0.5.2] — 2026-06-29
 
 ### Fixed
 - Plugin now correctly uses the OpenCode `config` hook to register agents at runtime
 - `slipway.json` is now read from `~/.config/opencode/slipway.json` (global config) instead of project root
 - `slipway.local.json` in same directory takes precedence over `slipway.json` for local overrides
 - Agents and model assignments are injected by mutating `input.agent` in the `config` hook — zero disk writes
+- `bin/install.js`: removed `git clone` — agents are registered at runtime by the plugin, no disk copy needed. Installer now only patches `~/.config/opencode/opencode.json` and copies `slipway.json` from the bundled npm package to `~/.config/opencode/`
+- `bin/install.js`: `slipway.json` source is now the bundled package file (`__dirname/../slipway.json`), not a git clone
+- `.npmignore`: removed stale `packages/slipway-plugin/` references, added `src/`, `docs/`, `.github/`, `CONTRIBUTING.md` exclusions
 
 ### How it works
 - On OpenCode startup, plugin loads all `subagents/*.md` from the npm package
@@ -202,7 +205,7 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
-[0.5.1]: https://github.com/fresp/slipway-agents/compare/v0.5.0...v0.5.1
+[0.5.2]: https://github.com/fresp/slipway-agents/compare/v0.5.0...v0.5.2
 [0.5.0]: https://github.com/fresp/slipway-agents/compare/v0.4.4...v0.5.0
 [0.4.0]: https://github.com/fresp/slipway-agents/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/fresp/slipway-agents/compare/v0.2.0...v0.3.0

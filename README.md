@@ -192,7 +192,7 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 // slipway.local.json — takes precedence over slipway.json
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "0.5.0",
+  "version": "0.5.2",
   "agents": {
     "slipway":      { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
     "chartmaker":   { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
@@ -219,6 +219,11 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 - [`skills/slipway/bootstrap-from-prd/examples/managed-waba/`](skills/slipway/bootstrap-from-prd/examples/managed-waba) — full pipeline output for a multi-tenant WhatsApp Business Calling service (Kamailio → Asterisk → WebRTC, MongoDB + Redis, multi-tenant SIP gateway)
 
 ---
+
+## What's new in v0.5.2
+
+- **Correct runtime registration** — agents are now registered via the OpenCode `config` hook (mutating `input.agent`) rather than the non-existent `client.config.patch()`. Model assignments are read from `~/.config/opencode/slipway.json` (global config); `slipway.local.json` takes precedence. Still zero disk writes.
+- **Simpler installer** — `slipway-agents` (the `bunx`/`npx` installer) no longer does a `git clone`. It only adds the plugin to `~/.config/opencode/opencode.json` and copies `slipway.json` from the installed npm package to `~/.config/opencode/`.
 
 ## What's new in v0.5.0
 
