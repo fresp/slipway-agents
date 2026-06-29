@@ -192,7 +192,7 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 // slipway.local.json — takes precedence over slipway.json
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "0.5.2",
+  "version": "0.7.0",
   "agents": {
     "slipway":      { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
     "chartmaker":   { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },

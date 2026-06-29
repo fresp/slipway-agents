@@ -13,7 +13,7 @@ Equivalent to typing `@slipway I want to build [idea]` or `@slipway bootstrap fr
 **When to use:** Starting a new project, or bootstrapping docs from an existing PRD.
 
 **Behavior:**
-- If no `.ai/docs/01-prd.md` exists, routes to `drafting-table` (bootstrap-from-prompt mode).
+- If no `.ai/docs/01-prd.md` exists, routes to `chartmaker` (bootstrap-from-prompt mode).
 - If `.ai/docs/01-prd.md` exists but engineering docs are missing, routes to `hullwright` (bootstrap-from-prd mode).
 - If docs already exist, warns the user and asks whether to rebuild or extend.
 

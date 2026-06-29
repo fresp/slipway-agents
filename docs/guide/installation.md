@@ -66,7 +66,7 @@ cp slipway.json slipway.local.json
 // slipway.local.json
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "0.5.2",
+  "version": "0.7.0",
   "agents": {
     "slipway":      { "model": "anthropic/claude-opus-4-6" },
     "chartmaker":   { "model": "anthropic/claude-sonnet-4-6" },

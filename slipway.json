@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/dev/slipway.schema.json",
-  "version": "0.6.5",
+  "version": "0.7.0",
   "agents": {
     "slipway":      { "model": "anthropic/claude-opus-4-6",   "fallback_model": "anthropic/claude-sonnet-4-6", "mode": "primary",  "description": "Primary orchestrator — routes the pipeline, enforces step order, never generates content directly" },
     "chartmaker":   { "model": "anthropic/claude-sonnet-4-6", "fallback_model": "anthropic/claude-haiku-4-5",  "mode": "subagent", "description": "Raw prompt / partial PRD → complete .ai/docs/01-prd.md with P0/P1/P2 ranking" },
