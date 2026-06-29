@@ -2,10 +2,8 @@
   "name": "slipway-agents",
   "version": "0.4.0",
   "description": "PRD-to-engineering-docs pipeline agents for OpenCode. One orchestrator, ten specialized subagents, Stakeholder Priority planning, model enforcement via slipway.json.",
-  "main": "packages/slipway-plugin/dist/index.js",
-  "types": "packages/slipway-plugin/dist/index.d.ts",
   "bin": {
-    "slipway-agents": "./bin/install.js"
+    "slipway-agents": "bin/install.js"
   },
   "files": [
     "bin/",
@@ -14,7 +12,6 @@
     "slipway.md",
     "slipway.json",
     "slipway.schema.json",
-    "packages/slipway-plugin/dist/",
     "README.md",
     "LICENSE"
   ],
@@ -40,7 +37,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fresp/slipway-agents.git"
+    "url": "git+https://github.com/fresp/slipway-agents.git"
   },
   "homepage": "https://github.com/fresp/slipway-agents#readme",
   "bugs": {

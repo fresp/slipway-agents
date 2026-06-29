@@ -19,6 +19,7 @@ const INSTALL_DIR = path.join(
 );
 const OPENCODE_CONFIG_DIR = path.join(os.homedir(), ".config", "opencode");
 const OPENCODE_CONFIG = path.join(OPENCODE_CONFIG_DIR, "opencode.json");
+const SLIPWAY_CONFIG = path.join(OPENCODE_CONFIG_DIR, "slipway.json");
 const PLUGIN_ENTRY = "slipway-agents@latest";
 
 // ---------------------------------------------------------------------------
@@ -117,9 +118,8 @@ function patchOpencodeJson(configPath, pluginEntry) {
  *   current file, then write the new one.
  * - User customizations in slipway.local.json are never touched.
  */
-function patchSlipwayJson(installDir, cwd) {
+function patchSlipwayJson(installDir, SLIPWAY_CONFIG) {
   const sourcePath = path.join(installDir, "slipway.json");
-  const destPath = path.join(cwd, "slipway.json");
 
   if (!fs.existsSync(sourcePath)) {
     warn("slipway.json not found in install directory — skipping.");
@@ -134,15 +134,15 @@ function patchSlipwayJson(installDir, cwd) {
     return;
   }
 
-  if (!fs.existsSync(destPath)) {
-    fs.copyFileSync(sourcePath, destPath);
-    log(`Created slipway.json at ${destPath} (version ${sourceConfig.version})`);
+  if (!fs.existsSync(SLIPWAY_CONFIG)) {
+    fs.copyFileSync(sourcePath, SLIPWAY_CONFIG);
+    log(`Created slipway.json at ${SLIPWAY_CONFIG} (version ${sourceConfig.version})`);
     return;
   }
 
   let destConfig;
   try {
-    destConfig = JSON.parse(fs.readFileSync(destPath, "utf-8"));
+    destConfig = JSON.parse(fs.readFileSync(SLIPWAY_CONFIG, "utf-8"));
   } catch (e) {
     warn(`Could not parse existing slipway.json: ${e.message}`);
     warn("Skipping slipway.json update — fix it manually.");
@@ -157,8 +157,8 @@ function patchSlipwayJson(installDir, cwd) {
   }
 
   // Back up before overwriting
-  backup(destPath, "pre-update");
-  fs.copyFileSync(sourcePath, destPath);
+  backup(SLIPWAY_CONFIG, "pre-update");
+  fs.copyFileSync(sourcePath, SLIPWAY_CONFIG);
   log(
     `Updated slipway.json: ${destConfig.version} → ${sourceConfig.version}`
   );
@@ -175,7 +175,7 @@ function cloneOrUpdate(repoUrl, installDir) {
     } catch {
       die(
         "git pull failed. Try deleting the install directory and re-running:\n" +
-          `  rm -rf "${installDir}"\n  bunx slipway-agents`
+        `  rm -rf "${installDir}"\n  bunx slipway-agents`
       );
     }
   } else {

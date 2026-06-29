@@ -1,0 +1,8 @@
+node_modules/
+packages/slipway-plugin/node_modules/
+packages/slipway-plugin/src/
+packages/slipway-plugin/README.md
+packages/slipway-plugin/tsconfig.json
+*.log
+.git/
+.claude/
