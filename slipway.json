@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
+  "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/dev/slipway.schema.json",
   "version": "0.4.0",
   "agents": {
     "slipway": {

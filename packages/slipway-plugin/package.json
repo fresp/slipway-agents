@@ -1,6 +1,6 @@
 {
   "name": "slipway-agents-plugin",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "private": true,
   "description": "Internal TypeScript plugin for slipway-agents model enforcement.",
   "main": "dist/index.js",
