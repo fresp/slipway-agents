@@ -18,7 +18,7 @@ interface SlipwayConfig {
 }
 
 interface AgentDefinition {
-  system?: string;
+  prompt?: string;
   model?: string;
   [key: string]: unknown;
 }
@@ -141,7 +141,7 @@ export const SlipwayPlugin = async (_ctx: PluginInput): Promise<Hooks> => {
 
       for (const [agentName, systemPrompt] of Object.entries(agentDefinitions)) {
         const agentDef: AgentDefinition = {
-          system: systemPrompt,
+          prompt: systemPrompt,
         };
 
         // Apply model from slipway.json if configured for this agent

@@ -7,6 +7,13 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.5.3] — 2026-06-29
+
+### Fixed
+- Plugin now correctly uses `prompt` (not `system`) when injecting agent definitions into OpenCode config — aligns with `ConfigAgentV1.Info` schema from OpenCode source. Previously the system prompt was silently dropped into the `options` catch-all and never applied.
+
+---
+
 ## [0.5.2] — 2026-06-29
 
 ### Fixed
@@ -205,6 +212,7 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
+[0.5.3]: https://github.com/fresp/slipway-agents/compare/v0.5.2...v0.5.3
 [0.5.2]: https://github.com/fresp/slipway-agents/compare/v0.5.0...v0.5.2
 [0.5.0]: https://github.com/fresp/slipway-agents/compare/v0.4.4...v0.5.0
 [0.4.0]: https://github.com/fresp/slipway-agents/compare/v0.3.0...v0.4.0
