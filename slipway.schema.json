@@ -11,7 +11,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "description": "Config schema version. Current: 0.1.0",
+      "description": "Config schema version. Current: 0.4.0",
       "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
     "agents": {
@@ -24,34 +24,37 @@
         "slipway": {
           "$ref": "#/definitions/agentConfig"
         },
-        "drafting-table": {
+        "chartmaker": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "cartographer": {
           "$ref": "#/definitions/agentConfig"
         },
         "hull-builder": {
           "$ref": "#/definitions/agentConfig"
         },
-        "inspector": {
-          "$ref": "#/definitions/agentConfig"
-        },
-        "groomer": {
+        "bosun": {
           "$ref": "#/definitions/agentConfig"
         },
         "rigger": {
           "$ref": "#/definitions/agentConfig"
         },
+        "purser": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "coxswain": {
+          "$ref": "#/definitions/agentConfig"
+        },
         "shipwright": {
           "$ref": "#/definitions/agentConfig"
         },
-        "security-auditor": {
-          "$ref": "#/definitions/agentConfig"
-        },
-        "estimator": {
-          "$ref": "#/definitions/agentConfig"
-        },
-        "schema-validator": {
-          "$ref": "#/definitions/agentConfig"
-        },
         "chronicler": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "surveyor": {
+          "$ref": "#/definitions/agentConfig"
+        },
+        "gunner": {
           "$ref": "#/definitions/agentConfig"
         }
       }

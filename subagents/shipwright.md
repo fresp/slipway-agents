@@ -63,7 +63,7 @@ This pre-flight runs even in extend mode when called from the orchestrator's STE
 
 ### STEP 1 — Scoped Brainstorm
 
-Run a short Q&A focused only on the new feature — much shorter than `drafting-table`'s full session, since the product context already exists.
+Run a short Q&A focused only on the new feature — much shorter than `chartmaker`'s full session, since the product context already exists.
 
 Typical questions:
 - What does this feature do, concretely? (maps to new FR-IDs)

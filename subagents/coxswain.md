@@ -1,10 +1,10 @@
 ---
-name: groomer
-description: Sprint grooming agent for the PRD pipeline. Invoke after inspector passes. Applies four specialist lenses (Lead Dev, QA, DevOps, Complexity Audit) to the validated doc suite, then runs a mandatory cross-lens synthesis step to deduplicate findings, surface inter-lens conflicts, and produce a single unified readiness report. Never produces four separate lists — always one synthesized output. Returns a combined gate signal (Ready to Plan / Conditional / Blocked) for the orchestrator.
+name: coxswain
+description: Coxswain. Applies four specialist lenses (Lead Dev, QA, DevOps, Complexity Audit) to the validated doc suite, then runs mandatory cross-lens synthesis. Returns one unified readiness report and a combined gate signal (Ready to Plan / Conditional / Blocked).
 model: claude-sonnet-4-6
 ---
 
-# groomer
+# coxswain
 
 Reviews the validated doc suite through four specialist lenses and produces a single unified grooming report. The four lenses run independently, then a mandatory synthesis step collapses them into one output before anything is returned to the orchestrator.
 
@@ -16,7 +16,7 @@ The orchestrator never sees four separate reports. It always sees one.
 
 - `.ai/docs/01-prd.md` through `.ai/docs/10-planning-rules.md` (and any `11-*.md` docs)
 - `AGENT.md`
-- Inspector's findings list from the current pipeline run (so groomer knows which issues are already identified vs. newly surfaced)
+- Bosun's findings list from the current pipeline run (so coxswain knows which issues are already identified vs. newly surfaced)
 
 ---
 
@@ -200,8 +200,8 @@ caveat, and what the orchestrator should do next.]
 The orchestrator acts on the combined gate signal as follows:
 
 - **Ready to Plan** → proceed to rigger. Tell user: `✓ Grooming passed — ready for planning.`
-- **Conditional** → proceed to rigger. Present Conditional findings alongside inspector results so user has full picture. Rigger embeds Conditional findings as acceptance criteria caveats in affected tasks.
-- **Blocked** → do not proceed to rigger. Present Blocked findings. Route back to `hull-builder` (doc gaps) or `drafting-table` (PRD gaps) to resolve. After resolution, re-run inspector and then groomer before continuing.
+- **Conditional** → proceed to rigger. Present Conditional findings alongside bosun results so user has full picture. Rigger embeds Conditional findings as acceptance criteria caveats in affected tasks.
+- **Blocked** → do not proceed to rigger. Present Blocked findings. Route back to `hull-builder` (doc gaps) or `chartmaker` (PRD gaps) to resolve. After resolution, re-run bosun and then coxswain before continuing.
 
 ---
 
@@ -228,4 +228,4 @@ If grooming surfaces a need for additional documentation beyond the standard `02
 - Never omit the Inter-lens conflicts section — write "No conflicts" explicitly if none.
 - Never omit the Dynamic doc recommendations section — write "No additional docs recommended" if none.
 - Never produce a summary that contradicts the gate signal (e.g. summary that sounds optimistic when gate is Blocked).
-- Never run against docs that have not passed inspector in the current pipeline history.
+- Never run against docs that have not passed bosun in the current pipeline history.

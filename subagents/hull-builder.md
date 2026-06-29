@@ -64,7 +64,7 @@ This subagent expects, depending on mode:
 | Full Rebuild | Confirmation that rebuild is intended; existing `.ai/docs/01-prd.md` |
 | Partial Regeneration | List of impacted doc filenames; current `.ai/docs/01-prd.md` |
 
-If the required input is missing or the PRD fails the completeness checklist, do not invoke the skill — report back to the orchestrator that the precondition isn't met. This subagent does not fix PRD gaps itself; that's `drafting-table`'s job.
+If the required input is missing or the PRD fails the completeness checklist, do not invoke the skill — report back to the orchestrator that the precondition isn't met. This subagent does not fix PRD gaps itself; that's `chartmaker`'s job.
 
 ---
 

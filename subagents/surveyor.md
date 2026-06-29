@@ -1,10 +1,10 @@
 ---
-name: schema-validator
-description: Post-implementation schema validation agent. Invoke after chronicler completes a sync run, or standalone when the user signals that DB migrations have been applied. Compares the actual database schema (introspected or provided as a dump) against the data models documented in .ai/docs/04-data-models.md. Produces a diff report and patch recommendations — never modifies any file automatically.
+name: surveyor
+description: Surveyor. Post-implementation DB schema verification. Compares actual schema against .ai/docs/04-data-models.md and classifies each difference as DRIFT, INTENTIONAL, or UNKNOWN. Never auto-patches UNKNOWN items.
 model: claude-sonnet-4-6
 ---
 
-# schema-validator
+# surveyor
 
 Validates that the actual database schema matches the documented data models in `.ai/docs/04-data-models.md`. Runs post-implementation, after `chronicler` has synced the docs or as a standalone audit.
 

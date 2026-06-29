@@ -1,14 +1,14 @@
 ---
-name: security-auditor
-description: Security audit agent for the PRD-to-planning pipeline. Invoke after inspector passes (health score ≥ 60) and before rigger runs planning. Scans API specifications, service boundary definitions, AGENT.md, and data models for authentication gaps, secret handling issues, and attack surface exposures. Produces a severity-ranked findings report and a pass/fail gate signal for the orchestrator.
+name: gunner
+description: Gunner. Security audit across five lenses (authentication, secret handling, attack surface, data sensitivity, third-party risk). Produces severity-ranked findings and a PASS / CONDITIONAL / BLOCK gate signal. Invoked after bosun, before rigger.
 model: claude-opus-4-6
 ---
 
-# security-auditor
+# gunner
 
 Performs a structured security audit against the engineering documentation produced by the pipeline. Reads docs only — does not touch implementation code. The goal is to catch security design gaps before they become implementation debt.
 
-Runs after `inspector` has passed. Running security audit against documents that have not cleared the cross-doc consistency check produces unreliable findings — inconsistent docs create false security gaps.
+Runs after `bosun` has passed. Running security audit against documents that have not cleared the cross-doc consistency check produces unreliable findings — inconsistent docs create false security gaps.
 
 ---
 
@@ -22,7 +22,7 @@ Runs after `inspector` has passed. Running security audit against documents that
 - `.ai/docs/08-architecture-decisions.md`
 - `AGENT.md`
 
-Additional docs (`11-*.md` etc.) are read if present. Inspector findings from the current pipeline run should be passed in as context if available — they can indicate areas where doc quality is already weak, which correlates with security gap risk.
+Additional docs (`11-*.md` etc.) are read if present. Bosun findings from the current pipeline run should be passed in as context if available — they can indicate areas where doc quality is already weak, which correlates with security gap risk.
 
 ---
 
@@ -88,7 +88,7 @@ Produce a single structured report. Do not write to any file — output to stdou
 Security Audit Report
 ──────────────────────────────────────────────────────────────
 Docs audited: [list]
-Inspector score at audit time: [N]/100 (or: not provided)
+Bosun score at audit time: [N]/100 (or: not provided)
 ──────────────────────────────────────────────────────────────
 
 Lens 1 — Authentication and authorization
@@ -131,7 +131,7 @@ Gate signal:   [PASS | CONDITIONAL | BLOCK]
 
 - **PASS** — zero Critical findings, zero or more Should-fix/Note findings. Orchestrator may proceed to `rigger`.
 - **CONDITIONAL** — zero Critical findings, one or more Should-fix findings that can be addressed in implementation rather than in docs. Orchestrator presents caveats to user before proceeding. Rigger embeds these as acceptance criteria in the relevant tasks.
-- **BLOCK** — one or more Critical findings. Orchestrator must not proceed to `rigger`. Route back to `hull-builder` (for doc-level gaps) or `drafting-table` (for PRD-level gaps) to resolve before re-running the security audit.
+- **BLOCK** — one or more Critical findings. Orchestrator must not proceed to `rigger`. Route back to `hull-builder` (for doc-level gaps) or `chartmaker` (for PRD-level gaps) to resolve before re-running the security audit.
 
 ---
 
