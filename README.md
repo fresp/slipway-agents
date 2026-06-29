@@ -174,7 +174,7 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 // slipway.local.json — takes precedence over slipway.json
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "agents": {
     "slipway":          { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
     "inspector":        { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
@@ -201,15 +201,23 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 
 ---
 
+## What's new in v1.2.0
+
+- **Runtime Capabilities in AGENT.md** — hull-builder now generates a `## Runtime Capabilities` section declaring exactly what tools the implementing agent is permitted to use (file write scope, bash commands, network policy, package installation) and what requires human confirmation before proceeding
+- **Escalation Protocol in AGENT.md** — AGENT.md now includes a structured `## Escalation Protocol` specifying when to halt vs. retry, the four-step escalation procedure, and a one-retry policy with explicit logging
+- **Verification fields on every task** — rigger task entries now include `Expected output` (the concrete artifact produced), `Verify command` (shell command to confirm completion), and `Test command` (scoped test suite)
+- **Implementation state tracking** — orchestrator now manages `.ai/implementation-state.md` tracking per-phase progress, blocked task log, and test results across sessions
+- **Parallelism semantics clarified** — `Parallel: true/false` is a planning signal, not a concurrency directive; sequential execution is always correct; parallel dispatch is an optimization for multi-agent runtimes like omo.dev
+- **Test results in pipeline completion report** — full pipeline run now reports test pass/fail alongside planning and grooming results
+
+See [CHANGELOG.md](CHANGELOG.md) for the full list.
+
 ## What's new in v1.1.0
 
 - **Three new agents** — `security-auditor`, `estimator`, `schema-validator`
 - **Agent upgrades** — `inspector` (per-doc health scores, Opus model), `rigger` (S/M/L sizing, dependency graph, stale check), `groomer` (cross-lens synthesis), `chronicler` (DRIFT/INTENTIONAL/UNKNOWN classification)
 - **Plugin model enforcement** — `slipway.json` model assignments are now enforced at runtime via the OpenCode plugin system, not just documentation
 - **`fallback_model` support** — automatic fallback per agent when the primary model is unavailable
-- All user-facing strings are now English only
-
-See [CHANGELOG.md](CHANGELOG.md) for the full list.
 
 ---
 
