@@ -29,6 +29,36 @@ This subagent does not regenerate engineering docs itself. It hands its impact m
 
 ---
 
+## Pre-flight: ADR conflict check
+
+Before running any Q&A, check `08-architecture-decisions.md` for ADRs that may be relevant to the stated feature. This is a proactive scan — the user may not know a conflict exists.
+
+Steps:
+1. Read `08-architecture-decisions.md`.
+2. Scan the feature description for any capability, pattern, or dependency that an existing ADR explicitly forbids or constrains.
+3. If a potential conflict is found, surface it immediately — before STEP 1:
+
+```
+⚠ Pre-flight: potential ADR conflict detected
+
+Feature: [stated feature]
+Conflicting ADR: [ADR-ID] — [title]
+Rule: [the specific rule from the ADR]
+
+This conflict must be resolved before scoping the feature. Options:
+  a) Revise the feature to avoid this constraint
+  b) Revise ADR-[ID] (requires explicit user approval)
+  c) Confirm this feature is intentionally exempt from this ADR (user must state why)
+
+Resolve before continuing.
+```
+
+4. If no conflicts are found, proceed directly to STEP 1 — no pre-flight report needed.
+
+This pre-flight runs even in extend mode when called from the orchestrator's STEP E1.
+
+---
+
 ## Process
 
 ### STEP 1 — Scoped Brainstorm

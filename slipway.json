@@ -1,26 +1,26 @@
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "agents": {
     "slipway": {
       "model": "anthropic/claude-opus-4-6",
       "fallback_model": "anthropic/claude-sonnet-4-6",
-      "description": "Primary orchestrator — routes the pipeline, enforces step order, never generates content directly"
+      "description": "Primary orchestrator \u2014 routes the pipeline, enforces step order, never generates content directly"
     },
     "drafting-table": {
       "model": "anthropic/claude-sonnet-4-6",
       "fallback_model": "anthropic/claude-haiku-4-5",
-      "description": "Raw prompt / partial PRD → complete .ai/docs/01-prd.md"
+      "description": "Raw prompt / partial PRD \u2192 complete .ai/docs/01-prd.md with Stakeholder Priority (P0/P1/P2) per FR-ID"
     },
     "hull-builder": {
       "model": "anthropic/claude-sonnet-4-6",
       "fallback_model": "anthropic/claude-haiku-4-5",
-      "description": "Invokes bootstrap-from-prd skill → .ai/docs/02–10 + AGENT.md"
+      "description": "Invokes bootstrap-from-prd skill \u2192 .ai/docs/02\u201310 + AGENT.md"
     },
     "inspector": {
       "model": "anthropic/claude-opus-4-6",
       "fallback_model": "anthropic/claude-sonnet-4-6",
-      "description": "Cross-doc validation + per-doc health score breakdown + severity-ranked findings"
+      "description": "Cross-doc validation + per-doc health score breakdown + severity-ranked findings + Stakeholder Priority check"
     },
     "groomer": {
       "model": "anthropic/claude-sonnet-4-6",
@@ -30,22 +30,22 @@
     "rigger": {
       "model": "anthropic/claude-sonnet-4-6",
       "fallback_model": "anthropic/claude-haiku-4-5",
-      "description": "Phase/milestone breakdown → .ai/planning/ with S/M/L sizing and dependency graph"
+      "description": "Phase/milestone breakdown \u2192 .ai/planning/ with S/M/L sizing, dependency graph, and P0/P1/P2 phase ordering"
     },
     "shipwright": {
       "model": "anthropic/claude-sonnet-4-6",
       "fallback_model": "anthropic/claude-haiku-4-5",
-      "description": "Update existing docs when a new feature is introduced (extend mode)"
+      "description": "Update existing docs when a new feature is introduced \u2014 proactive ADR conflict pre-flight before scoping"
     },
     "security-auditor": {
       "model": "anthropic/claude-opus-4-6",
       "fallback_model": "anthropic/claude-sonnet-4-6",
-      "description": "Auth, secrets, and attack surface audit — runs after inspector, before rigger"
+      "description": "Auth, secrets, and attack surface audit \u2014 runs after inspector, before rigger"
     },
     "estimator": {
       "model": "anthropic/claude-sonnet-4-6",
       "fallback_model": "anthropic/claude-haiku-4-5",
-      "description": "Cost and time forecast per phase based on .ai/planning/ — runs after rigger, before build"
+      "description": "Cost and time forecast per phase based on .ai/planning/ \u2014 runs after rigger, before build"
     },
     "schema-validator": {
       "model": "anthropic/claude-sonnet-4-6",
@@ -55,13 +55,13 @@
     "chronicler": {
       "model": "anthropic/claude-haiku-4-5",
       "fallback_model": "anthropic/claude-sonnet-4-6",
-      "description": "Post-implementation doc sync — detect and classify drift (DRIFT / INTENTIONAL / UNKNOWN)"
+      "description": "Post-implementation doc sync \u2014 detect and classify drift (DRIFT / INTENTIONAL / UNKNOWN)"
     }
   },
   "categories": {
     "quick": {
       "model": "anthropic/claude-haiku-4-5",
-      "description": "Trivial or pattern-matching tasks — fast and cheap"
+      "description": "Trivial or pattern-matching tasks \u2014 fast and cheap"
     },
     "standard": {
       "model": "anthropic/claude-sonnet-4-6",
@@ -70,7 +70,7 @@
     "deep": {
       "model": "anthropic/claude-opus-4-6",
       "fallback_model": "anthropic/claude-sonnet-4-6",
-      "description": "Reasoning-heavy tasks — validation, security audit, orchestration"
+      "description": "Reasoning-heavy tasks \u2014 validation, security audit, orchestration"
     }
   }
 }

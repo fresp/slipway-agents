@@ -577,6 +577,7 @@ Pipeline complete.
 ✓ Grooming: [Ready to Plan | Conditional] — Lead Dev: [R/C/B] | QA: [R/C/B] | DevOps: [R/C/B]
 ✓ .ai/planning/ (phase breakdown with sizing and dependency graph)
 ✓ Estimate: [total time range] — Critical path: [range]
+✓ Stakeholder Priority: [N P0, N P1, N P2 across all phases] — P2 deferred: [N requirements, or "none"]
 ✓ Tests: [pass | N failures] — [command run, or "not yet run — implementation pending"]
 
 Optimize cycles used: [N]/2
@@ -599,3 +600,5 @@ Changelog written to: .ai/docs/.pipeline-changelog.md
 - Never run `estimator` before `rigger` has produced `.ai/planning/`.
 - Never restart the entire pipeline from STEP 1 on a mid-pipeline PRD edit if the edit is additive and the existing PRD checklist still passes — restart from the earliest step that is actually invalidated.
 - Never use non-English strings for trigger matching, user prompts, or error messages.
+- Never run `rigger` without first checking `.ai/docs/.pipeline-state.md` to confirm that `shipwright` (in extend mode) surfaced no unresolved ADR conflicts — unresolved ADR conflicts must be resolved before planning runs.
+- Never allow `drafting-table` to proceed past its completion contract with missing Stakeholder Priority tags and no default-P1 warning note.

@@ -9,7 +9,7 @@ slipway-agents takes a raw product idea or existing PRD and drives it through a 
 
 ## How it works
 
-[![slipway-agents pipeline](https://github.com/fresp/slipway-agents/raw/dev/docs/pipeline.svg)](https://github.com/fresp/slipway-agents/blob/dev/docs/pipeline.svg)
+[![slipway-agents pipeline](https://github.com/fresp/slipway-agents/raw/dev/docs/pipeline.png)](https://github.com/fresp/slipway-agents/blob/dev/docs/pipeline.png)
 
 **Pipeline stages**
 
@@ -167,6 +167,18 @@ slipway walks you through each step with a `yes / no` prompt — you never need 
 
 ---
 
+## Slash commands
+
+| Command | What it does |
+|---------|-------------|
+| `/slipway-init` | Start a new pipeline run — routes to drafting-table or hull-builder based on current state |
+| `/slipway-status` | Show current pipeline state, last completed step, and health scores without running anything |
+| `/slipway-resume` | Resume from the last completed step — reads `.ai/docs/.pipeline-state.md` automatically |
+
+Full reference: [docs/slash-commands.md](docs/slash-commands.md)
+
+---
+
 ## Overriding models
 
 Copy `slipway.json` to your project root and edit it. The plugin picks it up automatically on next session start.
@@ -199,6 +211,16 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 ## Examples
 
 - [`skills/slipway/bootstrap-from-prd/examples/managed-waba/`](skills/slipway/bootstrap-from-prd/examples/managed-waba) — full pipeline output for a multi-tenant WhatsApp Business Calling service (Kamailio → Asterisk → WebRTC, MongoDB + Redis, multi-tenant SIP gateway)
+
+---
+
+## What's new in v1.3.0
+
+- **Stakeholder Priority (P0/P1/P2)** — drafting-table now assigns priority tiers to every functional requirement. Rigger uses these tiers to order phases (P0 must ship in Phase 1–2, P2 is deferred to `future-scope.md`). Inspector validates that every FR-ID has a priority tag.
+- **Proactive ADR conflict guard** — shipwright now runs a pre-flight scan against `08-architecture-decisions.md` before any Q&A, surfacing conflicts before feature scoping begins rather than mid-process.
+- **Slash commands** — `/slipway-init`, `/slipway-status`, `/slipway-resume` registered in OpenCode for quick access without remembering trigger phrases.
+- **Dynamic doc awareness in inspector** — inspector now reads the canonical doc list from `10-planning-rules.md` instead of hardcoding `02–10`, so dynamic docs (`11-*.md`) are always included in the audit scope.
+- **`slipway.local.json` support** — create `slipway.local.json` in any project root to override model assignments without modifying the shared `slipway.json`.
 
 ---
 

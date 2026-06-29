@@ -64,12 +64,29 @@ Every output must cover, in this order:
 2. Goals
 3. Actors
 4. Functional Requirements
+4a. Stakeholder Priority
 5. Non-Functional Requirements
 6. Constraints
 7. Out of Scope
 8. Success Criteria
 
 This list is identical to the checklist in `bootstrap-from-prd/SKILL.md` — do not diverge from it, since Docs Builder validates against exactly this list.
+
+### Stakeholder Priority
+
+After completing Functional Requirements, ask the user to assign a priority tier to each functional requirement or feature cluster:
+
+| Tier | Label | Meaning |
+|------|-------|---------|
+| **P0** | Must ship | Blocking — product cannot launch without this |
+| **P1** | Should ship | High value, plan for it in phase 1–2 |
+| **P2** | Nice to have | Defer to future scope unless capacity allows |
+
+Record priority assignments inline in the Functional Requirements list as a suffix tag: `FR-001 [P0]`, `FR-002 [P1]`, etc.
+
+If the user cannot or will not prioritize, default all requirements to **P1** and note: `⚠ Priority: all requirements defaulted to P1 — user did not assign tiers. Review before planning.`
+
+This question counts as 1 Q&A budget item.
 
 ---
 
@@ -160,6 +177,7 @@ Before handing back to the orchestrator, verify:
 - ✓ No Functional Requirement or Goal is empty — these are non-negotiable per the skill
 - ✓ No known contradiction remains unresolved
 - ✓ User has confirmed any content that was inferred rather than stated directly
+- ✓ Every Functional Requirement has a priority tier tag (P0/P1/P2) — or the default-P1 warning note is present
 
 ## Report Back
 
@@ -167,6 +185,15 @@ Before handing back to the orchestrator, verify:
 ✓ .ai/docs/01-prd.md [created | updated]
 ✓ Sections: 8/8 complete (or: N/A noted for [section])
 ✓ Functional Requirements: [count], FR-001–FR-[N]
+✓ Stakeholder Priority: [N P0, N P1, N P2] (or: defaulted to P1)
 ⚠ Inferred & confirmed: [list, or "none"]
 → Ready for Docs Builder
 ```
+
+---
+
+## Forbidden Behaviors
+
+- Never leave all Functional Requirements without a priority tier and without the default-P1 warning note.
+- Never assign P0 to more than 60% of all functional requirements without surfacing a warning: `⚠ More than 60% of requirements are P0 — this likely means the prioritization is not meaningful. Consider revising.`
+- Never fabricate priority tiers the user has not stated or confirmed.

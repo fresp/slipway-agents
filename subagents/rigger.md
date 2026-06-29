@@ -44,6 +44,7 @@ If `.ai/planning/` does not exist, proceed directly to planning.
 - Inspector's final findings list (so tasks can carry forward accepted Should-fix caveats)
 - Groomer's caveats list (Conditional findings to embed as acceptance criteria in relevant tasks)
 - `.ai/docs/.pipeline-state.md` (for stale check timestamps)
+- Stakeholder Priority tags from `.ai/docs/01-prd.md` (P0/P1/P2 per FR-ID)
 
 ---
 
@@ -195,6 +196,25 @@ When called by the orchestrator in `extend` mode (a new feature is being added t
 
 ---
 
+## Stakeholder Priority integration
+
+Use Stakeholder Priority tags from `01-prd.md` to influence phase ordering:
+
+| Tier | Phase placement |
+|------|----------------|
+| **P0** | Must appear in Phase 1 or Phase 2 — never deferred |
+| **P1** | Target Phase 1–3 — default placement |
+| **P2** | Defer to the final phase OR to `.ai/planning/future-scope.md` if capacity is constrained |
+
+**Rules:**
+- If all P0 requirements fit in Phase 1 without making it too large (more than 10 tasks), put them all in Phase 1.
+- If P0 requirements span multiple phases, document the split explicitly in `00-overview.md` with a note: `P0 split across phases [N] and [N+1] — reason: [dependency chain / size constraint]`.
+- Create `.ai/planning/future-scope.md` when there are P2 requirements that do not fit in the planned phases. List each P2 FR-ID, its deferred rationale, and a one-line description of what it would take to promote it to P1.
+- Never place a P0 requirement in a phase that depends on a P2 requirement. P0 tasks must be on the critical path or parallel to it — not blocked by lower-priority work.
+- If the PRD uses the default-P1 fallback (all requirements defaulted to P1), skip tier-based reordering entirely and organize phases by technical dependency only.
+
+---
+
 ## Forbidden behaviors
 
 - Never leave `Expected output`, `Verify command`, or `Test command` blank — write `[manual review required]` or `[no automated tests — manual QA required]` rather than omitting the field entirely.
@@ -205,3 +225,5 @@ When called by the orchestrator in `extend` mode (a new feature is being added t
 - Never produce a plan against docs that have not passed inspector and groomer in the current pipeline history (check `.ai/docs/.pipeline-state.md`).
 - Never include groomer Blocked findings as accepted caveats — Blocked findings must be resolved before planning runs.
 - Never write more than one dependency graph — it lives in `00-overview.md` only.
+- Never place a P0 requirement in a phase that depends on a P2 requirement.
+- Never leave `.ai/planning/future-scope.md` unwritten when P2 requirements exist and are being deferred.
