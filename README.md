@@ -220,52 +220,6 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 
 ---
 
-## What's new in v0.5.2
-
-- **Correct runtime registration** — agents are now registered via the OpenCode `config` hook (mutating `input.agent`) rather than the non-existent `client.config.patch()`. Model assignments are read from `~/.config/opencode/slipway.json` (global config); `slipway.local.json` takes precedence. Still zero disk writes.
-- **Simpler installer** — `slipway-agents` (the `bunx`/`npx` installer) no longer does a `git clone`. It only adds the plugin to `~/.config/opencode/opencode.json` and copies `slipway.json` from the installed npm package to `~/.config/opencode/`.
-
-## What's new in v0.5.0
-
-- **Single package** — the monorepo is gone. The standalone `slipway-agents-plugin` package has been merged into `slipway-agents`, which is now both the agent framework and the OpenCode plugin. Install one package, reference one plugin: `"plugin": ["slipway-agents@latest"]`.
-- **Pure runtime agent registration** — the plugin registers agents directly into the OpenCode runtime via `client.config.patch()` with zero disk writes. Agents load from the bundled `subagents/*.md` and pick up model assignments from `slipway.json` at startup.
-
-## What's new in v0.4.0
-
-- **Nautical rename** — six agents renamed for thematic consistency: `drafting-table→chartmaker`, `inspector→bosun`, `groomer→coxswain`, `estimator→purser`, `security-auditor→gunner`, `schema-validator→surveyor`
-- **`cartographer`** — new agent that reverse-engineers an existing codebase into `.ai/docs/` with confidence markers (`[INFERRED]`, `[PARTIAL]`, `[TEMPLATE]`, `[ASSUMED]`) so the full pipeline can run on a project that has code but no docs
-- **`reverse-engineer` mode** — new pipeline mode triggered automatically when `.ai/docs/` is absent and a root manifest is detected; routes through cartographer → chartmaker (gap-fill only) → bosun (relaxed 60-point threshold) → standard pipeline
-
-## What's new in v0.3.0
-
-- **Stakeholder Priority (P0/P1/P2)** — chartmaker now assigns priority tiers to every functional requirement. Rigger uses these tiers to order phases (P0 must ship in Phase 1–2, P2 is deferred to `future-scope.md`). Bosun validates that every FR-ID has a priority tag.
-- **Proactive ADR conflict guard** — shipwright now runs a pre-flight scan against `08-architecture-decisions.md` before any Q&A, surfacing conflicts before feature scoping begins rather than mid-process.
-- **Slash commands** — `/slipway-init`, `/slipway-status`, `/slipway-resume` registered in OpenCode for quick access without remembering trigger phrases.
-- **Dynamic doc awareness in bosun** — bosun now reads the canonical doc list from `10-planning-rules.md` instead of hardcoding `02–10`, so dynamic docs (`11-*.md`) are always included in the audit scope.
-- **`slipway.local.json` support** — create `slipway.local.json` in any project root to override model assignments without modifying the shared `slipway.json`.
-
----
-
-## What's new in v0.2.0
-
-- **Runtime Capabilities in AGENT.md** — hullwright now generates a `## Runtime Capabilities` section declaring exactly what tools the implementing agent is permitted to use (file write scope, bash commands, network policy, package installation) and what requires human confirmation before proceeding
-- **Escalation Protocol in AGENT.md** — AGENT.md now includes a structured `## Escalation Protocol` specifying when to halt vs. retry, the four-step escalation procedure, and a one-retry policy with explicit logging
-- **Verification fields on every task** — rigger task entries now include `Expected output` (the concrete artifact produced), `Verify command` (shell command to confirm completion), and `Test command` (scoped test suite)
-- **Implementation state tracking** — orchestrator now manages `.ai/implementation-state.md` tracking per-phase progress, blocked task log, and test results across sessions
-- **Parallelism semantics clarified** — `Parallel: true/false` is a planning signal, not a concurrency directive; sequential execution is always correct; parallel dispatch is an optimization for multi-agent runtimes like omo.dev
-- **Test results in pipeline completion report** — full pipeline run now reports test pass/fail alongside planning and grooming results
-
-See [CHANGELOG.md](CHANGELOG.md) for the full list.
-
-## What's new in v0.1.0
-
-- **Three new agents** — `gunner`, `purser`, `surveyor`
-- **Agent upgrades** — `bosun` (per-doc health scores, Opus model), `rigger` (S/M/L sizing, dependency graph, stale check), `coxswain` (cross-lens synthesis), `chronicler` (DRIFT/INTENTIONAL/UNKNOWN classification)
-- **Plugin model enforcement** — `slipway.json` model assignments are now enforced at runtime via the OpenCode plugin system, not just documentation
-- **`fallback_model` support** — automatic fallback per agent when the primary model is unavailable
-
----
-
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
