@@ -3,7 +3,7 @@
 
 > PRD-to-engineering-docs pipeline agents for [OpenCode](https://opencode.ai).
 
-slipway-agents takes a raw product idea or existing PRD and drives it through a structured, multi-agent pipeline — brainstorm → engineering docs → security audit → phased planning → cost estimate → sprint grooming → build → post-implementation sync. One orchestrator (`slipway`) coordinates eleven specialized subagents.
+slipway-agents takes a raw product idea or existing PRD and drives it through a structured, multi-agent pipeline — brainstorm → engineering docs → security audit → phased planning → cost estimate → sprint grooming → build → post-implementation sync. One orchestrator (`slipway`) coordinates twelve specialized subagents.
 
 ---
 
@@ -98,7 +98,21 @@ A single pipeline run from a raw idea produces:
 
 ## Install
 
-**Quick install — let an agent do it:**
+**One command (recommended):**
+
+```bash
+# With bun
+bunx slipway-agents@latest install
+
+# Or with npm
+npx slipway-agents@latest install
+```
+
+This registers the `slipway-agents@latest` plugin in `~/.config/opencode/opencode.json`, copies `slipway.json` to `~/.config/opencode/`, and clears the OpenCode plugin cache so the latest version is fetched on next start. Restart OpenCode and you're done.
+
+The plugin reads `slipway.json` at startup and enforces model assignments per agent at runtime. Edit `slipway.json` to change models — no other files need to be touched.
+
+**Let an agent do it:**
 
 ```
 Install and configure slipway-agents by following the instructions here:
@@ -117,19 +131,10 @@ Add to `opencode.json`:
 {
   "agents": {
     "include": ["~/.config/opencode/agents/slipway-agents"]
-  }
-}
-```
-
-**With plugin model enforcement (recommended):**
-
-```json
-{
+  },
   "plugin": ["slipway-agents@latest"]
 }
 ```
-
-This registers the slipway-agents plugin, which reads `slipway.json` from your project root at startup and enforces model assignments per agent at runtime. Edit `slipway.json` to change models — no other files need to be touched.
 
 Full guide: [docs/guide/installation.md](docs/guide/installation.md)
 
@@ -196,7 +201,7 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 // slipway.local.json — takes precedence over slipway.json
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "agents": {
     "slipway":      { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
     "chartmaker":   { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
@@ -209,7 +214,8 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
     "purser":       { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
     "shipwright":   { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
     "surveyor":     { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
-    "chronicler":   { "model": "amazon-bedrock/us.anthropic.claude-haiku-4-5",  "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" }
+    "chronicler":   { "model": "amazon-bedrock/us.anthropic.claude-haiku-4-5",  "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
+    "caulker":      { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" }
   }
 }
 ```
