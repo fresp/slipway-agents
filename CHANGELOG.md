@@ -7,6 +7,23 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.7.1] — 2026-07-03
+
+### Added
+- `caulker` — new subagent that resolves conflicts in `.ai/docs/` and `AGENT.md` after
+  multi-contributor git merges. Performs section-level semantic comparison (not line-level)
+  to catch contradictions that a clean git merge doesn't flag — e.g. two contributors
+  independently claiming the same service ownership, or contradictory ADRs. Auto-merges only
+  genuinely non-overlapping additions; blocks and escalates everything else to the user.
+- `doc-merge-resolution` skill — structural parsing rules per document type (ADRs by ID,
+  service Owns-lists, endpoints by method+path, FR-IDs, AGENT.md sections) used by `caulker`.
+- Scope-lock advisory check in `slipway` orchestrator — before `shipwright`/`chronicler`/
+  `hullwright` start a mutating step, checks `.ai/docs/.pipeline-state.md` for overlapping
+  in-progress work from another contributor and warns before proceeding.
+- New `resolve-conflicts` standalone entry point and mode-detection signal in `slipway`.
+
+---
+
 ## [0.7.0] — 2026-06-29
 
 ### Changed

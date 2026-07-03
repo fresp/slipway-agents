@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/dev/slipway.schema.json",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "agents": {
     "slipway":      { "model": "anthropic/claude-opus-4-6",   "fallback_model": "anthropic/claude-sonnet-4-6", "mode": "primary",  "description": "Primary orchestrator — routes the pipeline, enforces step order, never generates content directly" },
     "chartmaker":   { "model": "anthropic/claude-sonnet-4-6", "fallback_model": "anthropic/claude-haiku-4-5",  "mode": "subagent", "description": "Raw prompt / partial PRD → complete .ai/docs/01-prd.md with P0/P1/P2 ranking" },
@@ -13,7 +13,8 @@
     "shipwright":   { "model": "anthropic/claude-sonnet-4-6", "fallback_model": "anthropic/claude-haiku-4-5",  "mode": "subagent", "description": "Update existing docs when a new feature is introduced — proactive ADR conflict pre-flight before scoping" },
     "chronicler":   { "model": "anthropic/claude-haiku-4-5",  "fallback_model": "anthropic/claude-sonnet-4-6", "mode": "subagent", "description": "Post-implementation doc sync — detect and classify drift (DRIFT / INTENTIONAL / UNKNOWN)" },
     "surveyor":     { "model": "anthropic/claude-sonnet-4-6", "fallback_model": "anthropic/claude-haiku-4-5",  "mode": "subagent", "description": "Post-implementation DB schema vs 04-data-models.md consistency check" },
-    "gunner":       { "model": "anthropic/claude-opus-4-6",   "fallback_model": "anthropic/claude-sonnet-4-6", "mode": "subagent", "description": "Auth, secrets, attack surface audit — PASS / CONDITIONAL / BLOCK gate" }
+    "gunner":       { "model": "anthropic/claude-opus-4-6",   "fallback_model": "anthropic/claude-sonnet-4-6", "mode": "subagent", "description": "Auth, secrets, attack surface audit — PASS / CONDITIONAL / BLOCK gate" },
+    "caulker":      { "model": "anthropic/claude-opus-4-6",   "fallback_model": "anthropic/claude-sonnet-4-6" }
   },
   "categories": {
     "quick":    { "model": "anthropic/claude-haiku-4-5",  "description": "Trivial or pattern-matching tasks — fast and cheap" },

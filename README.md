@@ -29,6 +29,9 @@ slipway-agents takes a raw product idea or existing PRD and drives it through a 
 | **Extend**           | `shipwright`       | New feature arrives → scoped PRD update + targeted doc rebuild                     |
 | **Sync**             | `chronicler`       | Post-build drift detection → DRIFT / INTENTIONAL / UNKNOWN classification          |
 | **Sync**             | `surveyor`         | DB schema vs `04-data-models.md` consistency check                                 |
+| **Resolve Conflicts** | `caulker` | Post-merge semantic conflict detection and resolution across docs and `AGENT.md` |
+
+After a multi-contributor merge or rebase touches `.ai/docs/` or `AGENT.md`, run `@slipway resolve-conflicts` to have `caulker` catch and resolve semantic conflicts that a clean git merge doesn't flag.
 
 ---
 
@@ -48,6 +51,7 @@ slipway-agents takes a raw product idea or existing PRD and drives it through a 
 | `shipwright`   | Extend existing docs when a new feature is introduced                             | `claude-sonnet-4-6` |
 | `surveyor`     | Post-implementation DB schema vs data model consistency check                     | `claude-sonnet-4-6` |
 | `chronicler`   | Post-implementation doc sync — classify drift, patch docs incrementally           | `claude-haiku-4-5`  |
+| `caulker` | Resolves conflicts in `.ai/docs/` and `AGENT.md` after multi-contributor merges — section-level semantic comparison, never silently resolves true contradictions | `claude-opus-4-6` |
 
 Model assignments live in [`slipway.json`](slipway.json) and are enforced at runtime by the slipway-agents plugin. See [Overriding models](#overriding-models).
 

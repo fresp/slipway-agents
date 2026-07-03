@@ -26,6 +26,7 @@ This agent never generates engineering content directly. It decides **which suba
 | Shipwright        | `subagents/shipwright.md`          | Update existing docs when a new feature is introduced                                       |
 | Chronicler        | `subagents/chronicler.md`          | Post-implementation doc sync — classify drift, patch incrementally                         |
 | Surveyor  | `subagents/surveyor.md`    | Post-implementation DB schema vs `04-data-models.md` consistency check                     |
+| Caulker | `subagents/caulker.md` | Post-merge semantic conflict resolution across `.ai/docs/` and `AGENT.md` |
 
 Hull Builder is the only subagent that invokes the `bootstrap-from-prd` skill directly. Every other subagent reads and writes plain markdown files and hands off through the filesystem, never through shared memory.
 
@@ -38,6 +39,20 @@ Hull Builder is the only subagent that invokes the `bootstrap-from-prd` skill di
 - The orchestrator is allowed to ask the user exactly one routing question per step. It does not ask domain questions — those belong to the subagent.
 - Never skip Bosun before Gunner. Never skip Gunner before Rigger. A plan built on unaudited docs is not trustworthy.
 - Never invent which mode to run. Detect it from user intent (see Mode Detection) or ask once if ambiguous.
+
+---
+
+## Scope Locks
+
+Before invoking `shipwright`, `chronicler`, or `hullwright` in partial-regeneration mode,
+read `.ai/docs/.pipeline-state.md` for a `## Active Locks` block. If an existing lock's
+`service` field overlaps the current task's target service and the lock is under 24h old,
+warn the user with the lock's contributor/branch/timestamp details and ask whether to
+proceed anyway, coordinate first, or wait. This is advisory only — it never blocks outright,
+since lock state is only as fresh as the last `git pull`.
+
+On successful completion of a mutating step, move that step's lock entry from
+`## Active Locks` to `## Released Locks` in `.pipeline-state.md`.
 
 ---
 
@@ -113,6 +128,7 @@ Run this before anything else, every time the orchestrator is invoked.
 | No `.ai/docs/` AND root manifest detected (`package.json` / `pyproject.toml` / `go.mod` / `Cargo.toml` / `composer.json`) | `reverse-engineer`      | `cartographer`                                  |
 | Raw idea, no PRD file, no `.ai/docs/01-prd.md` exists                                                                    | `bootstrap-from-prompt` | `chartmaker`                                |
 | `.ai/docs/01-prd.md` exists, but `.ai/docs/02-*.md` does not                                                             | `bootstrap-from-prd`    | `hullwright` (brainstorm optional, see below) |
+| Literal git conflict markers found in any `.ai/docs/*.md` or `AGENT.md`, OR user explicitly says "resolve conflicts" / "merge conflict" / runs `@slipway resolve-conflicts` | `resolve-conflicts` | `caulker` |
 | `.ai/docs/02-*.md` through `.ai/docs/10-*.md` already exist, user mentions a new feature or "add feature"                | `extend`                | `shipwright`                                    |
 | User explicitly asks to "review", "summarize", or "check consistency" with no mention of new features                    | `review-only`           | `bosun`                                     |
 | User says "groom this", "sprint grooming", "is this ready to build?", "dev/QA/DevOps review", "ready to build?"          | `grooming-only`         | `coxswain`                                       |
@@ -146,6 +162,11 @@ Call `chartmaker`.
 ---
 
 ### STEP 2 — Build Docs + AGENT.md
+
+Before invoking `hullwright`, scan `.ai/docs/*.md` and `AGENT.md` for literal git conflict
+markers. If any are found, do not proceed — route to `caulker` first via the
+resolve-conflicts entry point, and only resume this flow after the user confirms all
+conflicts are resolved.
 
 Call `hullwright`.
 
@@ -323,6 +344,11 @@ Triggered when core docs already exist and the user describes a new feature.
 
 ### STEP E1 — Extend
 
+Before invoking `shipwright`, scan `.ai/docs/*.md` and `AGENT.md` for literal git conflict
+markers. If any are found, do not proceed — route to `caulker` first via the
+resolve-conflicts entry point, and only resume this flow after the user confirms all
+conflicts are resolved.
+
 Call `shipwright` directly. Brainstorm is not re-run from scratch — `shipwright` owns its own scoped Q&A for the new feature only.
 
 **Input:** New feature description (raw prompt or short PRD addendum) + all existing `.ai/docs/*.md` and `AGENT.md`.
@@ -398,6 +424,11 @@ This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and
 - **estimate-only**: call `purser` against `.ai/planning/`. Refuse if `.ai/planning/` does not exist — ask the user to run planning first.
 - **schema-validate**: call `surveyor`. Ask the user for the schema source (SQL dump, ORM schema file, or migration directory) before invoking.
 - **sync**: call `chronicler` then `surveyor`. See Pipeline — sync run below.
+- **resolve-conflicts**: call `caulker` against the touched `.ai/docs/`/`AGENT.md` files. If
+  `caulker` reports any escalated (blocked) units, stop and present them to the user — do not
+  auto-continue to any other pipeline step until the user has resolved every blocked unit in
+  this run or explicitly defers them. After a clean resolution (or user confirms all blocks are
+  resolved), ask the user: "Run bosun on the affected docs to confirm consistency? (yes / no)".
 
 ---
 
@@ -406,6 +437,11 @@ This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and
 Triggered when the user signals that implementation is complete and docs need to be reconciled with reality.
 
 ### STEP S1 — Sync
+
+Before invoking `chronicler`, scan `.ai/docs/*.md` and `AGENT.md` for literal git conflict
+markers. If any are found, do not proceed — route to `caulker` first via the
+resolve-conflicts entry point, and only resume this flow after the user confirms all
+conflicts are resolved.
 
 Call `chronicler`.
 
@@ -633,3 +669,6 @@ Changelog written to: .ai/docs/.pipeline-changelog.md
 - Never use non-English strings for trigger matching, user prompts, or error messages.
 - Never run `rigger` without first checking `.ai/docs/.pipeline-state.md` to confirm that `shipwright` (in extend mode) surfaced no unresolved ADR conflicts — unresolved ADR conflicts must be resolved before planning runs.
 - Never allow `chartmaker` to proceed past its completion contract with missing Stakeholder Priority tags and no default-P1 warning note.
+- Never allow `shipwright`, `chronicler`, or `hullwright` to run against docs containing
+  literal git conflict markers — always route to `caulker` first.
+- Never let `caulker` auto-continue into another subagent without an explicit user go-ahead.

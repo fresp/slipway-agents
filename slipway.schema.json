@@ -56,6 +56,9 @@
         },
         "gunner": {
           "$ref": "#/definitions/agentConfig"
+        },
+        "caulker": {
+          "$ref": "#/definitions/agentConfig"
         }
       }
     },
