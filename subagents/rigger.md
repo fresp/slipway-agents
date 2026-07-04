@@ -219,6 +219,8 @@ If a task is L-sized and has no parallel opportunities and no `depends_on` tasks
 - A task has `parallel: false` if it must complete before another task in the same phase can start, or if it depends on a shared resource (same DB table, same config file) that would create a write conflict.
 - Cross-phase dependencies are expressed at the phase level in `00-overview.md` and at the task level via `depends_on` in the phase file.
 - Every `depends_on` must reference an existing TASK-ID. No dangling references.
+- When determining task order and `Depends on` fields for tasks that implement a specific operational flow, cross-reference that flow's Flow Graph table in `06-operational-flows.md`: a task implementing the `To` side of an edge depends on the `From` side's implementation existing first, unless the `From` side already exists in an extend or reverse-engineered project.
+- Do not invent dependency edges beyond what the Flow Graph and existing `03-service-boundaries.md` ownership already establish.
 
 ---
 

@@ -162,6 +162,14 @@ Run all of the following checks. Each failure produces a finding at the appropri
 ### Data models ↔ Operational flows
 - Every data mutation described in `06` must correspond to a field or entity in `04`. Mutations on undocumented fields = Should-fix.
 
+### Operational flows Flow Graph ↔ Service boundaries / API specifications
+
+- Every Flow Graph row's `From`/`To` must reference a service that exists in `02-technical-architecture.md`, or be explicitly listed as an Actor in `01-prd.md`. Unknown service/actor names = Critical.
+- Every `sync-http` row's Contract must match an existing `[method] [path]` entry in `05-api-specifications.md` exactly. Non-matching contracts = Critical — this indicates the flow references an endpoint that doesn't exist, which will silently break Sisyphus's implementation understanding.
+- Flow Graph step numbers must be a strict subset of the flow's own Steps list, in ascending order matching the Steps sequence. Out-of-order or duplicate step references = Should-fix.
+- A Failure Mode value of "Not yet decided — flag for ADR" appearing more than twice across all flows combined = Should-fix — it signals systemic gaps in error-handling design, worth surfacing before planning begins rather than one at a time.
+- If `06-operational-flows.md` has no Flow Graph subsection at all for any flow (legacy doc generated before this feature, or omitted), do not treat absence as Critical — flag as Note only, since this is new structure and older/`omitted` docs predate it.
+
 ### Engineering standards ↔ Architecture decisions
 - Any constraint in `07` (e.g. "all services must use JWT") must not contradict any decision in `08`. Contradiction = Critical.
 

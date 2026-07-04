@@ -227,7 +227,7 @@ Generate in this exact order, **skipping any doc marked `omitted` in `.manifest.
 3. `03-service-boundaries.md` — draws from: Owner column (owns), Capability column (must never own = capabilities not in owner's list)
 4. `04-data-models.md` — draws from: Persistence column (entities, collections, fields), Security column (encryption flags)
 5. `05-api-specifications.md` — draws from: Capability + Owner (endpoints), Actors from PRD (who calls what), Security column (auth per endpoint)
-6. `06-operational-flows.md` — draws from: Runtime column (sync/async/event), Capability + Dependencies (flow steps)
+6. `06-operational-flows.md` — draws from: Runtime column (sync/async/event), Capability + Dependencies (flow steps), and the Flow Graph subsection per flow, cross-referenced against the services and endpoints already fixed in `02` and `05` by this point in generation order
 7. `07-engineering-standards.md` — draws from: ADRs already written (stack, patterns), NFRs (logging, testing, security), Dependencies column (infrastructure components)
 8. `09-topology-and-architecture-diagrams.md` — draws from: all docs above (visualizes what is already decided)
 9. `10-planning-rules.md` — draws from: all docs above (source-of-truth list, implementation order from flow dependencies)

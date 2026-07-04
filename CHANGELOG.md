@@ -51,6 +51,26 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   active vs resolved counts, stale active sessions (>3 days), and
   reconciliation history presence.
 
+### Added (Batch 13 — Operational Flow Graph)
+- `06-operational-flows.md` template gains a structured `Flow Graph` table per
+  flow (Step | From | To | Call Type | Contract | Failure Mode), in addition
+  to its existing prose Purpose/Trigger/Outcome/Steps sections — not a
+  replacement.
+- `bosun` gains a new cross-check validating Flow Graph rows against
+  `02-technical-architecture.md` services, `01-prd.md` actors, and
+  `05-api-specifications.md` endpoints, plus a Should-fix signal when
+  multiple flows leave Failure Mode undecided.
+- `rigger` now cross-references a flow's Flow Graph when ordering tasks that
+  implement that flow, in addition to its existing service-boundary-based
+  dependency logic.
+- Existing docs generated before this batch have no Flow Graph subsection;
+  bosun treats this as a Note, not a Critical finding, until those docs are
+  regenerated or extended.
+- Follow-up: the managed-waba reference example remains pre-Flow Graph in this
+  batch because its frozen PRD does not explicitly list external Actors; backfill
+  it during a regenerated example pass so Flow Graph rows can satisfy Bosun's
+  new service/actor cross-check without widening this phase's scope.
+
 ---
 
 ## [0.9.0] — 2026-07-04
