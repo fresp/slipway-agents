@@ -25,7 +25,7 @@ slipway-agents/
 └── docs/                          # Installation and usage guides
 ```
 
-Each agent is a single Markdown file with YAML frontmatter. The orchestrator (`slipway.md`) routes between them. The plugin (`src/index.ts`) enforces the model assignments from `slipway.json` at runtime.
+Each agent is a single Markdown file with YAML frontmatter. The orchestrator (`subagents/slipway.md`) routes between them. The plugin (`src/index.ts`) enforces the model assignments from `slipway.json` at runtime.
 
 ---
 
@@ -82,7 +82,7 @@ This is load-bearing — the orchestrator and users rely on it.]
 1. Create `subagents/[agent-name].md` following the conventions above.
 2. Add the agent to `slipway.json` with a `model` and `fallback_model`.
 3. Add the agent to `slipway.schema.json` under `properties.agents.properties`.
-4. Update `slipway.md` to include the new agent in:
+4. Update `subagents/slipway.md` to include the new agent in:
    - The subagent table at the top
    - The mode detection table (if it introduces a new mode)
    - The relevant pipeline step (if it runs in the main flow)
@@ -94,13 +94,13 @@ This is load-bearing — the orchestrator and users rely on it.]
 ## Upgrading an existing agent
 
 1. Make your changes to the agent file.
-2. If the upgrade changes the agent's output contract or gate signal, update `slipway.md` to reflect the new behavior.
+2. If the upgrade changes the agent's output contract or gate signal, update `subagents/slipway.md` to reflect the new behavior.
 3. Add an entry to `CHANGELOG.md` under `[Unreleased]` in the **Changed** section.
 4. If the upgrade changes what the agent reads or writes, check all other agents that interact with it and update their docs accordingly.
 
 ---
 
-## Modifying the orchestrator (`slipway.md`)
+## Modifying the orchestrator (`subagents/slipway.md`)
 
 The orchestrator is the most sensitive file in the repo. Changes here affect every pipeline run.
 
@@ -130,7 +130,7 @@ There are no automated tests yet. Manual testing process:
 
 1. Install the plugin locally: `npm run build` from repo root (builds `dist/`), then set the `plugin` field in your project's `opencode.json` to an absolute path to the repo root.
 2. Create a scratch project, run `@slipway I want to build [idea]`, and walk through the pipeline.
-3. Verify the agent table in `slipway.md` matches what actually ran.
+3. Verify the agent table in `subagents/slipway.md` matches what actually ran.
 4. If you changed model assignments, verify the correct model is selected in the OpenCode session header.
 
 Automated eval framework is on the roadmap. Contributions welcome.

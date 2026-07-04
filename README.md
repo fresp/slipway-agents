@@ -3,7 +3,7 @@
 
 > PRD-to-engineering-docs pipeline agents for [OpenCode](https://opencode.ai).
 
-slipway-agents takes a raw product idea or existing PRD and drives it through a structured, multi-agent pipeline — brainstorm → engineering docs → security audit → phased planning → sprint grooming → build → post-implementation sync. One orchestrator (`slipway`) coordinates eleven specialized subagents.
+slipway-agents takes a raw product idea or existing PRD and drives it through a structured, multi-agent pipeline — brainstorm → engineering docs → review/optimize → sprint grooming checkpoint → security audit → phased planning → pre-build grooming → build → post-implementation sync. One orchestrator (`slipway`) coordinates eleven specialized subagents.
 
 ---
 
@@ -21,9 +21,10 @@ slipway-agents takes a raw product idea or existing PRD and drives it through a 
 | **Docs**             | `hullwright`     | Invokes `bootstrap-from-prd` skill → docs `02`–`10` + `AGENT.md` |
 | **Review**           | `bosun`            | Cross-doc + `AGENT.md` contract validation, per-doc health scores, severity-ranked findings 0–100 |
 | **Review**           | optimize loop      | Up to 2 cycles to resolve Critical findings before continuing                      |
+| **Grooming**         | `coxswain`         | First Lead Dev + QA + DevOps + Complexity Audit checkpoint before security and planning |
 | **Security**         | `gunner`           | Auth, secrets, attack surface audit — PASS / CONDITIONAL / BLOCK gate              |
 | **Plan**             | `rigger`           | Phase breakdown → `.ai/planning/` with S/M/L sizing, dependency graph, Flow Graph-aware ordering, and time/cost estimate |
-| **Grooming**         | `coxswain`         | Lead Dev + QA + DevOps + Complexity Audit lenses → unified synthesis report        |
+| **Grooming**         | `coxswain`         | Pre-build Lead Dev + QA + DevOps + Complexity Audit synthesis after planning        |
 | **Build**            | Sisyphus / omo.dev | Implements based on `AGENT.md` + planning docs, recording the Execution Verification Gate before completion |
 | **Extend**           | `shipwright`       | New feature arrives → scoped PRD update + targeted doc rebuild                     |
 | **Sync**             | `chronicler`       | Post-build drift detection → DRIFT / INTENTIONAL / UNKNOWN classification          |
@@ -108,7 +109,7 @@ A single pipeline run from a raw idea produces:
 reconciliation work. Sessions are now reconciled by orchestrator STEP 0 and can
 transition from `active` to `resolved` only through that check.
 
-`gunner` (security audit) and `surveyor` (schema check) report to the session by design rather than writing files. Rigger now includes the time/cost estimate in `00-overview.md`. Their results are recorded in `.pipeline-state.md` and `.pipeline-changelog.md`.
+`gunner` writes the security audit to `.ai/docs/11-security-audit.md` and updates the docs manifest. `surveyor` remains a standalone schema check that reports to the session rather than writing files. Rigger now includes the time/cost estimate in `00-overview.md`. Gate results are recorded in `.pipeline-state.md` and `.pipeline-changelog.md`.
 
 ---
 

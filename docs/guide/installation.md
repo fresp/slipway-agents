@@ -85,7 +85,7 @@ Manual installs must be updated with `git pull`; the CLI `update` command only r
 
 ## Override models
 
-The installer writes `~/.config/opencode/slipway.json`. To customize model assignments without editing the bundled config, create `~/.config/opencode/slipway.local.json` with the same schema. Project-local `slipway.local.json` files can also override project configs.
+The installer writes `~/.config/opencode/slipway.json`. To customize model assignments for a project without editing the global installed config, create `slipway.local.json` in that project with the same schema. Project-local `slipway.local.json` takes precedence over project `slipway.json`; global `~/.config/opencode/slipway.local.json` is not loaded.
 
 ```jsonc
 // slipway.local.json
@@ -234,7 +234,7 @@ Confirm the `plugin` array contains `slipway-agents@latest` and the status outpu
 
 ### Step 3: Configure models if needed
 
-If the user chose a provider other than Anthropic, create `slipway.local.json` next to the installed `slipway.json` with all 12 configured entries: `slipway` plus the 11 subagents. Use the same model-tier logic as `slipway.json`: Opus for `slipway`, `bosun`, `gunner`, and `caulker`; Sonnet for `chartmaker`, `cartographer`, `hullwright`, `rigger`, `coxswain`, `shipwright`, and `surveyor`; Haiku for `chronicler`.
+If the user chose a provider other than Anthropic, create project-local `slipway.local.json` with all 12 configured entries: `slipway` plus the 11 subagents. Use the same model-tier logic as `slipway.json`: Opus for `slipway`, `bosun`, `gunner`, and `caulker`; Sonnet for `chartmaker`, `cartographer`, `hullwright`, `rigger`, `coxswain`, `shipwright`, and `surveyor`; Haiku for `chronicler`.
 
 ### Step 4: Verify in OpenCode
 
