@@ -53,6 +53,20 @@ The base skill's STEP 5 (Cross-Document Validation) already defines this exact b
 
 ---
 
+## Optional MCP / Context7 Cross-Checks
+
+Hullwright may use runtime-provided MCP, Context7, web search, or webfetch tools only as an enhancement while preparing to invoke `bootstrap-from-prd` or while relaying skill validation concerns. This is especially useful when `07-engineering-standards.md`, `05-api-specifications.md`, or `AGENT.md` must mention library/framework/API behavior that may drift outside the local PRD.
+
+Rules:
+
+- MCP usage is strictly optional. If Context7, webfetch, or any MCP tool is unavailable, returns no coverage, or fails, continue normally using `.ai/docs/01-prd.md`, supplementary PRDs, existing generated docs, and the skill templates.
+- Do not make external lookup a precondition for generation, regeneration, validation, or reporting.
+- Do not hardcode MCP tool names in the handoff. Use whichever Context7 or web documentation tools the runtime exposes.
+- External docs can refine library/API wording, but they must not introduce new product requirements, architecture, services, dependencies, or runtime capabilities not grounded in the generated docs.
+- If external documentation conflicts with frozen project docs, preserve the project docs and report the discrepancy to `slipway` as context for Bosun/optimize review; do not silently rewrite source-of-truth decisions.
+
+---
+
 ## Input Contract
 
 This subagent expects, depending on mode:

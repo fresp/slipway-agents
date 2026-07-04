@@ -9,6 +9,22 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.8.0] — 2026-07-04
 
+### Added (Batch 4 — AGENT.md validation + optional MCP)
+- `bosun` now validates `AGENT.md` as an implementation contract, checking required
+  sections, Source Of Truth parity with `10-planning-rules.md` / `.manifest.md`, placeholder
+  residue, traceability, service/topology/technology guardrails, project-specific Decision Tree
+  and Definition Of Done items, Golden Rules count, and unsafe Sisyphus/omo handoff guidance.
+  Gate rules and the health score formula are unchanged.
+- `hullwright` may optionally use runtime-provided Context7/MCP/web documentation tools to
+  cross-check external library/framework/API facts before or during `bootstrap-from-prd` handoff;
+  unavailable tools never block generation or regeneration.
+- `bosun` may optionally use runtime web/MCP checks for externally dependent API/engineering
+  claims, treating external evidence as supporting context rather than overriding frozen project
+  docs.
+- `slipway.json` declares `webfetch: allow` for `hullwright` and `bosun` while preserving
+  Bosun's `edit: deny`. These permissions remain declarative-only from the plugin's current
+  `src/index.ts` perspective.
+
 ### Added (Batch 2 — gunner Lens 6)
 - `gunner` gains a 6th audit lens — Dependency & Image Vulnerabilities. Detects which
   ecosystems are present (npm, Python, Go, Rust, container images) and runs read-only
