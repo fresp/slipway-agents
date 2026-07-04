@@ -371,7 +371,7 @@ This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and
 
 ## Doctor mode
 
-Doctor mode is a read-only pre-flight diagnostic. It may run before a pipeline, after a failed pipeline, or standalone. It never invokes Chartmaker, Cartographer, Hull Builder, Bosun, Gunner, Coxswain, Rigger, Purser, Shipwright, Chronicler, Surveyor, or Caulker, and it never writes, edits, deletes, regenerates, or normalizes files.
+Doctor mode is a read-only pre-flight diagnostic. It may run before a pipeline, after a failed pipeline, or standalone. It never invokes Chartmaker, Cartographer, Hull Builder, Bosun, Gunner, Coxswain, Rigger, Shipwright, Chronicler, Surveyor, or Caulker, and it never writes, edits, deletes, regenerates, or normalizes files.
 
 Run the checks below in order and print a structured report with clear section headers. Prefix every finding with one of:
 
