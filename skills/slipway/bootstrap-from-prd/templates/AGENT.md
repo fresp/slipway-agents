@@ -99,8 +99,9 @@ Use this loop for every non-trivial task:
 4. Confirm the change stays inside the existing boundaries.
 5. Define acceptance criteria before implementation.
 6. Implement the smallest useful increment.
-7. Verify only the affected surface.
-8. Stop when the requested scope is complete.
+7. Verify only the affected surface using the task's provided verification command or artifact check.
+8. Record the verification outcome using the Test Results Format below before marking the increment complete.
+9. Stop only when the requested scope is complete and the verification gate is passed, blocked, or explicitly marked `[manual review required]`.
 
 Rules for execution:
 
@@ -109,6 +110,27 @@ Rules for execution:
 - Prefer explicit code over reusable internal frameworks.
 - If a task touches multiple concerns, split it into ordered increments.
 - Every increment must be independently deliverable.
+
+## Test Results Format
+
+For every implementation increment, report verification in this format:
+
+```markdown
+Test Results:
+- Verify command: [exact command from the task, or "artifact/manual review"]
+- Attempt 1: [passed | failed | not run] — [brief evidence]
+- Retry: [not needed | passed | failed | not run] — [brief evidence]
+- Gate result: [passed | blocked | manual review required]
+- Notes: [only blockers, manual-review evidence, or relevant caveats]
+```
+
+Verification gate rules:
+
+- If the task has an executable verify command, run it before marking the task complete.
+- If the first verify attempt fails, address the concrete failure and retry once automatically.
+- If the retry fails with a consistent non-flaky failure, halt and follow the Escalation Protocol; do not retry more than once without user input.
+- If the task is explicitly tagged `[manual review required]`, do not invent an automated command. Mark `Gate result: manual review required`, record the artifact or reviewer evidence needed, and stop at that manual-review handoff.
+- If no verify command is provided and the task is not tagged `[manual review required]`, use the smallest relevant artifact check that proves the increment exists; if no meaningful check exists, halt through the Escalation Protocol instead of claiming completion.
 
 # Architecture Guardrails
 

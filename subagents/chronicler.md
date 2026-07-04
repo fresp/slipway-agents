@@ -156,6 +156,10 @@ Populate the session log only from data this agent already has by this point:
   `skills/slipway/doc-merge-resolution/SKILL.md`.
 - `Notes for Reviewers`: copy over any UNKNOWN items the user manually resolved
   in Step 4. If no UNKNOWN items were manually resolved, use `None.`
+- Verification gate context: if the implementation handoff already includes
+  Test Results or a `[manual review required]` marker, summarize that evidence
+  inside the existing `Session Summary` or `Notes for Reviewers` fields; do not
+  add new session-log fields.
 
 This is pure reformatting of the existing classification, user-input, and patch
 data. Do not run new drift detection, perform new analysis, modify

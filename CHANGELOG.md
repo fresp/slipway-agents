@@ -9,6 +9,20 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added (Batch 14 — Execution Verification Gate)
+- `AGENT.md` template Working Loop now requires every implementation increment
+  to record verification with a structured Test Results block before it can be
+  treated as complete.
+- Verification failure handling now preserves the existing one-retry rule: retry
+  once automatically after addressing the concrete failure, then halt through the
+  Escalation Protocol on a consistent second failure.
+- `[manual review required]` tasks now have an explicit non-automated gate path:
+  record the artifact or reviewer evidence needed instead of inventing a verify
+  command.
+- `chronicler` and `slipway` now preserve verification-gate context during
+  post-build sync warnings and session summaries without changing the
+  `session-log` format.
+
 ### Added (Batch 10 — Session Doc Foundation)
 - New `session-log` skill (`skills/slipway/session-log/SKILL.md`) — structured
   per-session log written to `.ai/sessions/`, using the same unit identifiers
