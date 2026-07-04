@@ -1,6 +1,6 @@
 # Installation
 
-slipway-agents is a plug-and-play PRD-to-engineering-docs pipeline for [OpenCode](https://opencode.ai). One orchestrator (`slipway`) coordinates twelve specialized subagents through brainstorm → engineering docs → security audit → planning → grooming → build → post-implementation sync — plus `cartographer` for reverse-engineering existing codebases when no PRD exists.
+slipway-agents is a plug-and-play PRD-to-engineering-docs pipeline for [OpenCode](https://opencode.ai). One orchestrator (`slipway`) coordinates eleven specialized subagents through brainstorm → engineering docs → security audit → planning → grooming → build → post-implementation sync — plus `cartographer` for reverse-engineering existing codebases when no PRD exists.
 
 ## Prerequisites
 
@@ -16,6 +16,9 @@ slipway-agents is a plug-and-play PRD-to-engineering-docs pipeline for [OpenCode
 # With bun
 bunx slipway-agents@latest install
 
+# Bare invocation is kept for backward compatibility and also installs
+bunx slipway-agents@latest
+
 # Or with npm
 npx slipway-agents@latest install
 ```
@@ -27,6 +30,16 @@ The installer does three things:
 3. Clears the OpenCode plugin cache (`~/.cache/opencode/packages/slipway-agents@latest`) so OpenCode fetches the latest published version on next start
 
 Restart OpenCode to activate the agents.
+
+Typical output uses clean symbols on every line:
+
+```text
+ℹ Installing slipway-agents...
+✓ Added slipway-agents@latest to plugin array in ~/.config/opencode/opencode.json
+✓ Created slipway.json at ~/.config/opencode/slipway.json (v0.9.0)
+ℹ Plugin cache not found — nothing to clear.
+✓ Done. Restart OpenCode to activate the agents.
+```
 
 ### Let an agent do it
 
@@ -87,19 +100,19 @@ cp slipway.json slipway.local.json
 // slipway.local.json
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "agents": {
     "slipway":      { "model": "anthropic/claude-opus-4-8" },
     "chartmaker":   { "model": "anthropic/claude-sonnet-5" },
     "cartographer": { "model": "anthropic/claude-sonnet-5" },
     "hullwright": { "model": "anthropic/claude-sonnet-5" },
     "bosun":        { "model": "anthropic/claude-opus-4-8" },
-    "gunner":       { "model": "anthropic/claude-opus-4-8" },
-    "coxswain":     { "model": "anthropic/claude-sonnet-5" },
     "rigger":       { "model": "anthropic/claude-sonnet-5" },
+    "coxswain":     { "model": "anthropic/claude-sonnet-5" },
     "shipwright":   { "model": "anthropic/claude-sonnet-5" },
-    "surveyor":     { "model": "anthropic/claude-sonnet-5" },
     "chronicler":   { "model": "anthropic/claude-haiku-4-5" },
+    "surveyor":     { "model": "anthropic/claude-sonnet-5" },
+    "gunner":       { "model": "anthropic/claude-opus-4-8" },
     "caulker":      { "model": "anthropic/claude-opus-4-8" }
   }
 }
@@ -118,19 +131,35 @@ Common provider substitutions:
 
 ```bash
 opencode --version   # 1.4.0 or higher
-# Then open a session and type:
-# @slipway help
+bunx slipway-agents@latest doctor
+bunx slipway-agents@latest status
 ```
 
-slipway will list all available modes and subagents if the install is working.
+`doctor` checks config health and exits non-zero if a required install check fails. `status` prints the local install state, active `slipway.json` version, configured agent count, and whether `slipway.local.json` is present. You can also open an OpenCode session and type `@slipway help`; slipway will list available modes and subagents if the install is working.
+
+## CLI commands
+
+```bash
+bunx slipway-agents@latest install     # register plugin + install/update slipway.json
+bunx slipway-agents@latest update      # refresh slipway.json from the bundled package
+bunx slipway-agents@latest doctor      # validate the installation
+bunx slipway-agents@latest status      # show local install status
+bunx slipway-agents@latest uninstall   # remove plugin entry + slipway.json
+```
 
 ## Updating
 
-For the one-command install, just re-run the installer — it updates `slipway.json` if the bundled version is newer and clears the plugin cache so the latest published version loads on next start:
+For the one-command install, run `update`. It updates `slipway.json` from the currently installed package when needed and clears the plugin cache so the latest published version loads on next start:
 
 ```bash
-bunx slipway-agents@latest install
-# or: npx slipway-agents@latest install
+bunx slipway-agents@latest update
+# or: npx slipway-agents@latest update
+```
+
+If `slipway.json` is already current, the CLI prints:
+
+```text
+✓ slipway.json already up to date (v0.9.0) — no change needed
 ```
 
 For a manual git-clone install:
@@ -142,7 +171,14 @@ git pull
 
 ## Uninstall
 
-For the one-command install: remove `slipway-agents@latest` from the `plugin` array in `~/.config/opencode/opencode.json` and delete `~/.config/opencode/slipway.json`.
+For the one-command install:
+
+```bash
+bunx slipway-agents@latest uninstall
+# or: npx slipway-agents@latest uninstall
+```
+
+The command removes `slipway-agents@latest` from the `plugin` array in `~/.config/opencode/opencode.json` and deletes `~/.config/opencode/slipway.json`, backing up both first. It does not delete `slipway.local.json`; that file contains your model customizations and is left in place for manual cleanup.
 
 For a manual install: remove the `include` and `plugin` entries from `opencode.json` and delete the cloned directory.
 
@@ -174,6 +210,8 @@ Map the answer to the model prefix:
 
 ```bash
 bunx slipway-agents@latest install
+# Bare invocation also installs:
+bunx slipway-agents@latest
 # or, if bun is not available:
 npx slipway-agents@latest install
 ```
@@ -190,7 +228,7 @@ Read the user's `opencode.json` (usually `~/.config/opencode/opencode.json`). Co
 
 ### Step 3: Configure models
 
-If the user chose a provider other than Anthropic, generate a `slipway.local.json` next to the installed `slipway.json` with the correct model prefix for all 13 agents. Use the same model-tier logic as `slipway.json` (Opus for `slipway`, `bosun`, `gunner`, `caulker`; Sonnet for all generation subagents; Haiku for `chronicler`) mapped to the target provider's equivalent tiers.
+If the user chose a provider other than Anthropic, generate a `slipway.local.json` next to the installed `slipway.json` with the correct model prefix for all 12 configured agent entries (`slipway` plus 11 subagents). Do not include `purser`. Use the same model-tier logic as `slipway.json` (Opus for `slipway`, `bosun`, `gunner`, `caulker`; Sonnet for `chartmaker`, `cartographer`, `hullwright`, `rigger`, `coxswain`, `shipwright`, `surveyor`; Haiku for `chronicler`) mapped to the target provider's equivalent tiers.
 
 ### Step 4: Verify
 

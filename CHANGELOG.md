@@ -7,6 +7,22 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased]
+
+---
+
+## [0.9.0] — 2026-07-04
+
+### CLI Refactor (Batch 9)
+- Refactored the npm installer into a command-based TypeScript CLI compiled from `src/cli.ts`, while preserving `src/index.ts` as the untouched OpenCode plugin entrypoint and keeping the existing `server -> config` PluginModule export shape.
+- Added `install`, `uninstall`, `update`, `doctor`, and `status` subcommands using `cac`; bare `bunx slipway-agents@latest` remains backward-compatible and runs install behavior.
+- Split installer behavior into focused command, service, and utility modules under `src/commands/`, `src/services/`, and `src/utils/`; `bin/install.js` is now a thin shim requiring `dist/cli.js`.
+- Preserved install behavior: idempotently patches `opencode.json`, copies bundled `slipway.json` when missing or version-mismatched, backs up files before mutation, never touches `slipway.local.json`, and clears `~/.cache/opencode/packages/slipway-agents@latest` for install/update because current OpenCode npm plugin installs still use the `~/.cache/opencode/packages/` cache path.
+- Added uninstall safeguards: removes only the `slipway-agents@latest` plugin entry and `slipway.json`, backs up modified/removed files, and leaves `slipway.local.json` in place with an explicit user-facing notice.
+- Added `doctor` and `status` diagnostics for local install health, configured agent count, local override presence, schema validity, and the plugin export-shape regression class fixed in v0.6.0.
+
+---
+
 ## [0.8.0] — 2026-07-04
 
 ### Agent Roster Simplification (Batch 8)

@@ -11,7 +11,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "description": "Config schema version. Current: 0.8.0",
+      "description": "Config schema version. Current: 0.9.0",
       "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
     "ralph_loop": {
