@@ -9,6 +9,15 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.8.0] — 2026-07-04
 
+### Agent Roster Simplification (Batch 8)
+- Merged `purser` into `rigger`: deleted `subagents/purser.md`, added `## Phase Estimate Summary` to `rigger.md` output contract (time/cost estimates, critical path duration, parallel opportunity summary, risk flags). `slipway.json`, `slipway.schema.json`, and `src/shared/model-requirements.ts` updated.
+- Made `surveyor` standalone-only: removed from automatic sync pipeline. `@slipway validate schema` remains available as an explicit command.
+- Made `caulker` explicit-only: removed all 4 automatic conflict-marker triggers (Mode Detection auto-detect + pre-STEP 2 + pre-STEP E1 + pre-STEP S1). `@slipway resolve-conflicts` remains available as explicit invocation.
+- Removed implementation-state format ownership from `slipway.md`: Sisyphus/AGENT.md now owns `.ai/implementation-state.md`. Sync pipeline warns if implementation may be in progress.
+- Removed Dry-Run Mode from `slipway.md`: preview/what-if intent now routes to status-style behavior.
+- Softened Stakeholder Priority from hard enforcement to optional guidance: `chartmaker.md` offers but does not block on priority assignment; `bosun.md` emits Note (not Critical) when tags are absent; `rigger.md` uses soft preference instead of hard P0/P2 ordering rule.
+- Agent count reduced from 12 to 11 specialized subagents.
+
 ### Simplify pass (Batch 7)
 - Removed the over-engineered pipeline hook system for interactive single-user runs. `slipway.json` has no hooks block, `slipway.schema.json` no longer defines a hooks schema, and the plugin TypeScript config/type/loader references were removed.
 - Deleted `slipway.hooks.example.json` and the unused `src/hooks/session-error-hook.ts`. `src/hooks/pipeline-hooks.ts` is now a no-op compatibility stub returning `{}`, and `src/index.ts` retains the `registerPipelineHooks` call only.

@@ -42,9 +42,6 @@
         "rigger": {
           "$ref": "#/definitions/agentConfig"
         },
-        "purser": {
-          "$ref": "#/definitions/agentConfig"
-        },
         "coxswain": {
           "$ref": "#/definitions/agentConfig"
         },

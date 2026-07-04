@@ -16,7 +16,6 @@ export const MODEL_REQUIREMENTS: Record<string, string[]> = {
   hullwright: ["anthropic/claude-sonnet-5", "anthropic/claude-haiku-4-5"],
   bosun: ["anthropic/claude-opus-4-8", "anthropic/claude-sonnet-5"],
   rigger: ["anthropic/claude-sonnet-5", "anthropic/claude-haiku-4-5"],
-  purser: ["anthropic/claude-sonnet-5", "anthropic/claude-haiku-4-5"],
   coxswain: ["anthropic/claude-sonnet-5", "anthropic/claude-haiku-4-5"],
   shipwright: ["anthropic/claude-sonnet-5", "anthropic/claude-haiku-4-5"],
   chronicler: ["anthropic/claude-haiku-4-5", "anthropic/claude-sonnet-5"],

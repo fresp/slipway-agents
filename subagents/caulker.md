@@ -1,6 +1,6 @@
 ---
 name: caulker
-description: Subagent that resolves conflicts in `.ai/docs/**` and `AGENT.md` after a git merge or rebase brings together changes from multiple contributors working on the same or overlapping services. Invoked when slipway detects literal git conflict markers in tracked doc files, or when the user explicitly runs `@slipway resolve-conflicts` after merging/rebasing a branch that touched `.ai/docs/` or `AGENT.md`. Performs section-level (not line-level) semantic comparison to catch silent contradictions that a normal git text-merge does not flag — two contributors adding conflicting ownership claims, contradictory ADRs, or divergent edits to the same entry without ever triggering a literal conflict marker. Never auto-resolves a genuine disagreement; those are always surfaced to the user for a decision.
+description: Subagent that resolves conflicts in `.ai/docs/**` and `AGENT.md` after a git merge or rebase brings together changes from multiple contributors working on the same or overlapping services. Invoked when the user explicitly runs `@slipway resolve-conflicts` or says 'resolve conflicts' / 'merge conflict' after merging/rebasing a branch that touched `.ai/docs/` or `AGENT.md`. Performs section-level (not line-level) semantic comparison to catch silent contradictions that a normal git text-merge does not flag — two contributors adding conflicting ownership claims, contradictory ADRs, or divergent edits to the same entry without ever triggering a literal conflict marker. Never auto-resolves a genuine disagreement; those are always surfaced to the user for a decision.
 model: anthropic/claude-opus-4-6
 ---
 
@@ -14,13 +14,13 @@ Caulker never merges documents by taking git's word for it. It always re-parses 
 
 ## Trigger Condition
 
-Invoke caulker when any of the following is true:
+Invoke caulker only when the user explicitly invokes it after discovering or suspecting doc conflicts:
 
-- Literal git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`) are found in any `.ai/docs/*.md` file or `AGENT.md`.
+- The user discovers literal git conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`) in any `.ai/docs/*.md` file or `AGENT.md` and explicitly invokes caulker.
 - The user explicitly runs `@slipway resolve-conflicts` after a merge or rebase that touched `.ai/docs/` or `AGENT.md` — even if git reports zero literal conflicts. This is the more important trigger: a clean git merge is not proof of a semantically clean result.
-- `slipway`'s pre-flight scope-lock check (see "Prevention Layer" below) detects two contributors with overlapping in-progress locks on the same service/FR scope, and the user asks to reconcile before proceeding.
+- The user says "resolve conflicts" / "merge conflict" after merging or rebasing a branch that touched `.ai/docs/` or `AGENT.md`.
 
-Do not wait for the user to report a problem. If a merge touched `.ai/docs/` or `AGENT.md`, treat semantic verification as the default, not an opt-in.
+Caulker runs only when the user explicitly invokes it. The orchestrator does not auto-detect conflict markers or auto-route to caulker.
 
 ---
 
@@ -35,6 +35,8 @@ Do not wait for the user to report a problem. If a merge touched `.ai/docs/` or 
 ---
 
 ## Prevention Layer — Scope Locks
+
+Note: The scope-lock mechanism described below is not currently wired in the `slipway` orchestrator. It is documented as a potential future enhancement.
 
 This is a lightweight complement to caulker's reactive resolution, owned jointly with the `slipway` orchestrator. It reduces how often caulker needs to be invoked at all.
 

@@ -97,7 +97,6 @@ cp slipway.json slipway.local.json
     "gunner":       { "model": "anthropic/claude-opus-4-8" },
     "coxswain":     { "model": "anthropic/claude-sonnet-5" },
     "rigger":       { "model": "anthropic/claude-sonnet-5" },
-    "purser":       { "model": "anthropic/claude-sonnet-5" },
     "shipwright":   { "model": "anthropic/claude-sonnet-5" },
     "surveyor":     { "model": "anthropic/claude-sonnet-5" },
     "chronicler":   { "model": "anthropic/claude-haiku-4-5" },

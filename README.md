@@ -3,7 +3,7 @@
 
 > PRD-to-engineering-docs pipeline agents for [OpenCode](https://opencode.ai).
 
-slipway-agents takes a raw product idea or existing PRD and drives it through a structured, multi-agent pipeline — brainstorm → engineering docs → security audit → phased planning → cost estimate → sprint grooming → build → post-implementation sync. One orchestrator (`slipway`) coordinates twelve specialized subagents.
+slipway-agents takes a raw product idea or existing PRD and drives it through a structured, multi-agent pipeline — brainstorm → engineering docs → security audit → phased planning → sprint grooming → build → post-implementation sync. One orchestrator (`slipway`) coordinates eleven specialized subagents.
 
 ---
 
@@ -22,13 +22,12 @@ slipway-agents takes a raw product idea or existing PRD and drives it through a 
 | **Review**           | `bosun`            | Cross-doc + `AGENT.md` contract validation, per-doc health scores, severity-ranked findings 0–100 |
 | **Review**           | optimize loop      | Up to 2 cycles to resolve Critical findings before continuing                      |
 | **Security**         | `gunner`           | Auth, secrets, attack surface audit — PASS / CONDITIONAL / BLOCK gate              |
-| **Plan**             | `rigger`           | Phase breakdown → `.ai/planning/` with S/M/L sizing and dependency graph           |
-| **Estimate**         | `purser`           | Time and cost forecast per phase, critical path, unrealistic phase flags           |
+| **Plan**             | `rigger`           | Phase breakdown → `.ai/planning/` with S/M/L sizing, dependency graph, and time/cost estimate |
 | **Grooming**         | `coxswain`         | Lead Dev + QA + DevOps + Complexity Audit lenses → unified synthesis report        |
 | **Build**            | Sisyphus / omo.dev | Implements based on `AGENT.md` + planning docs                                     |
 | **Extend**           | `shipwright`       | New feature arrives → scoped PRD update + targeted doc rebuild                     |
 | **Sync**             | `chronicler`       | Post-build drift detection → DRIFT / INTENTIONAL / UNKNOWN classification          |
-| **Sync**             | `surveyor`         | DB schema vs `04-data-models.md` consistency check                                 |
+| **Sync**             | `surveyor`         | Run `@slipway validate schema` separately if DB schema validation is needed              |
 | **Resolve Conflicts** | `caulker` | Post-merge semantic conflict detection and resolution across docs and `AGENT.md` |
 
 After a multi-contributor merge or rebase touches `.ai/docs/` or `AGENT.md`, run `@slipway resolve-conflicts` to have `caulker` catch and resolve semantic conflicts that a clean git merge doesn't flag.
@@ -46,10 +45,9 @@ After a multi-contributor merge or rebase touches `.ai/docs/` or `AGENT.md`, run
 | `bosun`        | Cross-doc + `AGENT.md` contract validation, per-doc health scores, severity-ranked findings | `claude-opus-4-8`   |
 | `gunner`       | Auth, secrets, and attack surface audit across five lenses                        | `claude-opus-4-8`   |
 | `coxswain`     | Sprint grooming — Lead Dev, QA, DevOps, Complexity Audit lenses + synthesis       | `claude-sonnet-5` |
-| `rigger`       | Phase/milestone breakdown → `.ai/planning/` with sizing and dependency graph      | `claude-sonnet-5` |
-| `purser`       | Time and cost forecast per phase based on `.ai/planning/`                         | `claude-sonnet-5` |
+| `rigger`       | Phase/milestone breakdown → `.ai/planning/` with sizing, dependency graph, and time/cost estimate | `claude-sonnet-5` |
 | `shipwright`   | Extend existing docs when a new feature is introduced                             | `claude-sonnet-5` |
-| `surveyor`     | Post-implementation DB schema vs data model consistency check                     | `claude-sonnet-5` |
+| `surveyor`     | Post-implementation DB schema vs data model consistency check — standalone only (`@slipway validate schema`) | `claude-sonnet-5` |
 | `chronicler`   | Post-implementation doc sync — classify drift, patch docs incrementally           | `claude-haiku-4-5`  |
 | `caulker` | Resolves conflicts in `.ai/docs/` and `AGENT.md` after multi-contributor merges — section-level semantic comparison, never silently resolves true contradictions | `claude-opus-4-8` |
 
@@ -99,7 +97,7 @@ A single pipeline run from a raw idea produces:
 └── AGENT.md                               ← implementation instructions for Sisyphus
 ```
 
-`gunner` (security audit), `purser` (time/cost estimate), and `surveyor` (schema check) report to the session by design rather than writing files — their results are recorded in `.pipeline-state.md` and `.pipeline-changelog.md`.
+`gunner` (security audit) and `surveyor` (schema check) report to the session by design rather than writing files. Rigger now includes the time/cost estimate in `00-overview.md`. Their results are recorded in `.pipeline-state.md` and `.pipeline-changelog.md`.
 
 ---
 
@@ -174,7 +172,8 @@ Full guide: [docs/guide/installation.md](docs/guide/installation.md)
 # Security audit only
 @slipway security audit
 
-# Estimate time and cost from existing plan
+# Estimate time and cost from existing plan (runs rigger in estimate-only mode)
+@slipway estimate
 @slipway estimate
 
 # Sync docs after implementation
@@ -219,7 +218,6 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
     "gunner":       { "model": "amazon-bedrock/us.anthropic.claude-opus-4-8",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-5" },
     "coxswain":     { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
     "rigger":       { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
-    "purser":       { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
     "shipwright":   { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
     "surveyor":     { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
     "chronicler":   { "model": "amazon-bedrock/us.anthropic.claude-haiku-4-5",  "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-5" },

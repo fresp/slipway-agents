@@ -186,8 +186,8 @@ Run all of the following checks. Each failure produces a finding at the appropri
 
 ### PRD — Stakeholder Priority
 
-- `01-prd.md` must contain a Stakeholder Priority section with P0/P1/P2 tier tags on Functional Requirements, OR a `⚠ Priority: all requirements defaulted to P1` warning note. Absence of either = Critical finding.
-- Every FR-ID in the requirement list must have exactly one priority tier tag. Missing tags on any FR-ID = Should-fix.
+- `01-prd.md` has no priority tags — consider adding P0/P1/P2 tiers to help rigger prioritize phases. (Note severity — never Critical, never Should-fix when absent.)
+- If priority tags ARE present, every tagged FR-ID must have exactly one of `P0`, `P1`, `P2`. Missing or duplicate tags on any tagged FR-ID = Should-fix.
 
 ---
 

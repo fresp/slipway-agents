@@ -36,7 +36,6 @@ Last completed step: [step name]
 Bosun: [health score]/100 — [last run timestamp]
 Security audit (gunner): [PASS | CONDITIONAL | BLOCK | never]
 Coxswain: [Ready to Plan | Conditional | Blocked | never]
-Purser: [completed | never]
 Optimize cycles: [N]/[ralph_loop.max_iterations]
 
 Next step: [step name and what it does]
@@ -57,7 +56,7 @@ Equivalent to typing `@slipway resume` or `@slipway continue from where we left 
 - Reads `.ai/docs/.pipeline-state.md` to determine the last completed step.
 - Invokes the next step directly — no re-routing through mode detection.
 - If the state file is missing or corrupted, falls back to mode detection and tells the user.
-- If implementation is in progress (`.ai/implementation-state.md` exists with `Status: in-progress`), surfaces the current phase and last completed task before offering to resume.
+- If implementation is in progress (`.ai/implementation-state.md` exists and Status is not complete), warns the user before offering to resume.
 
 ---
 

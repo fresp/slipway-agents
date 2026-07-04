@@ -5,7 +5,7 @@ description: Primary orchestrator agent for the PRD-to-implementation pipeline. 
 
 # slipway
 
-Coordinator for the full PRD pipeline: brainstorm → `.ai/docs/` → review → security audit → planning → estimate → grooming → build → sync. Also handles standalone entry points for review, grooming, planning, security audit, estimate, and schema validation.
+Coordinator for the full PRD pipeline: brainstorm → `.ai/docs/` → review → security audit → planning (+ embedded estimate) → grooming → build → sync. Also handles standalone entry points for review, grooming, planning, security audit, estimate, and schema validation.
 
 This agent never generates engineering content directly. It decides **which subagent runs next**, **what gets handed to it**, and **when the pipeline is done**. All content generation is delegated.
 
@@ -22,7 +22,6 @@ This agent never generates engineering content directly. It decides **which suba
 | Gunner  | `subagents/gunner.md`    | Auth, secrets, and attack surface audit — PASS / CONDITIONAL / BLOCK gate                   |
 | Coxswain           | `subagents/coxswain.md`             | Multi-lens sprint grooming (Lead Dev, QA, DevOps, Complexity Audit) + cross-lens synthesis  |
 | Rigger            | `subagents/rigger.md`              | Phase/milestone breakdown → `.ai/planning/` with sizing, dep graph, stale check            |
-| Purser         | `subagents/purser.md`           | Time and cost forecast per phase based on `.ai/planning`                                  |
 | Shipwright        | `subagents/shipwright.md`          | Update existing docs when a new feature is introduced                                       |
 | Chronicler        | `subagents/chronicler.md`          | Post-implementation doc sync — classify drift, patch incrementally                         |
 | Surveyor  | `subagents/surveyor.md`    | Post-implementation DB schema vs `04-data-models.md` consistency check                     |
@@ -83,35 +82,6 @@ State saved to .ai/docs/.pipeline-state.md
 
 ---
 
-## Dry-Run Mode
-
-Triggered when the user says "dry run", "preview", "show me the plan", or "what would happen if".
-
-In dry-run mode:
-
-1. Run Mode Detection and State Tracking as normal.
-2. Print the full execution plan — which subagents would run, in which order, with what inputs — based on the current `.ai/docs/.pipeline-state.md` and filesystem state.
-3. **Do not invoke any subagent.**
-4. End with: `This is a dry run. No files were created or modified. Run without "dry run" to execute.`
-
-Dry-run output format:
-
-```
-Dry-run plan — [mode]
-
-Step 1 → [subagent]: [what it would do, what input it would receive]
-Step 2 → [subagent]: [what it would do]
-...
-
-Files that would be created/modified:
-  - [path] (new | updated)
-  - ...
-
-To execute: just say "go" or "yes".
-```
-
----
-
 ## Mode Detection
 
 Run this before anything else, every time the orchestrator is invoked.
@@ -121,14 +91,14 @@ Run this before anything else, every time the orchestrator is invoked.
 | No `.ai/docs/` AND root manifest detected (`package.json` / `pyproject.toml` / `go.mod` / `Cargo.toml` / `composer.json`) | `reverse-engineer`      | `cartographer`                                  |
 | Raw idea, no PRD file, no `.ai/docs/01-prd.md` exists                                                                    | `bootstrap-from-prompt` | `chartmaker`                                |
 | `.ai/docs/01-prd.md` exists, but `.ai/docs/02-*.md` does not                                                             | `bootstrap-from-prd`    | `hullwright` (brainstorm optional, see below) |
-| Literal git conflict markers found in any `.ai/docs/*.md` or `AGENT.md`, OR user explicitly says "resolve conflicts" / "merge conflict" / runs `@slipway resolve-conflicts` | `resolve-conflicts` | `caulker` |
+| User explicitly says "resolve conflicts" / "merge conflict" / runs `@slipway resolve-conflicts` | `resolve-conflicts` | `caulker` |
 | `.ai/docs/02-*.md` through `.ai/docs/10-*.md` already exist, user mentions a new feature or "add feature"                | `extend`                | `shipwright`                                    |
 | User explicitly asks to "review", "summarize", or "check consistency" with no mention of new features                    | `review-only`           | `bosun`                                     |
 | User says "groom this", "sprint grooming", "is this ready to build?", "dev/QA/DevOps review", "ready to build?"          | `grooming-only`         | `coxswain`                                       |
 | User explicitly asks for "planning", "phases", "milestones" and docs already exist and have been reviewed                 | `plan-only`             | `rigger`                                        |
 | User says "sync docs", "update docs after build", "implementation done", "build complete", or similar post-build signal   | `sync`                  | `chronicler`                                    |
 | User says "security audit", "audit security", "check security"                                                            | `security-only`         | `gunner`                              |
-| User says "estimate", "how long will this take", "cost estimate", "time forecast"                                         | `estimate-only`         | `purser`                                     |
+| User says "estimate", "how long will this take", "cost estimate", "time forecast"                                         | `estimate-only`         | `rigger` (estimate-only mode)                |
 | User says "validate schema", "check schema", "schema drift"                                                               | `schema-validate`       | `surveyor`                              |
 | User runs `/slipway-doctor` or asks for "slipway doctor", "doctor", "diagnostics", "pre-flight diagnostic", or "pipeline diagnostic" | `doctor`                | `slipway` read-only diagnostic        |
 
@@ -156,11 +126,6 @@ Call `chartmaker`.
 ---
 
 ### STEP 2 — Build Docs + AGENT.md
-
-Before invoking `hullwright`, scan `.ai/docs/*.md` and `AGENT.md` for literal git conflict
-markers. If any are found, do not proceed — route to `caulker` first via the
-resolve-conflicts entry point, and only resume this flow after the user confirms all
-conflicts are resolved.
 
 Call `hullwright`.
 
@@ -283,33 +248,14 @@ Call `rigger`.
 
 **Output expected back:**
 - `.ai/planning/00-overview.md` — dependency graph + phase list + critical path
+- Phase Estimate Summary in `.ai/planning/00-overview.md`
 - `.ai/planning/01-phase-*.md` — one file per phase, with S/M/L sizing, parallel flags, depends_on, context load hints, and acceptance criteria
 
 **Gate:** Planning never runs against docs that have not passed Bosun (STEP 3), Coxswain (STEP 3.5), and Gunner (STEP 5) at least once in this run.
 
 ---
 
-### STEP 7 — Estimate
-
-Call `purser`.
-
-**Input handed to subagent:**
-- `.ai/planning/` directory (all phase files + `00-overview.md`)
-- `.ai/docs/.pipeline-state.md`
-
-**Output expected back:**
-- Per-phase estimate table (task counts, S/M/L mix, time range, cost tier)
-- Critical path analysis
-- Parallel opportunity summary
-- Flags for unrealistic or high-risk phases
-
-Present the estimate report to the user. Ask: `Review complete. Proceed to grooming? (yes / no)`
-
-If the user identifies phases they want to revise based on the estimate, route back to `rigger` in incremental mode before proceeding to STEP 8.
-
----
-
-### STEP 8 — Sprint Grooming (pre-build)
+### STEP 7 — Sprint Grooming (pre-build)
 
 Call `coxswain` with the full planning context.
 
@@ -327,7 +273,7 @@ Gate logic identical to STEP 3.5.
 
 ---
 
-### STEP 9 — Build (Sisyphus)
+### STEP 8 — Build (Sisyphus)
 
 Pipeline is complete. Hand off to Sisyphus / omo.dev.
 
@@ -340,11 +286,6 @@ New feature during build → route to `shipwright` (extend mode).
 Triggered when core docs already exist and the user describes a new feature.
 
 ### STEP E1 — Extend
-
-Before invoking `shipwright`, scan `.ai/docs/*.md` and `AGENT.md` for literal git conflict
-markers. If any are found, do not proceed — route to `caulker` first via the
-resolve-conflicts entry point, and only resume this flow after the user confirms all
-conflicts are resolved.
 
 Call `shipwright` directly. Brainstorm is not re-run from scratch — `shipwright` owns its own scoped Q&A for the new feature only.
 
@@ -375,10 +316,6 @@ Same contract as STEP 4 in the full pipeline. Loop limit still applies, counter 
 ### STEP E6 — Planning Update
 
 Call `rigger` in **incremental mode** — append new phases/tasks for the extended feature rather than regenerating the whole plan, unless the user explicitly asks for a full re-plan.
-
-### STEP E7 — Estimate (extend scope)
-
-Call `purser` against the new/updated planning files only.
 
 ---
 
@@ -418,9 +355,9 @@ This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and
 - **grooming-only**: call `coxswain` against existing docs. Refuse if `bosun` has never passed for this project (check `.ai/docs/.pipeline-state.md`) — grooming after unvalidated docs produces misleading readiness signals.
 - **plan-only**: call `rigger` against existing docs. Refuse if docs have never passed Bosun and Gunner in this project's history.
 - **security-only**: call `gunner` against existing docs. Refuse if `bosun` has never passed — security audit against inconsistent docs produces unreliable findings.
-- **estimate-only**: call `purser` against `.ai/planning/`. Refuse if `.ai/planning/` does not exist — ask the user to run planning first.
+- **estimate-only**: call `rigger` in estimate-only mode — rigger re-reads existing `.ai/planning/` files and re-emits the Phase Estimate Summary without regenerating tasks. Refuse if `.ai/planning/` does not exist — ask the user to run planning first.
 - **schema-validate**: call `surveyor`. Ask the user for the schema source (SQL dump, ORM schema file, or migration directory) before invoking.
-- **sync**: call `chronicler` then `surveyor`. See Pipeline — sync run below.
+- **sync**: call `chronicler`. See Pipeline — sync run below.
 - **resolve-conflicts**: call `caulker` against the touched `.ai/docs/`/`AGENT.md` files. If
   `caulker` reports any escalated (blocked) units, stop and present them to the user — do not
   auto-continue to any other pipeline step until the user has resolved every blocked unit in
@@ -484,10 +421,7 @@ Triggered when the user signals that implementation is complete and docs need to
 
 ### STEP S1 — Sync
 
-Before invoking `chronicler`, scan `.ai/docs/*.md` and `AGENT.md` for literal git conflict
-markers. If any are found, do not proceed — route to `caulker` first via the
-resolve-conflicts entry point, and only resume this flow after the user confirms all
-conflicts are resolved.
+If `.ai/implementation-state.md` exists and Status is not complete, warn the user that implementation may still be in progress before syncing docs.
 
 Call `chronicler`.
 
@@ -500,19 +434,9 @@ Call `chronicler`.
 
 **Gate:** `chronicler` always returns — even if there is zero drift, it confirms that. "No output" is not valid; retry once if empty.
 
-### STEP S2 — Schema Validation
+### STEP S2 — Post-Sync Review (optional)
 
-After `chronicler` completes, ask the user:
-
-```
-Doc sync complete. Run schema validation to check DB against data models? (yes / no)
-```
-
-If yes: invoke `surveyor`. Ask the user for the schema source before invoking.
-
-### STEP S3 — Post-Sync Review (optional)
-
-After chronicler and surveyor complete, ask the user:
+After chronicler completes, ask the user:
 
 ```
 Sync complete. Run a review pass on the updated docs to confirm consistency? (yes / no)
@@ -552,43 +476,6 @@ After each step completes, append to `.ai/docs/.pipeline-changelog.md` (never ov
 - Bosun score: [N/100 or n/a]
 - Notes: [any retry, scope expansion, or conflict surfaced]
 ```
-
----
-
-## Implementation State Tracking
-
-Sisyphus maintains `.ai/implementation-state.md` across the build run. The orchestrator reads this file when the user returns to a session to determine whether implementation is in progress and which task to resume from.
-
-```
-# Implementation State
-
-Last updated: [timestamp]
-Current phase: [phase number and name]
-Last completed task: [TASK-ID]
-Blocked tasks: [TASK-ID list, or "none"]
-Status: [in-progress | blocked | complete]
-
-## Phase progress
-| Phase | Status | Tasks done | Tasks remaining | Test result |
-|-------|--------|-----------|-----------------|-------------|
-| 1 — [name] | [pending | in-progress | done | blocked] | [N] | [N] | [pass | fail | n/a] |
-
-## Blocked task log
-[TASK-ID] — [timestamp] — [description of blocker] — [escalation taken]
-
-## Test results
-| Phase | Command | Result | Timestamp |
-|-------|---------|--------|-----------|
-| [name] | [command] | [pass | fail] | [timestamp] |
-```
-
-**Rules for the orchestrator:**
-- If `Status: blocked`, surface the blocked task log to the user before offering next steps.
-- If `Status: complete`, proceed to the sync pipeline (chronicler → surveyor).
-- If `Status: in-progress` with no recent activity, ask the user whether to resume or restart from the last completed task.
-- This file is distinct from `.pipeline-state.md` — it tracks implementation progress, not planning pipeline progress. Do not merge them.
-
----
 
 ## Parallelism
 
@@ -645,9 +532,7 @@ Pipeline complete.
 ✓ Bosun: [health score]/100 — [band label]
 ✓ Security audit: [PASS | CONDITIONAL] — [N caveats carried to planning]
 ✓ Grooming: [Ready to Plan | Conditional] — Lead Dev: [R/C/B] | QA: [R/C/B] | DevOps: [R/C/B]
-✓ .ai/planning/ (phase breakdown with sizing and dependency graph)
-✓ Estimate: [total time range] — Critical path: [range]
-✓ Stakeholder Priority: [N P0, N P1, N P2 across all phases] — P2 deferred: [N requirements, or "none"]
+✓ Planning: [N phases, M tasks] + estimate in 00-overview.md
 ✓ Tests: [pass | N failures] — [command run, or "not yet run — implementation pending"]
 
 Optimize cycles used: [N]/[ralph_loop.max_iterations]
@@ -667,11 +552,7 @@ Changelog written to: .ai/docs/.pipeline-changelog.md
 - Never run `rigger` against docs where `coxswain` returned Blocked — resolve Blocked findings first.
 - Never run `coxswain` before `bosun` has passed at least once — grooming on inconsistent docs produces misleading readiness signals.
 - Never run `gunner` before `bosun` has passed at least once.
-- Never run `purser` before `rigger` has produced `.ai/planning/`.
 - Never restart the entire pipeline from STEP 1 on a mid-pipeline PRD edit if the edit is additive and the existing PRD checklist still passes — restart from the earliest step that is actually invalidated.
 - Never use non-English strings for trigger matching, user prompts, or error messages.
-- Never allow `chartmaker` to proceed past its completion contract with missing Stakeholder Priority tags and no default-P1 warning note.
-- Never allow `shipwright`, `chronicler`, or `hullwright` to run against docs containing
-  literal git conflict markers — always route to `caulker` first.
 - Never let `caulker` auto-continue into another subagent without an explicit user go-ahead.
 - Never block, retry, pause, or change a gate decision because a hook failed, was skipped, or could not fire.

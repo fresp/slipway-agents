@@ -46,7 +46,7 @@ If `.ai/planning/` does not exist, proceed directly to planning.
 - Coxswain's caveats list (Conditional findings to embed as acceptance criteria in relevant tasks)
 - `.ai/docs/11-security-audit.md` (if present, per manifest Extensions) — gunner's CONDITIONAL/Should-fix findings feed the same acceptance-criteria-embedding mechanism as coxswain's caveats (see "Coxswain and gunner caveats carried forward" below)
 - `.ai/docs/.pipeline-state.md` (for stale check timestamps)
-- Stakeholder Priority tags from `.ai/docs/01-prd.md` (P0/P1/P2 per FR-ID)
+- Priority tags from `.ai/docs/01-prd.md` if present (P0/P1/P2 per FR-ID) — optional planning signal
 
 ---
 
@@ -101,6 +101,31 @@ embedded in the relevant task acceptance criteria below]
 |-------|----------------|----------------|
 | 1 — [name] | `[command]` | [what this tests — e.g. data layer + one end-to-end flow] |
 | 2 — [name] | `[command]` | [what this tests] |
+
+## Phase Estimate Summary
+
+Phase               Tasks   S/M/L       Est. time    Cost tier
+──────────────────────────────────────────────────────────────
+Phase 1 — [name]    [N]     [S:M:L]     [range]      [tier]
+Phase 2 — [name]    [N]     [S:M:L]     [range]      [tier]
+...
+──────────────────────────────────────────────────────────────
+Total                                   [range]
+
+Critical path:
+  Phase 1 → [task A] → [task B] → Phase 3 → [task C] → ...
+  Estimated critical path duration: [range]
+
+Parallelizable work:
+  Phase 2 tasks [X, Y] can run alongside Phase 3 task [Z]
+  Potential time saving: [range]
+
+⚠ Flags
+  [UNDERESTIMATED] [description]
+  [MISSING SIZING] [description]
+  [DEPENDENCY RISK] [description]
+  [HIGH COST CONCENTRATION] [description]
+  [SCOPE UNCLEAR] [description]
 ```
 
 ### Per-phase file format
@@ -175,6 +200,19 @@ If a task is L-sized and has no parallel opportunities and no `depends_on` tasks
 
 ---
 
+## Estimation methodology
+
+- S task = 15–45 min (human-reviewed AI implementation).
+- M task = 1–3 hours.
+- L task = half-day to full day.
+- Add 20% buffer per phase for integration, testing, and review overhead.
+- Cost tiers are based on model assignments in `slipway.json`: Low (Haiku-class), Medium (Sonnet-class), High (Opus-class or Opus-heavy subagents like bosun, gunner).
+- Critical path is derived from `depends_on` fields and `parallel: false` flags.
+- Parallel opportunity summary is derived from `parallel: true` flags.
+- Estimation flags: `[UNDERESTIMATED]`, `[MISSING SIZING]`, `[DEPENDENCY RISK]`, `[HIGH COST CONCENTRATION]`, `[SCOPE UNCLEAR]`.
+
+---
+
 ## Dependency graph rules
 
 - A task has `parallel: true` if it does not depend on any in-progress task in the same phase and does not produce an artifact that another concurrent task in the same phase requires.
@@ -227,20 +265,13 @@ When called by the orchestrator in `extend` mode (a new feature is being added t
 
 ## Stakeholder Priority integration
 
-Use Stakeholder Priority tags from `01-prd.md` to influence phase ordering:
+Use Stakeholder Priority tags from `01-prd.md` as a soft planning preference, not a hard ordering rule.
 
-| Tier | Phase placement |
-|------|----------------|
-| **P0** | Must appear in Phase 1 or Phase 2 — never deferred |
-| **P1** | Target Phase 1–3 — default placement |
-| **P2** | Defer to the final phase OR to `.ai/planning/future-scope.md` if capacity is constrained |
+If priority tags exist, prefer placing P0 requirements in early phases and deferring P2 to later phases or `future-scope.md`. If no priority tags exist, use dependency structure and complexity to determine phase order — this is equally valid.
 
 **Rules:**
-- If all P0 requirements fit in Phase 1 without making it too large (more than 10 tasks), put them all in Phase 1.
-- If P0 requirements span multiple phases, document the split explicitly in `00-overview.md` with a note: `P0 split across phases [N] and [N+1] — reason: [dependency chain / size constraint]`.
 - Create `.ai/planning/future-scope.md` when there are P2 requirements that do not fit in the planned phases. List each P2 FR-ID, its deferred rationale, and a one-line description of what it would take to promote it to P1.
-- Never place a P0 requirement in a phase that depends on a P2 requirement. P0 tasks must be on the critical path or parallel to it — not blocked by lower-priority work.
-- If the PRD uses the default-P1 fallback (all requirements defaulted to P1), skip tier-based reordering entirely and organize phases by technical dependency only.
+- If priority tags exist, prefer not placing P0 requirements in phases that depend on P2 requirements — but this is a soft preference, not a hard rule.
 
 ---
 
@@ -256,5 +287,6 @@ Use Stakeholder Priority tags from `01-prd.md` to influence phase ordering:
 - Never include coxswain Blocked findings as accepted caveats — Blocked findings must be resolved before planning runs.
 - Never include gunner BLOCK findings as accepted caveats — a BLOCK gate signal means the security audit must be re-run clean before planning runs, not that the finding gets embedded as a task caveat.
 - Never write more than one dependency graph — it lives in `00-overview.md` only.
-- Never place a P0 requirement in a phase that depends on a P2 requirement.
+- If priority tags exist, prefer not placing P0 requirements in phases that depend on P2 requirements — but this is a soft preference, not a hard rule.
+- Never omit the Phase Estimate Summary from `00-overview.md`.
 - Never leave `.ai/planning/future-scope.md` unwritten when P2 requirements exist and are being deferred.
