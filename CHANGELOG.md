@@ -9,6 +9,22 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.8.0] — 2026-07-04
 
+### Added (Batch 5 — parallel grooming + pipeline hooks)
+- `coxswain` now dispatches its Lead Dev, QA, DevOps, and Complexity Audit grooming lenses in
+  parallel when the runtime supports it, with automatic fallback to the previous sequential
+  A → B → C → D order. Synthesis, gate-signal rules, and stdout output format are unchanged.
+- All four `groomer-*` skills now explicitly state that they run as independent parallel lenses
+  and must not read or depend on another groomer lens's output.
+- `slipway.schema.json` gains an optional top-level `hooks` block for fire-and-forget pipeline
+  notifications: `on_step_complete`, `on_block`, `on_pipeline_complete`, and
+  `on_user_input_required`. Missing hooks or delivery failures never change pipeline behavior.
+- `subagents/slipway.md` documents prompt-level Hook Dispatch and read-only Hooks Diagnostic
+  mode. Hook dispatch happens only after state is written, logs delivery failures to
+  `.ai/docs/.pipeline-changelog.md`, and remains declarative/prompt-level with no
+  `src/index.ts` changes.
+- Added `/slipway-hooks` documentation and `slipway.hooks.example.json` as a strict-JSON hook
+  configuration example; the active `slipway.json` remains comment-free and schema-valid.
+
 ### Added (Batch 4 — AGENT.md validation + optional MCP)
 - `bosun` now validates `AGENT.md` as an implementation contract, checking required
   sections, Source Of Truth parity with `10-planning-rules.md` / `.manifest.md`, placeholder

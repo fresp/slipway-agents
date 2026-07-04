@@ -21,9 +21,13 @@ The orchestrator never sees four separate reports. It always sees one.
 
 ## Process
 
-### Step 1 — Lens review (run all three)
+### Step 1 — Lens review (run all four in parallel)
 
-Run each lens independently against the full doc suite. Each lens produces an internal list of findings and a lens-level readiness signal. These internal lists are used only in Step 2 — they are not included in the final output.
+Dispatch all four lenses simultaneously against the same input doc set: Lead Dev, QA, DevOps, and Complexity Audit. Each lens reads independently and produces its structured output. Lens A, B, and C each return an internal findings list plus a lens-level readiness signal; Lens D returns only its flag list. These internal outputs are used only in Step 2 — they are not included in the final output as separate reports.
+
+If the runtime does not support parallel task dispatch, fall back automatically to sequential execution in this exact order: Lens A → Lens B → Lens C → Lens D → Step 2 synthesis. This fallback changes only latency, not semantics.
+
+Lens isolation rule: no lens may read or depend on another lens's output. Any comparison, reference, deduplication, conflict detection, or priority reconciliation across lenses belongs exclusively in Step 2 synthesis.
 
 #### Lens A: Lead Dev
 
@@ -106,7 +110,7 @@ Lens D does not produce a separate readiness signal — its flags feed directly 
 
 ### Step 2 — Synthesis (mandatory)
 
-This step runs after all three lenses complete. It is not optional and may not be skipped.
+This step runs after all four lenses complete. It is not optional and may not be skipped.
 
 **2a. Deduplicate**
 

@@ -19,6 +19,8 @@ before that mismatch surfaces mid-sprint as a blown estimate or a stalled critic
 
 You read docs. You report flags. You do not edit any file.
 
+This skill runs as an independent parallel lens — do not read or depend on output from other groomer-* skills. Synthesis happens in coxswain after all lenses complete.
+
 Unlike the other groomer lenses, this lens does **not** produce its own Ready / Conditional /
 Blocked signal. Its flags feed directly into coxswain's synthesis step, where any flag caps
 the combined gate signal at Conditional and any flag on a critical-path task escalates to

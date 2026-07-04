@@ -14,6 +14,7 @@
     "skills/",
     "slipway.md",
     "slipway.json",
+    "slipway.hooks.example.json",
     "slipway.schema.json",
     "opencode.json",
     "README.md",

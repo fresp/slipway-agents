@@ -16,6 +16,8 @@ be verified for failure modes, and every NFR has a measurable threshold.
 
 You read docs. You report findings. You do not edit any file.
 
+This skill runs as an independent parallel lens — do not read or depend on output from other groomer-* skills. Synthesis happens in coxswain after all lenses complete.
+
 ---
 
 ## Docs to Read

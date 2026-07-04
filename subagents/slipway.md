@@ -91,6 +91,8 @@ Then merge any per-agent override from `agents.[name].ralph_loop` field by field
 
 Use the global effective `ralph_loop` value for any future orchestrator-managed agent loop that does not define an agent-level override.
 
+For `hooks`, resolve only the top-level `hooks` block from the active config. If the block is absent, empty, unreadable, or invalid against `slipway.schema.json`, treat hooks as disabled and continue normal pipeline execution. Hook configuration is sparse: only configured event keys fire, and no per-agent hook merge exists.
+
 ---
 
 ## Error Recovery and Retry
@@ -161,6 +163,7 @@ Run this before anything else, every time the orchestrator is invoked.
 | User says "estimate", "how long will this take", "cost estimate", "time forecast"                                         | `estimate-only`         | `purser`                                     |
 | User says "validate schema", "check schema", "schema drift"                                                               | `schema-validate`       | `surveyor`                              |
 | User runs `/slipway-doctor` or asks for "slipway doctor", "doctor", "diagnostics", "pre-flight diagnostic", or "pipeline diagnostic" | `doctor`                | `slipway` read-only diagnostic        |
+| User runs `/slipway-hooks` or asks for "slipway hooks", "show hooks", "hook status", or "configured hooks"              | `hooks-diagnostic`      | `slipway` read-only diagnostic        |
 
 If `.ai/docs/01-prd.md` exists but looks incomplete against the section checklist in `bootstrap-from-prd/SKILL.md`, still route to `chartmaker` first in **gap-fill mode** rather than straight to `hullwright`.
 
@@ -457,6 +460,63 @@ This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and
   this run or explicitly defers them. After a clean resolution (or user confirms all blocks are
   resolved), ask the user: "Run bosun on the affected docs to confirm consistency? (yes / no)".
 - **doctor**: run Doctor mode in the orchestrator itself. Do not invoke any subagent and do not modify any file.
+- **hooks-diagnostic**: run Hooks Diagnostic mode in the orchestrator itself. Do not invoke any subagent, do not modify any file, and do not fire hooks.
+
+---
+
+## Hook Dispatch
+
+Hook dispatch is an optional prompt-level notification mechanism driven by the active top-level `hooks` config. It is not a pipeline step, not a subagent, and not plugin-enforced. If `hooks` is absent, pipeline behavior is unchanged.
+
+### Events that trigger hooks
+
+- `on_step_complete` — fire after each major pipeline step completes successfully, including after STEP 3 Bosun passes, after STEP 5 Gunner gate resolves, after STEP 6 Rigger completes, and after STEP 8 Coxswain gate resolves. Payload fields: `event`, `step`, `gate_signal` when applicable, `timestamp`, `project_root`.
+- `on_block` — fire when any gate returns BLOCK / Blocked, or when `ralph_loop.block_on_exhaustion` triggers. Payload fields: `event`, `step`, `block_reason`, `critical_count`, `timestamp`, `project_root`.
+- `on_pipeline_complete` — fire when the full pipeline completes with all steps done and no blocks. Payload fields: `event`, `final_gate`, `steps_completed`, `timestamp`, `project_root`.
+- `on_user_input_required` — fire when the orchestrator pauses for user input, including optimize/proceed decisions and conflict-resolution prompts. Payload fields: `event`, `step`, `prompt_text`, `timestamp`, `project_root`.
+
+### Dispatch rules
+
+- Hooks fire only after the relevant event has already been written to `.ai/docs/.pipeline-state.md`; never dispatch before state is durable.
+- Dispatch is fire-and-forget. Use whichever runtime tool is available for outbound HTTP (`webfetch`, bash `curl`, or equivalent), do not wait for a response beyond the tool's immediate result, do not retry, and do not block the pipeline on hook failure.
+- If no outbound tool is available, the hook URL is unreachable, or delivery returns non-2xx, append one warning line to `.ai/docs/.pipeline-changelog.md` and continue. Never fail, pause, retry, or change a gate decision because a hook failed.
+- Template substitution replaces `{{event}}`, `{{step}}`, `{{gate}}`, `{{timestamp}}`, and `{{project}}` before dispatch. `{{gate}}` maps to the current gate signal or final gate when available; `{{project}}` maps to the project root. Unknown placeholders are left as-is.
+- `method` defaults to `POST` when omitted. `GET` hooks ignore `template` body content and may use substituted values only if the configured URL includes placeholders.
+- Never print full hook URLs in user-facing output. Show only the URL origin/domain because webhook URLs may contain tokens.
+
+---
+
+## Hooks Diagnostic mode
+
+Hooks Diagnostic mode is read-only. It lists configured hooks and recent hook activity without firing any hook.
+
+Run these checks in order:
+
+1. Resolve the active `slipway.json` using the same project-root then global fallback order as Runtime Config Resolution.
+2. Validate the active config against `slipway.schema.json` when both files are readable. Report hook schema violations as `✗` findings.
+3. List each supported event: `on_step_complete`, `on_block`, `on_pipeline_complete`, `on_user_input_required`.
+4. For each configured event, show the method and URL domain only; never print paths, query strings, headers, or tokens.
+5. Read `.ai/docs/.pipeline-changelog.md` if present and report whether each hook event fired, failed, was skipped, or was unavailable in the last pipeline run.
+
+Output format:
+
+```
+Slipway hooks
+
+## Config
+✓ Using config: [path]
+
+## Configured hooks
+on_step_complete       [configured | not configured]  [method]  [domain]
+on_block               [configured | not configured]  [method]  [domain]
+on_pipeline_complete   [configured | not configured]  [method]  [domain]
+on_user_input_required [configured | not configured]  [method]  [domain]
+
+## Last run activity
+[event] — [fired | failed | skipped | unavailable | no record] — [timestamp or n/a]
+
+N hook issues found (X errors, Y warnings)
+```
 
 ---
 
@@ -616,6 +676,7 @@ After each step completes, append to `.ai/docs/.pipeline-changelog.md` (never ov
 - Duration: [Xs]
 - Bosun score: [N/100 or n/a]
 - Notes: [any retry, scope expansion, or conflict surfaced]
+- Hooks: [event fired/skipped/unavailable summary, or "none configured"]
 ```
 
 ---
@@ -746,3 +807,4 @@ Changelog written to: .ai/docs/.pipeline-changelog.md
 - Never allow `shipwright`, `chronicler`, or `hullwright` to run against docs containing
   literal git conflict markers — always route to `caulker` first.
 - Never let `caulker` auto-continue into another subagent without an explicit user go-ahead.
+- Never block, retry, pause, or change a gate decision because a hook failed, was skipped, or could not fire.

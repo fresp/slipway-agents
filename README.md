@@ -195,6 +195,8 @@ slipway walks you through each step with a `yes / no` prompt — you never need 
 | `/slipway-init` | Initialize slipway in a new project — creates `.ai/` directories and state files |
 | `/slipway-status` | Show current pipeline and implementation state without running anything |
 | `/slipway-resume` | Resume an interrupted pipeline from the last completed step |
+| `/slipway-doctor` | Read-only pre-flight diagnostic for config, docs, state, agents, and declarative-only settings |
+| `/slipway-hooks` | Read-only view of configured optional pipeline notification hooks and last hook activity |
 
 Full reference: [docs/slash-commands.md](docs/slash-commands.md)
 
