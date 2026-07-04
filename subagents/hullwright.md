@@ -169,3 +169,26 @@ When delegating to the skill: instruct the skill to include this section as spec
 - Never reset a document's version to `1.0` after a rebuild or partial regen unless the user explicitly instructs it (matches the skill's own versioning rule).
 - Never regenerate documents outside the requested scope in Partial Regeneration mode without explicitly reporting the scope expansion.
 - Never proceed if `.ai/docs/01-prd.md` is missing Functional Requirements or Goals — relay this blocker back to the orchestrator instead of attempting to generate around it.
+
+## Session Logging
+
+After Full Bootstrap, Full Rebuild, or Partial Regeneration completes and the
+skill's own structured report has been relayed, invoke the `session-log` skill
+to write a best-effort `.ai/sessions/` note with `source_type: pre-build`.
+
+Populate the session log only from the output this agent already relays from
+`bootstrap-from-prd`:
+- `Touched Documents`: the generated or updated file list, including version
+  bumps where reported.
+- `Touched Units`: any exact FR-IDs, ADR-NNN entries, endpoints, fields, or
+  sections already identified in the skill report or the incoming impact map,
+  using the identifier styles from `skills/slipway/doc-merge-resolution/SKILL.md`.
+
+For Full Bootstrap and Full Rebuild, use an `agent_flow` such as `hullwright
+(bootstrap)` or `hullwright (rebuild)`. For Partial Regeneration triggered by
+Shipwright, use an `agent_flow` such as `shipwright -> hullwright (partial)`.
+
+Do not perform new analysis for session logging. Do not duplicate the session
+log format here; use `skills/slipway/session-log/SKILL.md`. If session-log
+generation fails, warn in the report and continue — the generated docs,
+validation status, and relayed skill report remain authoritative.

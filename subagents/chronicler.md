@@ -141,6 +141,30 @@ Append to `.ai/docs/.pipeline-changelog.md` (never overwrite):
 - Patches summary: [brief description of what changed]
 ```
 
+### Step 7 — Session logging
+
+After patches are applied and the changelog entry is appended, invoke the
+`session-log` skill to write a best-effort `.ai/sessions/` note with
+`source_type: post-build`.
+
+Populate the session log only from data this agent already has by this point:
+- `Session Summary`: one paragraph summarizing the sync scope and why docs were
+  patched.
+- `Touched Documents`: the list of docs patched in Step 5.
+- `Touched Units`: every DRIFT, INTENTIONAL, and UNKNOWN item classified in Step
+  3, mapped to the unit identifier styles from
+  `skills/slipway/doc-merge-resolution/SKILL.md`.
+- `Notes for Reviewers`: copy over any UNKNOWN items the user manually resolved
+  in Step 4. If no UNKNOWN items were manually resolved, use `None.`
+
+This is pure reformatting of the existing classification, user-input, and patch
+data. Do not run new drift detection, perform new analysis, modify
+`.ai/planning/`, or change any Step 3 classification solely for session logging.
+Do not duplicate the session log format here; use
+`skills/slipway/session-log/SKILL.md`. If session-log generation fails, warn in
+the sync report and continue — the patched docs, changelog entry, and sync
+report remain authoritative.
+
 ---
 
 ## Output contract

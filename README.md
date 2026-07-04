@@ -67,6 +67,7 @@ Model assignments live in [`slipway.json`](slipway.json) and are enforced at run
 | `groomer-devops`     | `coxswain`     | DevOps/Cloud lens — infra, deployment, observability readiness |
 | `groomer-complexity-audit` | `coxswain` | Complexity Audit lens — sizing red flags, hidden phase coupling, phase-split signals |
 | `doc-merge-resolution` | `caulker`    | Per-doc-type unit parsing + divergence classification rules for semantic conflict resolution |
+| `session-log` | `shipwright`, `hullwright`, `chronicler` | Writes passive per-session `.ai/sessions/` notes for future cross-branch reconciliation |
 
 ---
 
@@ -96,8 +97,18 @@ A single pipeline run from a raw idea produces:
 │   ├── 01-phase-*.md                      ├─ rigger — S/M/L sizing, parallel flags,
 │   ├── ...                               ┘ context load hints per task
 │   └── future-scope.md                    ← deferred P2 requirements (rigger, only when P2s are deferred)
+├── sessions/
+│   └── {branch-slug}-{topic-slug}-{timestamp}.md   ← session-log skill
+│                                                       (shipwright, hullwright,
+│                                                       chronicler)
 └── AGENT.md                               ← implementation instructions for Sisyphus
 ```
+
+`.ai/sessions/` contains best-effort per-session notes written by the
+`session-log` skill after Shipwright, Hullwright, or Chronicler mutate
+`.ai/docs/`. These files are reviewer breadcrumbs for future cross-branch
+reconciliation work; nothing in the current pipeline reads them, and they do not
+gate or block any step.
 
 `gunner` (security audit), `purser` (time/cost estimate), and `surveyor` (schema check) report to the session by design rather than writing files — their results are recorded in `.pipeline-state.md` and `.pipeline-changelog.md`.
 
