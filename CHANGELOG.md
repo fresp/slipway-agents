@@ -9,6 +9,13 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added (Batch 15 — Execution Protocol Examples)
+- `hullwright` now embeds the Execution Protocol with an explicit caution-over-speed
+  tradeoff line, while preserving the existing non-negotiable framing for
+  non-trivial implementation work.
+- The embedded Goal-Driven Execution guidance now includes ad-hoc request examples
+  that convert validation, bug-fix, and refactor prompts into verifiable goals.
+
 ### Added (Batch 14 — Execution Verification Gate)
 - `AGENT.md` template Working Loop now requires every implementation increment
   to record verification with a structured Test Results block before it can be

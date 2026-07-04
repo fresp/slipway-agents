@@ -106,6 +106,7 @@ The section to embed:
 
 These behavioral guidelines apply to every task in this project.
 They are non-negotiable and take precedence over "getting things done faster."
+Tradeoff: These guidelines bias toward caution over speed. For trivial tasks, use judgment — without softening the non-negotiable requirement for non-trivial work.
 
 ### 1. Think Before Coding
 Before implementing anything:
@@ -137,6 +138,11 @@ Every task has a `verify:` field in `.ai/planning/`.
 - Do not mark a task done until every verify condition passes.
 - For multi-step work, state a brief plan with verify checkpoints before starting.
 - Strong success criteria let you loop independently. If verify is unclear, ask before implementing.
+
+Transform ad-hoc requests into verifiable goals before coding:
+- "Add validation" → "Write tests for invalid inputs, then make them pass."
+- "Fix the bug" → "Write a test or reproduction that fails before the fix, then make it pass."
+- "Refactor X" → "Capture before/after behavior with tests, typecheck, or build evidence."
 
 ### 5. Library & Framework Docs
 Always resolve current docs via Context7 before implementing with any library or framework.
