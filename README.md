@@ -65,6 +65,7 @@ Model assignments live in [`slipway.json`](slipway.json) and are enforced at run
 | `groomer-lead-dev`   | `coxswain`     | Lead Dev lens — architecture, implementation risk, tech debt   |
 | `groomer-qa`         | `coxswain`     | QA lens — testability, edge cases, acceptance criteria gaps    |
 | `groomer-devops`     | `coxswain`     | DevOps/Cloud lens — infra, deployment, observability readiness |
+| `doc-merge-resolution` | `caulker`    | Per-doc-type unit parsing + divergence classification rules for semantic conflict resolution |
 
 ---
 

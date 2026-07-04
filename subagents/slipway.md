@@ -20,7 +20,7 @@ This agent never generates engineering content directly. It decides **which suba
 | Hull Builder      | `subagents/hullwright.md`        | Invokes the `bootstrap-from-prd` skill → `.ai/docs/02`–`10` + `AGENT.md`                   |
 | Bosun         | `subagents/bosun.md`           | Cross-doc validation + per-doc health score breakdown + severity-ranked findings            |
 | Gunner  | `subagents/gunner.md`    | Auth, secrets, and attack surface audit — PASS / CONDITIONAL / BLOCK gate                   |
-| Coxswain           | `subagents/coxswain.md`             | Multi-lens sprint grooming (Lead Dev, QA, DevOps) + cross-lens synthesis                   |
+| Coxswain           | `subagents/coxswain.md`             | Multi-lens sprint grooming (Lead Dev, QA, DevOps, Complexity Audit) + cross-lens synthesis  |
 | Rigger            | `subagents/rigger.md`              | Phase/milestone breakdown → `.ai/planning/` with sizing, dep graph, stale check            |
 | Purser         | `subagents/purser.md`           | Time and cost forecast per phase based on `.ai/planning`                                  |
 | Shipwright        | `subagents/shipwright.md`          | Update existing docs when a new feature is introduced                                       |
