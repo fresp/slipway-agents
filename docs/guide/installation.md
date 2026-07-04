@@ -93,21 +93,23 @@ The installer writes `~/.config/opencode/slipway.json`. To customize model assig
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
   "version": "0.10.0",
   "agents": {
-    "slipway":      { "model": "anthropic/claude-opus-4-8" },
-    "chartmaker":   { "model": "anthropic/claude-sonnet-5" },
-    "cartographer": { "model": "anthropic/claude-sonnet-5" },
-    "hullwright":   { "model": "anthropic/claude-sonnet-5" },
-    "bosun":        { "model": "anthropic/claude-opus-4-8" },
-    "rigger":       { "model": "anthropic/claude-sonnet-5" },
-    "coxswain":     { "model": "anthropic/claude-sonnet-5" },
-    "shipwright":   { "model": "anthropic/claude-sonnet-5" },
-    "chronicler":   { "model": "anthropic/claude-haiku-4-5" },
-    "surveyor":     { "model": "anthropic/claude-sonnet-5" },
-    "gunner":       { "model": "anthropic/claude-opus-4-8" },
-    "caulker":      { "model": "anthropic/claude-opus-4-8" }
+    "slipway":      { "model": "anthropic/claude-opus-4-8",   "fallback_model": "anthropic/claude-sonnet-5" },
+    "chartmaker":   { "model": "anthropic/claude-sonnet-5", "fallback_model": "anthropic/claude-haiku-4-5" },
+    "cartographer": { "model": "anthropic/claude-sonnet-5", "fallback_model": "anthropic/claude-haiku-4-5" },
+    "hullwright":   { "model": "anthropic/claude-sonnet-5", "fallback_model": "anthropic/claude-haiku-4-5" },
+    "bosun":        { "model": "anthropic/claude-opus-4-8",   "fallback_model": "anthropic/claude-sonnet-5" },
+    "rigger":       { "model": "anthropic/claude-sonnet-5", "fallback_model": "anthropic/claude-haiku-4-5" },
+    "coxswain":     { "model": "anthropic/claude-sonnet-5", "fallback_model": "anthropic/claude-haiku-4-5" },
+    "shipwright":   { "model": "anthropic/claude-sonnet-5", "fallback_model": "anthropic/claude-haiku-4-5" },
+    "chronicler":   { "model": "anthropic/claude-haiku-4-5",  "fallback_model": "anthropic/claude-sonnet-5" },
+    "surveyor":     { "model": "anthropic/claude-sonnet-5", "fallback_model": "anthropic/claude-haiku-4-5" },
+    "gunner":       { "model": "anthropic/claude-opus-4-8",   "fallback_model": "anthropic/claude-sonnet-5" },
+    "caulker":      { "model": "anthropic/claude-opus-4-8",   "fallback_model": "anthropic/claude-sonnet-5" }
   }
 }
 ```
+
+`fallback_model` is used automatically if the primary model is unavailable — no manual intervention needed.
 
 Common provider substitutions:
 
@@ -188,6 +190,14 @@ npx slipway-agents@latest uninstall
 The command removes only the `slipway-agents@latest` plugin entry and `~/.config/opencode/slipway.json`. It backs up changed/removed files and intentionally does not delete `slipway.local.json` because that file contains user-specific model customizations.
 
 For manual installs, remove the `agents.include` and `plugin` entries from `opencode.json`, then delete the cloned directory.
+
+## Troubleshooting
+
+If `@slipway` is not available after installation, restart OpenCode and run `bunx slipway-agents@latest doctor` to confirm the plugin entry, installed config, schema, and package export checks pass.
+
+If `doctor` reports config or permission errors, inspect `~/.config/opencode/opencode.json`, `~/.config/opencode/slipway.json`, and the containing directory permissions. If OpenCode still loads an old package after an update, run `bunx slipway-agents@latest update` to refresh `slipway.json` and clear the plugin cache.
+
+For manual installs, confirm both the `agents.include` entry and the `plugin` entry are present in `opencode.json`; manual checkouts also need `git pull` because the CLI `update` command only refreshes the installed config file.
 
 ---
 
