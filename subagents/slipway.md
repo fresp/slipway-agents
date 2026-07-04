@@ -42,18 +42,6 @@ Hull Builder is the only subagent that invokes the `bootstrap-from-prd` skill di
 
 ---
 
-## Scope Locks
-
-Before invoking `shipwright`, `chronicler`, or `hullwright` in partial-regeneration mode,
-read `.ai/docs/.pipeline-state.md` for a `## Active Locks` block. If an existing lock's
-`service` field overlaps the current task's target service and the lock is under 24h old,
-warn the user with the lock's contributor/branch/timestamp details and ask whether to
-proceed anyway, coordinate first, or wait. This is advisory only — it never blocks outright,
-since lock state is only as fresh as the last `git pull`.
-
-On successful completion of a mutating step, move that step's lock entry from
-`## Active Locks` to `## Released Locks` in `.pipeline-state.md`.
-
 ---
 
 ## Model Configuration
@@ -72,27 +60,7 @@ If `slipway.json` is not present in the project root, the plugin exits silently 
 
 ## Runtime Config Resolution
 
-At orchestrator startup, before Mode Detection and before STEP 1, resolve the active Slipway config for orchestration settings:
-
-1. Look for `slipway.json` in the target project root.
-2. If absent, fall back to the global OpenCode config copy at `~/.config/opencode/slipway.json`.
-3. If neither file exists or the active file is unreadable, use the documented defaults for orchestration-only settings and report that defaults are in effect.
-
-For `ralph_loop`, resolve the global defaults first:
-
-```
-enabled: true
-max_iterations: 2
-strategy: reset
-block_on_exhaustion: false
-```
-
-Then merge any per-agent override from `agents.[name].ralph_loop` field by field. Agent-level values win only for fields explicitly present in the override; missing override fields inherit the global value. For the Bosun optimize loop, use the effective `agents.bosun.ralph_loop` value, so the configured `block_on_exhaustion: true` override applies while `max_iterations` and `strategy` still inherit from the global default unless Bosun overrides them later.
-
-Use the global effective `ralph_loop` value for any future orchestrator-managed agent loop that does not define an agent-level override.
-
-For `hooks`, resolve only the top-level `hooks` block from the active config. If the block is absent, empty, unreadable, or invalid against `slipway.schema.json`, treat hooks as disabled and continue normal pipeline execution. Hook configuration is sparse: only configured event keys fire, and no per-agent hook merge exists.
-
+At startup, read `slipway.json` from the project root, falling back to `~/.config/opencode/slipway.json`. For `ralph_loop`, use `max_iterations` from config (default: `2`). For Bosun’s loop, apply `agents.bosun.ralph_loop.block_on_exhaustion` override if present. Full resolution rules are in `CLAUDE.md`.
 ---
 
 ## Error Recovery and Retry
@@ -163,7 +131,6 @@ Run this before anything else, every time the orchestrator is invoked.
 | User says "estimate", "how long will this take", "cost estimate", "time forecast"                                         | `estimate-only`         | `purser`                                     |
 | User says "validate schema", "check schema", "schema drift"                                                               | `schema-validate`       | `surveyor`                              |
 | User runs `/slipway-doctor` or asks for "slipway doctor", "doctor", "diagnostics", "pre-flight diagnostic", or "pipeline diagnostic" | `doctor`                | `slipway` read-only diagnostic        |
-| User runs `/slipway-hooks` or asks for "slipway hooks", "show hooks", "hook status", or "configured hooks"              | `hooks-diagnostic`      | `slipway` read-only diagnostic        |
 
 If `.ai/docs/01-prd.md` exists but looks incomplete against the section checklist in `bootstrap-from-prd/SKILL.md`, still route to `chartmaker` first in **gap-fill mode** rather than straight to `hullwright`.
 
@@ -460,63 +427,8 @@ This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and
   this run or explicitly defers them. After a clean resolution (or user confirms all blocks are
   resolved), ask the user: "Run bosun on the affected docs to confirm consistency? (yes / no)".
 - **doctor**: run Doctor mode in the orchestrator itself. Do not invoke any subagent and do not modify any file.
-- **hooks-diagnostic**: run Hooks Diagnostic mode in the orchestrator itself. Do not invoke any subagent, do not modify any file, and do not fire hooks.
 
 ---
-
-## Hook Dispatch
-
-Hook dispatch is an optional prompt-level notification mechanism driven by the active top-level `hooks` config. It is not a pipeline step, not a subagent, and not plugin-enforced. If `hooks` is absent, pipeline behavior is unchanged.
-
-### Events that trigger hooks
-
-- `on_step_complete` — fire after each major pipeline step completes successfully, including after STEP 3 Bosun passes, after STEP 5 Gunner gate resolves, after STEP 6 Rigger completes, and after STEP 8 Coxswain gate resolves. Payload fields: `event`, `step`, `gate_signal` when applicable, `timestamp`, `project_root`.
-- `on_block` — fire when any gate returns BLOCK / Blocked, or when `ralph_loop.block_on_exhaustion` triggers. Payload fields: `event`, `step`, `block_reason`, `critical_count`, `timestamp`, `project_root`.
-- `on_pipeline_complete` — fire when the full pipeline completes with all steps done and no blocks. Payload fields: `event`, `final_gate`, `steps_completed`, `timestamp`, `project_root`.
-- `on_user_input_required` — fire when the orchestrator pauses for user input, including optimize/proceed decisions and conflict-resolution prompts. Payload fields: `event`, `step`, `prompt_text`, `timestamp`, `project_root`.
-
-### Dispatch rules
-
-- Hooks fire only after the relevant event has already been written to `.ai/docs/.pipeline-state.md`; never dispatch before state is durable.
-- Dispatch is fire-and-forget. Use whichever runtime tool is available for outbound HTTP (`webfetch`, bash `curl`, or equivalent), do not wait for a response beyond the tool's immediate result, do not retry, and do not block the pipeline on hook failure.
-- If no outbound tool is available, the hook URL is unreachable, or delivery returns non-2xx, append one warning line to `.ai/docs/.pipeline-changelog.md` and continue. Never fail, pause, retry, or change a gate decision because a hook failed.
-- Template substitution replaces `{{event}}`, `{{step}}`, `{{gate}}`, `{{timestamp}}`, and `{{project}}` before dispatch. `{{gate}}` maps to the current gate signal or final gate when available; `{{project}}` maps to the project root. Unknown placeholders are left as-is.
-- `method` defaults to `POST` when omitted. `GET` hooks ignore `template` body content and may use substituted values only if the configured URL includes placeholders.
-- Never print full hook URLs in user-facing output. Show only the URL origin/domain because webhook URLs may contain tokens.
-
----
-
-## Hooks Diagnostic mode
-
-Hooks Diagnostic mode is read-only. It lists configured hooks and recent hook activity without firing any hook.
-
-Run these checks in order:
-
-1. Resolve the active `slipway.json` using the same project-root then global fallback order as Runtime Config Resolution.
-2. Validate the active config against `slipway.schema.json` when both files are readable. Report hook schema violations as `✗` findings.
-3. List each supported event: `on_step_complete`, `on_block`, `on_pipeline_complete`, `on_user_input_required`.
-4. For each configured event, show the method and URL domain only; never print paths, query strings, headers, or tokens.
-5. Read `.ai/docs/.pipeline-changelog.md` if present and report whether each hook event fired, failed, was skipped, or was unavailable in the last pipeline run.
-
-Output format:
-
-```
-Slipway hooks
-
-## Config
-✓ Using config: [path]
-
-## Configured hooks
-on_step_complete       [configured | not configured]  [method]  [domain]
-on_block               [configured | not configured]  [method]  [domain]
-on_pipeline_complete   [configured | not configured]  [method]  [domain]
-on_user_input_required [configured | not configured]  [method]  [domain]
-
-## Last run activity
-[event] — [fired | failed | skipped | unavailable | no record] — [timestamp or n/a]
-
-N hook issues found (X errors, Y warnings)
-```
 
 ---
 
@@ -622,49 +534,12 @@ Current mode: [bootstrap-from-prompt | bootstrap-from-prd | extend | review-only
 Last completed step: [step name]
 Optimize cycles used: [N] / [ralph_loop.max_iterations]
 Bosun last run: [timestamp or "never"]
-Bosun last result: [passed | findings: N critical, N should-fix, N note]
 Bosun health score: [0–100 or "n/a"]
-Bosun history: [score1, score2, score3 — last 3 runs, oldest first]
-Security audit last run: [timestamp or "never"]
 Security audit last result: [PASS | CONDITIONAL | BLOCK | "never"]
-Purser last run: [timestamp or "never"]
-Purser last result: [completed | "never"]
-Coxswain last run: [timestamp or "never"]
 Coxswain last result: [Ready to Plan | Conditional | Blocked | "never"]
-Coxswain Lead Dev: [Ready | Conditional | Blocked | "never"]
-Coxswain QA: [Ready | Conditional | Blocked | "never"]
-Coxswain DevOps: [Ready | Conditional | Blocked | "never"]
-Last sync: [timestamp or "never"]
-
-## Step Durations
-| Step | Started | Completed | Duration |
-|------|---------|-----------|----------|
-| [step name] | [timestamp] | [timestamp] | [Xs] |
 ```
 
 Read this file at the start of every invocation. If it shows an in-progress run, resume from `Last completed step` rather than restarting at STEP 1 — unless the user explicitly asks to start over.
-
-### Health Trend Detection
-
-After every Bosun run, update `Bosun history` (keep only the last 3 scores). Then check:
-
-- **Declining trend** — scores monotonically decreasing across 3 runs (e.g. 72 → 68 → 64):
-
-```
-⚠ Health trend warning: scores have declined across 3 consecutive runs ([score1] → [score2] → [score3]).
-This may indicate a structural issue in the PRD rather than surface doc problems.
-Recommendation: review .ai/docs/01-prd.md for ambiguity or missing requirements before the next optimize cycle.
-```
-
-- **Stagnating trend** — scores within ±3 points across 3 runs and all below 80 (e.g. 72 → 70 → 71):
-
-```
-⚠ Health trend warning: scores have stagnated at [avg] across 3 runs without reaching target.
-Optimize cycles may be addressing symptoms rather than root causes.
-Recommendation: review Critical and Should-fix findings for a common root — they may all trace to one PRD gap.
-```
-
-Do not trigger trend warnings if fewer than 3 Bosun runs have occurred.
 
 After each step completes, append to `.ai/docs/.pipeline-changelog.md` (never overwrite):
 
@@ -676,7 +551,6 @@ After each step completes, append to `.ai/docs/.pipeline-changelog.md` (never ov
 - Duration: [Xs]
 - Bosun score: [N/100 or n/a]
 - Notes: [any retry, scope expansion, or conflict surfaced]
-- Hooks: [event fired/skipped/unavailable summary, or "none configured"]
 ```
 
 ---
@@ -718,13 +592,7 @@ Status: [in-progress | blocked | complete]
 
 ## Parallelism
 
-The `Parallel: true/false` flag on each task is a **planning signal, not an execution directive.**
-
-**In a single-agent context (Sisyphus running alone):** tasks are always executed sequentially, even when marked `Parallel: true`. The flag tells Sisyphus that parallel-flagged tasks have no data dependency on each other — if it needs to pause one and resume another it may do so without risk. It does not imply concurrent execution.
-
-**In a multi-agent context (omo.dev or equivalent runtime):** the orchestrator may dispatch `Parallel: true` tasks to separate agent instances concurrently. Each task's `Context load` list specifies exactly which files that agent needs — loading only those files keeps per-agent context bounded. The orchestrator must never dispatch tasks where `Parallel: false` to concurrent agents, as these tasks share a resource (same DB table, config file, or sequential dependency).
-
-**When in doubt, execute sequentially.** Parallel dispatch is a performance optimization, not a correctness requirement. A plan with correct sequential execution is always preferable to a parallel execution with a race condition.
+Parallel: true/false on a task is a planning signal, not an execution directive. In a single-agent context, always execute sequentially regardless of this flag. In a multi-agent runtime (omo.dev), the orchestrator may dispatch parallel-flagged tasks concurrently — each task's Context load list keeps per-agent context bounded. Never dispatch Parallel: false tasks concurrently.
 
 ---
 
@@ -802,7 +670,6 @@ Changelog written to: .ai/docs/.pipeline-changelog.md
 - Never run `purser` before `rigger` has produced `.ai/planning/`.
 - Never restart the entire pipeline from STEP 1 on a mid-pipeline PRD edit if the edit is additive and the existing PRD checklist still passes — restart from the earliest step that is actually invalidated.
 - Never use non-English strings for trigger matching, user prompts, or error messages.
-- Never run `rigger` without first checking `.ai/docs/.pipeline-state.md` to confirm that `shipwright` (in extend mode) surfaced no unresolved ADR conflicts — unresolved ADR conflicts must be resolved before planning runs.
 - Never allow `chartmaker` to proceed past its completion contract with missing Stakeholder Priority tags and no default-P1 warning note.
 - Never allow `shipwright`, `chronicler`, or `hullwright` to run against docs containing
   literal git conflict markers — always route to `caulker` first.

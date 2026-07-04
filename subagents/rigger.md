@@ -96,8 +96,9 @@ gunner's `11-security-audit.md` (Lens 6 included), that must be resolved during 
 embedded in the relevant task acceptance criteria below]
 
 ## Test plan
-| Phase | Test command | Coverage scope |
-|-------|-------------|----------------|
+
+| Phase | Verify command | Coverage scope |
+|-------|----------------|----------------|
 | 1 — [name] | `[command]` | [what this tests — e.g. data layer + one end-to-end flow] |
 | 2 — [name] | `[command]` | [what this tests] |
 ```
@@ -127,11 +128,9 @@ embedded in the relevant task acceptance criteria below]
   - [ ] [Specific, testable criterion]
   - [ ] [Coxswain caveat embedded here if applicable: "Coxswain flagged: [issue] — resolve before marking complete"]
   - [ ] [Gunner caveat embedded here if applicable: "Gunner flagged (Lens N): [issue] — resolve before marking complete"]
-- **Expected output:** [The concrete artifact this task produces — a file path, a passing test suite, a running endpoint. Must be unambiguous enough that Sisyphus can check it without re-reading acceptance criteria.]
 - **Verify command:** [Shell command that confirms the task is complete — e.g. `npm test src/auth/`, `curl -sf http://localhost:3000/health`, `prisma validate`. Write `[manual review required]` if no automated check is possible.]
-- **Test command:** [Test suite command scoped to this task's code — e.g. `npm test src/payments/`, `pytest tests/test_auth.py`. Write `[no automated tests — manual QA required]` if the task is infrastructure-only.]
 - **Verify:**
-  - [Concrete condition that must be true after the task is complete — e.g. "returns 401 for unauthenticated requests", "file exists at path X", "all existing tests pass"]
+  - [Concrete completion signal — what must be true AND what artifact exists when this task is done — e.g. "returns 401 for unauthenticated requests", "file exists at path X", "all existing tests pass"]
   - [Additional condition if needed — max 5 total]
 - **Functional requirement trace:** [FR-IDs from 01-prd.md that this task addresses]
 - **Notes:** [Any accepted Should-fix findings from bosun that affect this task]
@@ -247,7 +246,7 @@ Use Stakeholder Priority tags from `01-prd.md` to influence phase ordering:
 
 ## Forbidden behaviors
 
-- Never leave `Expected output`, `Verify command`, `Test command`, or `Verify:` blank — write `[manual review required]` or `[no automated tests — manual QA required]` rather than omitting the field entirely.
+- Never leave `Verify command` or `Verify:` blank — write `[manual review required]` or `[manual review required]` rather than omitting the field entirely.
 - Never invent a `Verify:` condition when the task spec is too vague to write a concrete one — flag to the orchestrator instead.
 - Never run without first completing the stale check.
 - Never proceed with a stale plan without an explicit user choice.

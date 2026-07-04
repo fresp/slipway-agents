@@ -8,8 +8,6 @@ import { slipwayConfigSchema } from "./schema";
 export type SlipwayConfig = z.infer<typeof slipwayConfigSchema>;
 export type AgentConfig = SlipwayConfig["agents"][string];
 export type PermissionConfig = NonNullable<AgentConfig["permission"]>;
-export type HookConfig = NonNullable<NonNullable<SlipwayConfig["hooks"]>[keyof NonNullable<SlipwayConfig["hooks"]>]>
-
 export interface AgentDefinition {
   prompt?: string;
   model?: string;

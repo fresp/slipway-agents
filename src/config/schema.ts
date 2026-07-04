@@ -32,24 +32,6 @@ export const ralphLoopConfigSchema = z
   })
   .strict();
 
-export const hookConfigSchema = z
-  .object({
-    url: z.string(),
-    method: z.enum(["POST", "GET"]).default("POST").optional(),
-    headers: z.record(z.string(), z.string()).optional(),
-    template: z.string().optional(),
-  })
-  .strict();
-
-export const hooksSchema = z
-  .object({
-    on_step_complete: hookConfigSchema.optional(),
-    on_block: hookConfigSchema.optional(),
-    on_pipeline_complete: hookConfigSchema.optional(),
-    on_user_input_required: hookConfigSchema.optional(),
-  })
-  .strict();
-
 export const categoryConfigSchema = z
   .object({
     model: z.string(),
@@ -76,7 +58,6 @@ export const slipwayConfigSchema = z
     $schema: z.string().optional(),
     version: z.string().regex(/^\d+\.\d+\.\d+$/),
     ralph_loop: ralphLoopConfigSchema.optional(),
-    hooks: hooksSchema.optional(),
     agents: z.record(z.string(), agentConfigSchema),
     categories: z.record(z.string(), categoryConfigSchema).optional(),
   })

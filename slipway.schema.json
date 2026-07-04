@@ -17,17 +17,6 @@
     "ralph_loop": {
       "$ref": "#/definitions/ralphLoopConfig"
     },
-    "hooks": {
-      "type": "object",
-      "description": "Optional external notification hooks. All hooks are optional — if absent or if delivery fails, the pipeline continues normally.",
-      "properties": {
-        "on_step_complete": { "$ref": "#/definitions/hookConfig" },
-        "on_block": { "$ref": "#/definitions/hookConfig" },
-        "on_pipeline_complete": { "$ref": "#/definitions/hookConfig" },
-        "on_user_input_required": { "$ref": "#/definitions/hookConfig" }
-      },
-      "additionalProperties": false
-    },
     "agents": {
       "type": "object",
       "description": "Model assignments per agent. Keys must match agent names exactly.",
@@ -177,17 +166,6 @@
           "description": "If true, and Critical findings remain after max_iterations, halt the pipeline and require explicit user decision instead of silently proceeding to the next stage."
         }
       },
-      "additionalProperties": false
-    },
-    "hookConfig": {
-      "type": "object",
-      "properties": {
-        "url": { "type": "string", "description": "Webhook URL to call." },
-        "method": { "type": "string", "enum": ["POST", "GET"], "default": "POST" },
-        "headers": { "type": "object", "additionalProperties": { "type": "string" } },
-        "template": { "type": "string", "description": "JSON body template. Use {{event}}, {{step}}, {{gate}}, {{timestamp}}, {{project}} as placeholders." }
-      },
-      "required": ["url"],
       "additionalProperties": false
     },
     "categoryConfig": {

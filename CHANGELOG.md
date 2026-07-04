@@ -9,6 +9,18 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.8.0] — 2026-07-04
 
+### Simplify pass (Batch 7)
+- Removed the over-engineered pipeline hook system for interactive single-user runs. `slipway.json` has no hooks block, `slipway.schema.json` no longer defines a hooks schema, and the plugin TypeScript config/type/loader references were removed.
+- Deleted `slipway.hooks.example.json` and the unused `src/hooks/session-error-hook.ts`. `src/hooks/pipeline-hooks.ts` is now a no-op compatibility stub returning `{}`, and `src/index.ts` retains the `registerPipelineHooks` call only.
+- Removed `/slipway-hooks`, Hook Dispatch, Hooks Diagnostic mode, hooks-diagnostic mode routing, Scope Locks, Health Trend Detection, Bosun history, Step Durations, and multiple unused `.pipeline-state.md` fields from `subagents/slipway.md`.
+- Compressed Runtime Config Resolution and Parallelism in `subagents/slipway.md` to the essentials needed for orchestration.
+- Removed optional MCP/Context7 sections from `subagents/hullwright.md` and `subagents/bosun.md`. Simplified `bosun.md` Cartographer handling to one rule and trimmed the AGENT.md contract checks to five high-signal checks.
+- Simplified `subagents/coxswain.md` Lens D to refer to the `[KEYWORD_REDACTED]-complexity-audit` skill instead of duplicating the check areas.
+- Removed `Expected output` and `Test command` fields from `subagents/rigger.md`, updated the `Verify` description to include artifact/completion signal expectations, and changed the overview test plan table to `Phase | Verify command | Coverage scope`.
+- Removed `/slipway-hooks` from `docs/slash-commands.md`, updated slash-command count to four, and removed stale active hook/Context7 mentions from `README.md`.
+- `slipway.json` no longer exposes `hullwright.permission`, and `bosun.permission` now contains only `{ "edit": "deny" }`.
+- Gate signal rules, Bosun scoring formula, health score thresholds, and normal pipeline routing behavior are unchanged beyond hook-diagnostic removal.
+
 ### Added (Batch 6 — plugin runtime enforcement)
 - Refactored the TypeScript plugin from a monolithic `src/index.ts` into focused modules for
   config loading/validation, agent config application, model resolution, prompt append handling,

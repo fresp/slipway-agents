@@ -1,6 +1,6 @@
 # Slash Commands
 
-slipway-agents registers five slash commands in OpenCode. These are convenience wrappers — they invoke the `slipway` orchestrator with a pre-filled intent, so you never need to remember the exact trigger phrase.
+slipway-agents registers four slash commands in OpenCode. These are convenience wrappers — they invoke the `slipway` orchestrator with a pre-filled intent, so you never need to remember the exact trigger phrase.
 
 ---
 
@@ -112,40 +112,3 @@ Slipway doctor
 N issues found (X errors, Y warnings)
 ```
 
----
-
-## `/slipway-hooks`
-
-**What it does:** Shows configured optional pipeline notification hooks and recent hook activity without firing any hook.
-
-Equivalent to asking `@slipway show hooks` or `@slipway hook status`.
-
-**When to use:** Before a long-running pipeline, after a blocked run, or when checking whether external notifications are configured correctly.
-
-**Behavior:**
-- Does not invoke any subagent.
-- Does not fire hooks, send HTTP requests, or modify files.
-- Reads the active `slipway.json` using the normal config resolution order.
-- Lists supported events: `on_step_complete`, `on_block`, `on_pipeline_complete`, and `on_user_input_required`.
-- Shows hook URLs truncated to origin/domain only; never prints full URLs, query strings, headers, or tokens.
-- Reads `.ai/docs/.pipeline-changelog.md` to report whether hooks fired, failed, were skipped, or were unavailable in the last pipeline run.
-
-**Output format:**
-
-```
-Slipway hooks
-
-## Config
-✓ Using config: [path]
-
-## Configured hooks
-on_step_complete       [configured | not configured]  [method]  [domain]
-on_block               [configured | not configured]  [method]  [domain]
-on_pipeline_complete   [configured | not configured]  [method]  [domain]
-on_user_input_required [configured | not configured]  [method]  [domain]
-
-## Last run activity
-[event] — [fired | failed | skipped | unavailable | no record] — [timestamp or n/a]
-
-N hook issues found (X errors, Y warnings)
-```

@@ -2,7 +2,6 @@ import { loadAgentDefinitions } from "./config/loader";
 import { loadSlipwayConfig } from "./config/loader";
 import { applyAgentConfig } from "./plugin-handlers/agent-config-handler";
 import { registerPipelineHooks } from "./hooks/pipeline-hooks";
-import { registerSessionErrorHook } from "./hooks/session-error-hook";
 import { Hooks, PluginInput } from "./config/types";
 
 export default {
@@ -22,8 +21,7 @@ export default {
       config: async (input) => {
         await applyAgentConfig(input, agentDefinitions, slipwayConfig);
       },
-      ...registerSessionErrorHook(),
-      ...registerPipelineHooks(slipwayConfig, projectRoot),
+      ...registerPipelineHooks(),
     };
   },
 };

@@ -18,7 +18,7 @@ slipway-agents takes a raw product idea or existing PRD and drives it through a 
 | **Input**            | `slipway`          | Detects mode: bootstrap, reverse-engineer, extend, or sync                         |
 | **Reverse-engineer** | `cartographer`     | Scans existing codebase → inferred docs 02–10 + gap-fill briefing for chartmaker   |
 | **PRD**              | `chartmaker`       | Structured Q&A → complete `01-prd.md` with P0/P1/P2 priority ranking              |
-| **Docs**             | `hullwright`     | Invokes `bootstrap-from-prd` skill → docs `02`–`10` + `AGENT.md`; may optionally use Context7/MCP checks for library/API facts |
+| **Docs**             | `hullwright`     | Invokes `bootstrap-from-prd` skill → docs `02`–`10` + `AGENT.md` |
 | **Review**           | `bosun`            | Cross-doc + `AGENT.md` contract validation, per-doc health scores, severity-ranked findings 0–100 |
 | **Review**           | optimize loop      | Up to 2 cycles to resolve Critical findings before continuing                      |
 | **Security**         | `gunner`           | Auth, secrets, attack surface audit — PASS / CONDITIONAL / BLOCK gate              |
@@ -42,7 +42,7 @@ After a multi-contributor merge or rebase touches `.ai/docs/` or `AGENT.md`, run
 | `slipway`      | Orchestrator — routes pipeline, enforces step order, never generates content      | `claude-opus-4-8`   |
 | `chartmaker`   | Raw prompt / partial PRD → complete `.ai/docs/01-prd.md` with P0/P1/P2 ranking   | `claude-sonnet-5` |
 | `cartographer` | Reverse-engineers existing codebase → `.ai/docs/` with confidence markers         | `claude-sonnet-5` |
-| `hullwright` | Invokes `bootstrap-from-prd` skill → docs 02–10 + `AGENT.md`; optional Context7/MCP cross-checks for external library/API facts | `claude-sonnet-5` |
+| `hullwright` | Invokes `bootstrap-from-prd` skill → docs 02–10 + `AGENT.md` | `claude-sonnet-5` |
 | `bosun`        | Cross-doc + `AGENT.md` contract validation, per-doc health scores, severity-ranked findings | `claude-opus-4-8`   |
 | `gunner`       | Auth, secrets, and attack surface audit across five lenses                        | `claude-opus-4-8`   |
 | `coxswain`     | Sprint grooming — Lead Dev, QA, DevOps, Complexity Audit lenses + synthesis       | `claude-sonnet-5` |
@@ -196,7 +196,6 @@ slipway walks you through each step with a `yes / no` prompt — you never need 
 | `/slipway-status` | Show current pipeline and implementation state without running anything |
 | `/slipway-resume` | Resume an interrupted pipeline from the last completed step |
 | `/slipway-doctor` | Read-only pre-flight diagnostic for config, docs, state, agents, and declarative-only settings |
-| `/slipway-hooks` | Read-only view of configured optional pipeline notification hooks and last hook activity |
 
 Full reference: [docs/slash-commands.md](docs/slash-commands.md)
 

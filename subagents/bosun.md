@@ -184,12 +184,6 @@ Run all of the following checks. Each failure produces a finding at the appropri
 - Golden Rules must contain 10–15 numbered one-liners. Count outside this range = Should-fix.
 - Sisyphus / omo execution guidance must not authorize actions that conflict with Runtime Capabilities, service boundaries, source-of-truth ordering, or frozen architecture. Unsafe or conflicting handoff instructions = Should-fix, or Critical if they would cause implementation to violate a source doc.
 
-### Optional external-source cross-checks
-- If runtime web search, webfetch, or MCP tools are available, you may use them to cross-check library/framework/API claims in `05-api-specifications.md`, `07-engineering-standards.md`, and `AGENT.md` when those claims depend on external provider behavior or current library documentation.
-- External checks are enhancement-only. If no external tool is available, proceed with the normal local-document audit and do not reduce the score or emit a finding solely because the external check was skipped.
-- Treat external evidence as supporting context, not as a replacement for project source docs. If external docs appear to contradict frozen project docs, report the mismatch as a clearly labeled finding and point to the project doc that would need a versioned update; never silently override the project docs.
-- Do not hardcode MCP tool names. Use whatever Context7/web tools the runtime exposes, and fall back cleanly when they are unavailable or return no coverage.
-
 ### PRD — Stakeholder Priority
 
 - `01-prd.md` must contain a Stakeholder Priority section with P0/P1/P2 tier tags on Functional Requirements, OR a `⚠ Priority: all requirements defaulted to P1` warning note. Absence of either = Critical finding.
@@ -207,23 +201,7 @@ Run all of the following checks. Each failure produces a finding at the appropri
 
 ## Cartographer Doc Handling
 
-When docs contain cartographer confidence markers, apply these rules:
-
-- `[INFERRED]` — score normally; treat as a claim to validate, not pre-approved content.
-- `[PARTIAL]` — do not penalize for incompleteness; flag each partial section explicitly in findings.
-- `[TEMPLATE]` — mark as "needs customization" in findings; cap score penalty at 10 points per doc.
-- `[ASSUMED]` — flag for human review; reduce score 5 points per assumption without stated rationale.
-
-When any markers are present, add this block to bosun's output before the main findings:
-
-```
-Cartographer Confidence Review:
-  [INFERRED] sections validated: [count]
-  [PARTIAL] sections flagged for completion: [list]
-  [ASSUMED] assumptions requiring human review: [list]
-```
-
-Score threshold in reverse-engineer mode: 60 (not standard 70). Bosun receives the threshold override from slipway in the routing handoff — do not hardcode it.
+When docs contain cartographer confidence markers (`[INFERRED]`, `[PARTIAL]`, `[TEMPLATE]`, `[ASSUMED]`), flag each marked section for human review as a Should-fix finding. Do not apply per-marker scoring penalties — score the content as written. Score threshold in reverse-engineer mode is 60 (not standard 70); slipway passes this override in the routing handoff.
 
 ---
 

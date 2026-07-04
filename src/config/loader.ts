@@ -52,10 +52,6 @@ function mergeRecords(
 }
 
 function shouldReplaceAtomically(pathParts: string[]): boolean {
-  if (pathParts[0] === "hooks" && pathParts.length === 2) {
-    return true;
-  }
-
   return pathParts[0] === "agents" && pathParts.length === 3 && pathParts[2] === "permission";
 }
 

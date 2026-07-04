@@ -78,31 +78,9 @@ Lens C readiness signal: **Ready** / **Conditional** / **Blocked**
 
 #### Lens D: Complexity Audit
 
-Full checklist: `skills/slipway/groomer-complexity-audit/SKILL.md`.
+Run the `[KEYWORD_REDACTED]-complexity-audit` skill against the same input docs. This lens returns a flag list only — no readiness signal. Flags feed into Step 2 synthesis directly.
 
-Focus: scope creep, over-engineering, blast radius, verify quality, sizing red flags, hidden coupling between phases, and phase-split signals.
-
-For each task or phase implied by the docs (and defined in `.ai/planning/` if rigger has already run), check:
-- **Scope creep** — does the task spec ask for more than what the PRD and docs define? Are features being added that were not explicitly requested?
-- **Over-engineering** — are there abstractions, configurability, or flexibility assumptions that no functional requirement justifies?
-- **Blast radius** — does the planned implementation touch more files, modules, or services than the requirement demands?
-- **Verify quality** — are the acceptance criteria (and `Verify:` fields, if rigger has already run) concrete and scope-aware? "Works correctly" is not a verify condition.
-- **Sizing red flags** — does any task's S/M/L label understate its real complexity (e.g. an S task crossing an ownership boundary, or with more acceptance criteria than its bucket plausibly covers)?
-- **Hidden coupling** — do two phases or tasks marked independent actually share a resource (same table, config surface, external credential) or an implicit ordering the dependency graph doesn't show?
-- **Phase split signals** — is any phase too large or too mixed to plan coherently (10+ tasks, unrelated milestones bundled, 3+ L tasks with no parallelism)?
-
-Output: a list of tasks/phases with flags `[OVERSCOPED]`, `[OVERENGINEERED]`, `[VERIFY_WEAK]`, `[SIZING_RISK]`, `[HIDDEN_COUPLING]`, or `[SPLIT_RECOMMENDED]`, each followed by one sentence of reasoning.
-
-Example:
-```
-[OVERSCOPED]        TASK-04 Auth middleware — spec asks for JWT validation; task description also adds refresh token rotation, which is not in the PRD.
-[OVERENGINEERED]    TASK-07 Config loader — implements a plugin system for a single config file read once at startup.
-[VERIFY_WEAK]       TASK-11 Rate limiting — acceptance criterion is "requests are rate limited"; not verifiable without a threshold and a test command.
-[HIDDEN_COUPLING]   Phase 2 ↔ Phase 3 — both write the tenant config collection; marked parallel but will serialize on schema agreement.
-[SPLIT_RECOMMENDED] Phase 4 — bundles reporting and billing (unrelated milestones); split at the billing boundary.
-```
-
-If no flags are raised, write: `No scope, complexity, or verify issues found.`
+Do not duplicate the check areas here. The skill file is the authoritative definition.
 
 Lens D does not produce a separate readiness signal — its flags feed directly into Step 2 synthesis.
 
