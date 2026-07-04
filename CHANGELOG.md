@@ -7,9 +7,42 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [Unreleased]
+## [0.8.0] — 2026-07-04
 
 ### Added
+- **Schema: per-agent `category` field** — links an agent to its `categories` fallback pool
+  (quick/standard/deep). All 13 agents now declare a category in `slipway.json`, matching
+  their primary model tier so the last-resort fallback never drops below the tier the agent
+  was designed for. Declarative for now — the plugin does not yet read it at runtime.
+- **Schema: per-agent `permission` object** — scoped `edit`/`webfetch`/`task`/`bash`
+  permissions (`ask`/`allow`/`deny`; `bash` also accepts a per-command object form for
+  scoped shell access). `bosun` sets `"edit": "deny"` (matches its documented read-only
+  role). `gunner`'s permission block is intentionally absent — its scoped bash permissions
+  land in Batch 2 with the dependency/image-scan lens. Declarative until plugin-side
+  enforcement ships.
+- **Schema: `ralph_loop` config** — global default + per-agent override for bounded
+  optimization cycles (`enabled`, `max_iterations`, `strategy`, `block_on_exhaustion`).
+  Global default mirrors the orchestrator's hardcoded 2-cycle optimize loop; `bosun`
+  overrides `block_on_exhaustion: true`, matching the orchestrator's documented rule that
+  unresolved Critical findings never pass STEP 4 without explicit user override. Declarative
+  only — the orchestrator still hardcodes the limit until a future batch wires it.
+- `caulker`'s `slipway.json` entry gained the `mode`/`description` fields every other agent
+  already had.
+
+### Changed
+- Model assignments upgraded to current tiers: Opus agents (`slipway`, `bosun`, `gunner`,
+  `caulker`) → `anthropic/claude-opus-4-8`; Sonnet agents → `anthropic/claude-sonnet-5`;
+  `chronicler` stays on `anthropic/claude-haiku-4-5`. Fallbacks and `categories` pools
+  updated to match. Bedrock example strings in README/installation docs follow the same
+  version swap under the existing `us.anthropic.` prefix pattern (unverified against
+  OpenCode's Bedrock provider naming — validate before relying on them).
+- `slipway.schema.json` version description corrected (was stale at "0.6.0") and bumped to
+  0.8.0 along with `package.json`, `slipway.json`, and doc examples.
+- Backward compatibility preserved: all new schema fields are optional; existing
+  `slipway.local.json` files that only set `model`/`fallback_model`/`mode`/`description`
+  remain valid.
+
+### Added (Batch 0 — doc suite flexibility)
 - **Doc suite manifest** (`.ai/docs/.manifest.md`) — the generated doc suite is no longer a
   rigid 02–10 set. The `bootstrap-from-prd` skill now runs a Doc Suite Selection step
   (STEP 2.5) that decides per baseline doc whether it is generated or `omitted` (currently

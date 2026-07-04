@@ -11,8 +11,11 @@
   "properties": {
     "version": {
       "type": "string",
-      "description": "Config schema version. Current: 0.6.0",
+      "description": "Config schema version. Current: 0.8.0",
       "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "ralph_loop": {
+      "$ref": "#/definitions/ralphLoopConfig"
     },
     "agents": {
       "type": "object",
@@ -94,12 +97,12 @@
       "properties": {
         "model": {
           "type": "string",
-          "description": "Primary model string in provider/model-id format. Example: anthropic/claude-sonnet-4-6",
+          "description": "Primary model string in provider/model-id format. Example: anthropic/claude-sonnet-5",
           "examples": [
-            "anthropic/claude-opus-4-6",
-            "anthropic/claude-sonnet-4-6",
+            "anthropic/claude-opus-4-8",
+            "anthropic/claude-sonnet-5",
             "anthropic/claude-haiku-4-5",
-            "amazon-bedrock/us.anthropic.claude-opus-4-6",
+            "amazon-bedrock/us.anthropic.claude-opus-4-8",
             "google/gemini-2.5-pro",
             "openai/gpt-4o"
           ]
@@ -116,6 +119,47 @@
         "description": {
           "type": "string",
           "description": "Human-readable note about this agent's role. Not used at runtime."
+        },
+        "category": {
+          "type": "string",
+          "description": "Which category pool (from top-level `categories`) this agent falls back to if it has no model set, or if its model/fallback_model are both unavailable at runtime."
+        },
+        "permission": {
+          "type": "object",
+          "description": "Scoped permissions for this agent. Absence of a key means no access to that action at all — this is NOT the same as setting it to 'deny' explicitly, though both result in no access. Most agents should have no permission block at all (doc-only agents never touch bash).",
+          "properties": {
+            "edit": { "type": "string", "enum": ["ask", "allow", "deny"] },
+            "webfetch": { "type": "string", "enum": ["ask", "allow", "deny"] },
+            "task": { "type": "string", "enum": ["ask", "allow", "deny"] },
+            "bash": {
+              "description": "Only agents that need shell access (currently: gunner, for vulnerability scanning) should set this. Prefer the object form to scope down to specific commands rather than blanket allow.",
+              "anyOf": [
+                { "type": "string", "enum": ["ask", "allow", "deny"] },
+                {
+                  "type": "object",
+                  "additionalProperties": { "type": "string", "enum": ["ask", "allow", "deny"] }
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "ralph_loop": {
+          "$ref": "#/definitions/ralphLoopConfig"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ralphLoopConfig": {
+      "type": "object",
+      "description": "Retry-loop configuration for agents that run bounded optimization cycles (e.g. bosun's Critical-finding resolution loop, currently hardcoded to 2 cycles in the orchestrator). At the top level this is the global default; inside an agent entry it is a per-agent override — all fields optional, unset fields inherit the global value.",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "max_iterations": { "type": "integer", "minimum": 1 },
+        "strategy": { "type": "string", "enum": ["reset", "continue"] },
+        "block_on_exhaustion": {
+          "type": "boolean",
+          "description": "If true, and Critical findings remain after max_iterations, halt the pipeline and require explicit user decision instead of silently proceeding to the next stage."
         }
       },
       "additionalProperties": false

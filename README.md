@@ -39,19 +39,19 @@ After a multi-contributor merge or rebase touches `.ai/docs/` or `AGENT.md`, run
 
 | Agent          | Role                                                                              | Model               |
 | -------------- | --------------------------------------------------------------------------------- | ------------------- |
-| `slipway`      | Orchestrator — routes pipeline, enforces step order, never generates content      | `claude-opus-4-6`   |
-| `chartmaker`   | Raw prompt / partial PRD → complete `.ai/docs/01-prd.md` with P0/P1/P2 ranking   | `claude-sonnet-4-6` |
-| `cartographer` | Reverse-engineers existing codebase → `.ai/docs/` with confidence markers         | `claude-sonnet-4-6` |
-| `hullwright` | Invokes `bootstrap-from-prd` skill → docs 02–10 + `AGENT.md`                     | `claude-sonnet-4-6` |
-| `bosun`        | Cross-doc validation + per-doc health score breakdown + severity-ranked findings  | `claude-opus-4-6`   |
-| `gunner`       | Auth, secrets, and attack surface audit across five lenses                        | `claude-opus-4-6`   |
-| `coxswain`     | Sprint grooming — Lead Dev, QA, DevOps, Complexity Audit lenses + synthesis       | `claude-sonnet-4-6` |
-| `rigger`       | Phase/milestone breakdown → `.ai/planning/` with sizing and dependency graph      | `claude-sonnet-4-6` |
-| `purser`       | Time and cost forecast per phase based on `.ai/planning/`                         | `claude-sonnet-4-6` |
-| `shipwright`   | Extend existing docs when a new feature is introduced                             | `claude-sonnet-4-6` |
-| `surveyor`     | Post-implementation DB schema vs data model consistency check                     | `claude-sonnet-4-6` |
+| `slipway`      | Orchestrator — routes pipeline, enforces step order, never generates content      | `claude-opus-4-8`   |
+| `chartmaker`   | Raw prompt / partial PRD → complete `.ai/docs/01-prd.md` with P0/P1/P2 ranking   | `claude-sonnet-5` |
+| `cartographer` | Reverse-engineers existing codebase → `.ai/docs/` with confidence markers         | `claude-sonnet-5` |
+| `hullwright` | Invokes `bootstrap-from-prd` skill → docs 02–10 + `AGENT.md`                     | `claude-sonnet-5` |
+| `bosun`        | Cross-doc validation + per-doc health score breakdown + severity-ranked findings  | `claude-opus-4-8`   |
+| `gunner`       | Auth, secrets, and attack surface audit across five lenses                        | `claude-opus-4-8`   |
+| `coxswain`     | Sprint grooming — Lead Dev, QA, DevOps, Complexity Audit lenses + synthesis       | `claude-sonnet-5` |
+| `rigger`       | Phase/milestone breakdown → `.ai/planning/` with sizing and dependency graph      | `claude-sonnet-5` |
+| `purser`       | Time and cost forecast per phase based on `.ai/planning/`                         | `claude-sonnet-5` |
+| `shipwright`   | Extend existing docs when a new feature is introduced                             | `claude-sonnet-5` |
+| `surveyor`     | Post-implementation DB schema vs data model consistency check                     | `claude-sonnet-5` |
 | `chronicler`   | Post-implementation doc sync — classify drift, patch docs incrementally           | `claude-haiku-4-5`  |
-| `caulker` | Resolves conflicts in `.ai/docs/` and `AGENT.md` after multi-contributor merges — section-level semantic comparison, never silently resolves true contradictions | `claude-opus-4-6` |
+| `caulker` | Resolves conflicts in `.ai/docs/` and `AGENT.md` after multi-contributor merges — section-level semantic comparison, never silently resolves true contradictions | `claude-opus-4-8` |
 
 Model assignments live in [`slipway.json`](slipway.json) and are enforced at runtime by the slipway-agents plugin. See [Overriding models](#overriding-models).
 
@@ -208,21 +208,21 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 // slipway.local.json — takes precedence over slipway.json
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "agents": {
-    "slipway":      { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
-    "chartmaker":   { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
-    "cartographer": { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
-    "hullwright": { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
-    "bosun":        { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
-    "gunner":       { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
-    "coxswain":     { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
-    "rigger":       { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
-    "purser":       { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
-    "shipwright":   { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
-    "surveyor":     { "model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
-    "chronicler":   { "model": "amazon-bedrock/us.anthropic.claude-haiku-4-5",  "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" },
-    "caulker":      { "model": "amazon-bedrock/us.anthropic.claude-opus-4-6",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-4-6" }
+    "slipway":      { "model": "amazon-bedrock/us.anthropic.claude-opus-4-8",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-5" },
+    "chartmaker":   { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
+    "cartographer": { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
+    "hullwright": { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
+    "bosun":        { "model": "amazon-bedrock/us.anthropic.claude-opus-4-8",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-5" },
+    "gunner":       { "model": "amazon-bedrock/us.anthropic.claude-opus-4-8",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-5" },
+    "coxswain":     { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
+    "rigger":       { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
+    "purser":       { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
+    "shipwright":   { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
+    "surveyor":     { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },
+    "chronicler":   { "model": "amazon-bedrock/us.anthropic.claude-haiku-4-5",  "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-5" },
+    "caulker":      { "model": "amazon-bedrock/us.anthropic.claude-opus-4-8",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-5" }
   }
 }
 ```

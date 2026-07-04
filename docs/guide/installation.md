@@ -87,21 +87,21 @@ cp slipway.json slipway.local.json
 // slipway.local.json
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "agents": {
-    "slipway":      { "model": "anthropic/claude-opus-4-6" },
-    "chartmaker":   { "model": "anthropic/claude-sonnet-4-6" },
-    "cartographer": { "model": "anthropic/claude-sonnet-4-6" },
-    "hullwright": { "model": "anthropic/claude-sonnet-4-6" },
-    "bosun":        { "model": "anthropic/claude-opus-4-6" },
-    "gunner":       { "model": "anthropic/claude-opus-4-6" },
-    "coxswain":     { "model": "anthropic/claude-sonnet-4-6" },
-    "rigger":       { "model": "anthropic/claude-sonnet-4-6" },
-    "purser":       { "model": "anthropic/claude-sonnet-4-6" },
-    "shipwright":   { "model": "anthropic/claude-sonnet-4-6" },
-    "surveyor":     { "model": "anthropic/claude-sonnet-4-6" },
+    "slipway":      { "model": "anthropic/claude-opus-4-8" },
+    "chartmaker":   { "model": "anthropic/claude-sonnet-5" },
+    "cartographer": { "model": "anthropic/claude-sonnet-5" },
+    "hullwright": { "model": "anthropic/claude-sonnet-5" },
+    "bosun":        { "model": "anthropic/claude-opus-4-8" },
+    "gunner":       { "model": "anthropic/claude-opus-4-8" },
+    "coxswain":     { "model": "anthropic/claude-sonnet-5" },
+    "rigger":       { "model": "anthropic/claude-sonnet-5" },
+    "purser":       { "model": "anthropic/claude-sonnet-5" },
+    "shipwright":   { "model": "anthropic/claude-sonnet-5" },
+    "surveyor":     { "model": "anthropic/claude-sonnet-5" },
     "chronicler":   { "model": "anthropic/claude-haiku-4-5" },
-    "caulker":      { "model": "anthropic/claude-opus-4-6" }
+    "caulker":      { "model": "anthropic/claude-opus-4-8" }
   }
 }
 ```
@@ -110,8 +110,8 @@ Common provider substitutions:
 
 | Provider | Model string |
 |---|---|
-| Anthropic direct | `anthropic/claude-opus-4-6` |
-| Amazon Bedrock | `amazon-bedrock/us.anthropic.claude-opus-4-6` |
+| Anthropic direct | `anthropic/claude-opus-4-8` |
+| Amazon Bedrock | `amazon-bedrock/us.anthropic.claude-opus-4-8` |
 | OpenCode Zen | `opencode/claude-opus-4-7` |
 | GitHub Copilot | `github-copilot/claude-opus-4.7` |
 
