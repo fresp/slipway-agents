@@ -34,6 +34,23 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - This batch does not wire any caller to headless mode yet — that lands in a
   later batch (orchestrator STEP 0 reconciliation).
 
+### Added (Batch 12 — STEP 0 Reconciliation Gate)
+- `slipway.md` orchestrator gains STEP 0: runs before mode detection on every
+  invocation, scans `.ai/sessions/*.md` for active sessions from more than one
+  branch lineage, and calls `caulker` in headless mode (added in Batch 11) to
+  check consistency before proceeding. Cheap no-op in the common single-
+  contributor case — cached via a new `last_reconciled_sessions` field in
+  `.ai/docs/.pipeline-state.md`.
+- Session docs can now transition `active` -> `resolved`, exclusively through
+  STEP 0 — no other code path may change this field. `session-log` itself is
+  unchanged; it only ever writes `status: active` on creation.
+- If STEP 0 finds blocked units, the originally requested pipeline mode does
+  not proceed until the user resolves them — this applies even if the
+  requested mode is unrelated to the conflicting docs.
+- `/slipway-doctor` gains a read-only "Session reconciliation health" check:
+  active vs resolved counts, stale active sessions (>3 days), and
+  reconciliation history presence.
+
 ---
 
 ## [0.9.0] — 2026-07-04

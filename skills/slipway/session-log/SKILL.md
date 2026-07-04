@@ -9,13 +9,12 @@ description: Generate a structured session log recording what a subagent
 # session-log
 
 Writes one file per work session to `.ai/sessions/`. This is a passive,
-best-effort record for reviewer context only — nothing in the current pipeline
-reads it yet. Do not treat its generation as a gate, source of truth, routing
-input, validation result, pipeline state, or blocker.
+best-effort record for reviewer context and orchestrator STEP 0 reconciliation
+only. Do not treat its generation as a source of truth, routing input,
+validation result, pipeline state, or blocker.
 
 Session files are not listed in `.ai/docs/.manifest.md`, are not `AGENT.md`
-inputs, are not planning inputs, and must not be consumed by Bosun, Rigger,
-Caulker, or the orchestrator in this phase.
+inputs, are not planning inputs, and must not be consumed by Bosun or Rigger.
 
 ## When to invoke
 
@@ -97,13 +96,25 @@ from the diff. Leave as "None." if nothing applies.}
 
 ## Status lifecycle
 
-Every session doc starts at `status: active`. Nothing in this phase changes
-that status — a later phase may introduce a reconciliation step that transitions
-sessions to `resolved`. Do not implement or imply any status transition logic in
-this phase.
+Every session doc starts at `status: active`.
 
-The `status` field is local session-note metadata only. It has no relationship
-to `.ai/docs/.pipeline-state.md`, implementation status, gates, or resume logic.
+Status transitions to `resolved` only through the orchestrator's STEP 0
+Session Reconciliation Check (see `subagents/slipway.md`), and only in these
+exact conditions:
+- Caulker's headless invocation against this session returns `clean: true`
+  for every unit this session touched, OR
+- Every blocked unit that referenced this session has been manually resolved
+  by the user through STEP 0's interactive escalation.
+
+No other agent, skill, or code path may change a session doc's `status`
+field. `session-log` itself never transitions status — it only ever writes
+`status: active` on creation, as before.
+
+The `status` field remains local session-note metadata; it still has no
+relationship to `.ai/docs/.pipeline-state.md`'s pipeline mode/step tracking,
+implementation status, or the `last_reconciled_sessions` list's own gate
+behavior for *other* purposes (planning, security audit, etc.) — only STEP 0
+reads and writes it.
 
 ## Forbidden behaviors
 
@@ -116,7 +127,7 @@ to `.ai/docs/.pipeline-state.md`, implementation status, gates, or resume logic.
 - Never overwrite an existing session doc — each session gets a new file,
   unique by timestamp.
 - Never list session docs in `.ai/docs/.manifest.md` or treat them as source of
-  truth docs, planning inputs, AGENT.md inputs, gate signals, or orchestration
-  state.
-- Never implement reconciliation, caulker integration, STEP 0 gates, or status
-  transition logic from this skill.
+  truth docs, planning inputs, or AGENT.md inputs.
+- Never transition a session doc's `status` field from within this skill —
+  that responsibility belongs exclusively to the orchestrator's STEP 0, per
+  the Status lifecycle section above.

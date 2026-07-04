@@ -82,9 +82,90 @@ State saved to .ai/docs/.pipeline-state.md
 
 ---
 
+## STEP 0 — Session Reconciliation Check
+
+Runs before mode detection, on every invocation, regardless of what mode the
+user is about to request.
+
+### 0.1 — Scan
+
+Read `.ai/docs/.pipeline-state.md` for a `last_reconciled_sessions` field (a
+list of session IDs). If absent, treat as empty.
+
+List all files in `.ai/sessions/*.md`. For each, read its frontmatter
+(`session_id`, `status`, `branch`, `contributor`).
+
+Filter to sessions where `status: active`.
+
+### 0.2 — Decide whether to call caulker
+
+If the filtered list is empty, or every session ID in it is already present
+in `last_reconciled_sessions`, skip straight to Mode Detection — do nothing
+else in STEP 0. This is the common case and must be fast.
+
+If there is more than one active session with a *different* `branch` value
+than the current git branch, OR more than one active session from different
+branches than each other, call `caulker` in headless mode (per
+subagents/caulker.md's Headless invocation mode section), passing all active
+session doc paths as additional context alongside the standard `.ai/docs/*.md`
+and `AGENT.md` input.
+
+If there is exactly one active session and it belongs to the current branch,
+skip the caulker call — a single contributor's own active session on their
+own branch is not a reconciliation candidate; treat it as still in progress
+and proceed to Mode Detection.
+
+### 0.3 — Handle caulker's headless result
+
+**If `clean: true`:**
+- Update every session doc in the filtered list: set `status: resolved`.
+- Append the session IDs to `last_reconciled_sessions` in
+  `.ai/docs/.pipeline-state.md`.
+- Log one line to `.ai/docs/.pipeline-changelog.md`:
+  ```
+  ## [timestamp] — session-reconciliation — caulker (headless)
+  - Sessions checked: [list of session_ids]
+  - Result: clean — all sessions marked resolved
+  ```
+- Proceed to Mode Detection as normal.
+
+**If `blocked` is non-empty:**
+- Do NOT proceed to Mode Detection yet.
+- Present the blocked items to the user using caulker's own report format
+  (per caulker.md Step 5), including session context (contributor, branch,
+  topic) where available.
+- Prefix the presentation with:
+  ```
+  ⚠ Session reconciliation found unresolved conflicts before proceeding.
+  These must be resolved before [requested mode] can continue.
+  ```
+- Ask the user to resolve each blocked unit (same options caulker's
+  interactive mode already offers: choose A, B, manual reconciliation, or
+  "not actually in conflict — merge both").
+- Once the user resolves every blocked unit in this run: apply the
+  resolutions (same as caulker's interactive Step 5 behavior), mark only the
+  session docs whose touched units are now fully resolved as `status:
+  resolved`, log the changelog entry (same format as caulker's own changelog
+  entry from its Output contract, noting this was triggered via STEP 0), then
+  proceed to Mode Detection.
+- If the user defers resolution (declines to resolve now), do not mark any
+  session as resolved, do not update `last_reconciled_sessions`, and do not
+  proceed to the originally requested mode this invocation — stop and tell
+  the user reconciliation must complete before continuing.
+
+### 0.4 — Never block on session doc absence or malformed sessions
+
+If `.ai/sessions/` doesn't exist, is empty, or a session file fails to parse
+(malformed frontmatter), do not error. Skip that file (log a single `⚠`
+warning line to stdout, not a hard stop) and continue STEP 0 with whatever
+sessions did parse. If zero sessions parse successfully, proceed to Mode
+Detection as if there were no active sessions.
+
+---
+
 ## Mode Detection
 
-Run this before anything else, every time the orchestrator is invoked.
+Run this after STEP 0, every time the orchestrator is invoked.
 
 | Signal in user input                                                                                                      | Mode                    | Entry point                                     |
 | ------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ----------------------------------------------- |
@@ -413,6 +494,17 @@ Never produce a wall of text. End with exactly one summary line: `N issues found
 - Report each config feature that `CLAUDE.md` still identifies as declarative-only, meaning present in config or docs but not enforced by the plugin at runtime.
 - If `CLAUDE.md` says a feature is now wired, do not report it as declarative-only.
 
+### 6. Session reconciliation health
+
+- List all `.ai/sessions/*.md` files. Report counts by status: `active` vs
+  `resolved`.
+- For any `active` session older than 3 days (compare `started` frontmatter
+  field to current date), flag as `⚠` — likely forgotten reconciliation.
+- Report the current `last_reconciled_sessions` list length from
+  `.ai/docs/.pipeline-state.md`, or `⚠ no reconciliation history` if absent.
+- This check is read-only — Doctor mode never triggers STEP 0 or calls
+  caulker. It only reports what it finds.
+
 ---
 
 ## Pipeline — sync run (`sync`)
@@ -461,6 +553,7 @@ Bosun last run: [timestamp or "never"]
 Bosun health score: [0–100 or "n/a"]
 Security audit last result: [PASS | CONDITIONAL | BLOCK | "never"]
 Coxswain last result: [Ready to Plan | Conditional | Blocked | "never"]
+last_reconciled_sessions: []
 ```
 
 Read this file at the start of every invocation. If it shows an in-progress run, resume from `Last completed step` rather than restarting at STEP 1 — unless the user explicitly asks to start over.

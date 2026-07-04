@@ -77,6 +77,7 @@ Equivalent to asking `@slipway run doctor` or `@slipway run pipeline diagnostics
   3. Pipeline state — last completed step, optimize counter, and blocked-state detection when Critical findings remain at the configured loop limit.
   4. Agent file integrity — expected `subagents/<name>.md` files and README-referenced skill files.
   5. Declarative-only features summary — current declarative-only notes read from `CLAUDE.md`.
+  6. Session reconciliation health — active vs resolved session counts, stale active sessions older than 3 days, and reconciliation history presence.
 
 **Output symbols:**
 - `✓` healthy
@@ -108,6 +109,10 @@ Slipway doctor
 ⚠ permission is declarative-only: [source note]
 ...
 
+## 6. Session reconciliation health
+✓ active sessions: [N], resolved sessions: [N]
+⚠ no reconciliation history
+...
+
 N issues found (X errors, Y warnings)
 ```
-

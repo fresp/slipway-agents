@@ -64,6 +64,11 @@ the changelog contract, and every Forbidden Behavior already listed. Headless
 mode changes only how blocked items are communicated, never whether they
 require human resolution eventually.
 
+The orchestrator's STEP 0 (subagents/slipway.md) is the first caller of
+headless mode. Caulker's own behavior, classification rules, and output
+contract are unaffected by who the caller is — STEP 0 is a caller like any
+other, not a new caulker mode.
+
 ---
 
 ## Trigger Condition

@@ -105,8 +105,8 @@ A single pipeline run from a raw idea produces:
 `.ai/sessions/` contains best-effort per-session notes written by the
 `session-log` skill after Shipwright, Hullwright, or Chronicler mutate
 `.ai/docs/`. These files are reviewer breadcrumbs for future cross-branch
-reconciliation work; nothing in the current pipeline reads them, and they do not
-gate or block any step.
+reconciliation work. Sessions are now reconciled by orchestrator STEP 0 and can
+transition from `active` to `resolved` only through that check.
 
 `gunner` (security audit) and `surveyor` (schema check) report to the session by design rather than writing files. Rigger now includes the time/cost estimate in `00-overview.md`. Their results are recorded in `.pipeline-state.md` and `.pipeline-changelog.md`.
 
