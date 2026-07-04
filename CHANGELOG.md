@@ -9,7 +9,27 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.8.0] — 2026-07-04
 
-### Added
+### Added (Batch 2 — gunner Lens 6)
+- `gunner` gains a 6th audit lens — Dependency & Image Vulnerabilities. Detects which
+  ecosystems are present (npm, Python, Go, Rust, container images) and runs read-only
+  scanners (`npm audit --json`, `pip-audit`, `trivy fs`/`trivy image`, `osv-scanner`,
+  `grype`) only against ecosystems actually detected; degrades gracefully with a NOTE-tier
+  finding when a scanner is unavailable rather than failing the lens; reports "not
+  applicable" when no manifests/images exist at all.
+- `gunner` now writes a persistent artifact, `.ai/docs/11-security-audit.md` (all six
+  lenses) — the first agent to use the Extensions table from Batch 0's doc manifest. Gunner
+  registers/updates its own row (`| 11-security-audit.md | gunner | security audit run |
+  frozen |`) on every run and owns that doc exclusively; regenerating it is explicitly not
+  drift.
+- `rigger`'s existing coxswain-caveat mechanism generalized to also carry forward gunner's
+  CONDITIONAL/Should-fix findings from `11-security-audit.md` — one mechanism, multiple
+  feeders, per the approved plan (no separate gunner-specific section).
+- `gunner`'s `slipway.json` entry gains a `permission` block (edit: allow, webfetch: ask,
+  task: deny, scoped `bash` allowlist for the Lens 6 scanners). Enforcement is **declarative
+  only** — see CLAUDE.md; `gunner.md` carries an explicit self-enforcement section as the
+  only real constraint until plugin support exists.
+
+### Added (Batch 1b)
 - **Schema: per-agent `category` field** — links an agent to its `categories` fallback pool
   (quick/standard/deep). All 13 agents now declare a category in `slipway.json`, matching
   their primary model tier so the last-resort fallback never drops below the tier the agent

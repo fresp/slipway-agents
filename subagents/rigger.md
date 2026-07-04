@@ -44,6 +44,7 @@ If `.ai/planning/` does not exist, proceed directly to planning.
 - `AGENT.md`
 - Bosun's final findings list (so tasks can carry forward accepted Should-fix caveats)
 - Coxswain's caveats list (Conditional findings to embed as acceptance criteria in relevant tasks)
+- `.ai/docs/11-security-audit.md` (if present, per manifest Extensions) — gunner's CONDITIONAL/Should-fix findings feed the same acceptance-criteria-embedding mechanism as coxswain's caveats (see "Coxswain and gunner caveats carried forward" below)
 - `.ai/docs/.pipeline-state.md` (for stale check timestamps)
 - Stakeholder Priority tags from `.ai/docs/01-prd.md` (P0/P1/P2 per FR-ID)
 
@@ -89,8 +90,9 @@ Phase 5 depends on Phase 3.
 Phase 1 → Phase 3 → Phase 5
 Estimated critical path duration: [range based on task sizing]
 
-## Coxswain caveats carried forward
-[List of Conditional findings from coxswain that must be resolved during build,
+## Coxswain and gunner caveats carried forward
+[List of Conditional findings from coxswain, and CONDITIONAL/Should-fix findings from
+gunner's `11-security-audit.md` (Lens 6 included), that must be resolved during build —
 embedded in the relevant task acceptance criteria below]
 
 ## Test plan
@@ -124,6 +126,7 @@ embedded in the relevant task acceptance criteria below]
   - [ ] [Specific, testable criterion]
   - [ ] [Specific, testable criterion]
   - [ ] [Coxswain caveat embedded here if applicable: "Coxswain flagged: [issue] — resolve before marking complete"]
+  - [ ] [Gunner caveat embedded here if applicable: "Gunner flagged (Lens N): [issue] — resolve before marking complete"]
 - **Expected output:** [The concrete artifact this task produces — a file path, a passing test suite, a running endpoint. Must be unambiguous enough that Sisyphus can check it without re-reading acceptance criteria.]
 - **Verify command:** [Shell command that confirms the task is complete — e.g. `npm test src/auth/`, `curl -sf http://localhost:3000/health`, `prisma validate`. Write `[manual review required]` if no automated check is possible.]
 - **Test command:** [Test suite command scoped to this task's code — e.g. `npm test src/payments/`, `pytest tests/test_auth.py`. Write `[no automated tests — manual QA required]` if the task is infrastructure-only.]
@@ -252,6 +255,7 @@ Use Stakeholder Priority tags from `01-prd.md` to influence phase ordering:
 - Never include a `depends_on` that references a non-existent TASK-ID.
 - Never produce a plan against docs that have not passed bosun and coxswain in the current pipeline history (check `.ai/docs/.pipeline-state.md`).
 - Never include coxswain Blocked findings as accepted caveats — Blocked findings must be resolved before planning runs.
+- Never include gunner BLOCK findings as accepted caveats — a BLOCK gate signal means the security audit must be re-run clean before planning runs, not that the finding gets embedded as a task caveat.
 - Never write more than one dependency graph — it lives in `00-overview.md` only.
 - Never place a P0 requirement in a phase that depends on a P2 requirement.
 - Never leave `.ai/planning/future-scope.md` unwritten when P2 requirements exist and are being deferred.
