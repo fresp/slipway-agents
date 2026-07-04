@@ -9,6 +9,16 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added (Batch 10 — Session Doc Foundation)
+- New `session-log` skill (`skills/slipway/session-log/SKILL.md`) — structured
+  per-session log written to `.ai/sessions/`, using the same unit identifiers
+  as `doc-merge-resolution` (FR-ID, ADR-NNN, endpoint, field).
+- `shipwright`, `hullwright`, and `chronicler` now invoke this skill after
+  completing their doc mutations, tagging sessions `pre-build` or `post-build`.
+- This is additive-only: no existing gate, output contract, or subagent
+  decision-making behavior changed. Nothing in the current pipeline reads
+  `.ai/sessions/` yet — that lands in a later batch.
+
 ---
 
 ## [0.9.0] — 2026-07-04

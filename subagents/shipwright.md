@@ -170,3 +170,21 @@ Impact map:
 ⚠ Conflicts: [list, or "none"]
 → Ready for hullwright (partial regeneration)
 ```
+
+## Session Logging
+
+After the scoped PRD update and impact-map handoff are complete, invoke the
+`session-log` skill to write a best-effort `.ai/sessions/` note with
+`source_type: pre-build`.
+
+Populate the session log only from data this agent already produced:
+- `Touched Documents`: the updated `.ai/docs/01-prd.md` or supplementary PRD,
+  plus every document listed in the impact map.
+- `Touched Units`: the new FR-IDs and any exact downstream unit identifiers
+  already present in the impact map, using the identifier styles from
+  `skills/slipway/doc-merge-resolution/SKILL.md`.
+
+Do not perform new analysis for session logging. Do not duplicate the session
+log format here; use `skills/slipway/session-log/SKILL.md`. If session-log
+generation fails, warn in the report and continue — the updated PRD and impact
+map remain the authoritative output.
