@@ -8,7 +8,8 @@ import { Hooks, PluginInput } from "./config/types";
 export default {
   server: async (_input: PluginInput): Promise<Hooks> => {
     const agentDefinitions = loadAgentDefinitions();
-    const slipwayConfig = loadSlipwayConfig();
+    const projectRoot = _input.project?.directory ?? _input.directory;
+    const slipwayConfig = loadSlipwayConfig(projectRoot);
 
     if (Object.keys(agentDefinitions).length === 0) {
       console.warn(
@@ -22,7 +23,7 @@ export default {
         await applyAgentConfig(input, agentDefinitions, slipwayConfig);
       },
       ...registerSessionErrorHook(),
-      ...registerPipelineHooks(),
+      ...registerPipelineHooks(slipwayConfig, projectRoot),
     };
   },
 };

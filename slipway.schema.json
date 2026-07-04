@@ -135,6 +135,10 @@
           "type": "string",
           "description": "Which category pool (from top-level `categories`) this agent falls back to if it has no model set, or if its model/fallback_model are both unavailable at runtime."
         },
+        "prompt_append": {
+          "type": "string",
+          "description": "Additional system prompt text appended after the bundled agent prompt. It never replaces the base prompt."
+        },
         "permission": {
           "type": "object",
           "description": "Scoped permissions for this agent. Absence of a key means no access to that action at all — this is NOT the same as setting it to 'deny' explicitly, though both result in no access. Most agents should have no permission block at all (doc-only agents never touch bash).",

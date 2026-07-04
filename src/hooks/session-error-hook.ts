@@ -1,14 +1,15 @@
 import { Hooks } from "../config/types";
 
 /**
- * Placeholder session error hook for Part 0.
+ * Documents the runtime fallback gap.
  *
- * OpenCode API used: none in Part 0. The current plugin registers only the
- * `config` hook, so this function returns no hooks to preserve behavior.
+ * OpenCode API used: none. Batch 6 uses proactive startup resolution instead:
+ * the config hook registers the first model from each agent's resolved fallback
+ * chain and stores the full chain in agent options for observability.
  *
- * Remaining gaps: reactive runtime fallback is not implemented; per the Batch 6
- * decision it remains a documented gap unless a client.config.patch() API is
- * exposed. Proactive fallback-chain resolution belongs to Part 2/5.
+ * Remaining gaps: reactive retry on session.error is not implemented because it
+ * requires a client.config.patch() API — not yet exposed by the proven plugin
+ * surface in this repository.
  */
 
 export function registerSessionErrorHook(): Hooks {

@@ -1,12 +1,26 @@
+import { AgentDefinition, PermissionConfig } from "../config/types";
+
 /**
- * Placeholder tool/permission config handler for Part 0.
+ * Applies Slipway permission config to OpenCode's native AgentConfig.permission.
  *
- * OpenCode API used: none in Part 0. The current repository implementation does
- * not assign permission fields in the config hook. Permission enforcement is a
- * later Batch 6 part and must use only verified OpenCode AgentConfig support.
+ * OpenCode API used: the SDK AgentConfig type exposes `permission?:
+ * PermissionConfig`, and the config hook accepts arbitrary agent fields. This
+ * handler only passes through the permission keys represented in slipway.json:
+ * edit, webfetch, task, and bash.
  *
- * Remaining gaps: edit/webfetch/task/bash permission passthrough is intentionally
- * not implemented in Part 0.
+ * Remaining gaps: OpenCode supports native `permission.bash`, but this repo does
+ * not prove whether object-form command scoping is matched by literal first
+ * command token, shell builtins, or another mechanism. We pass the native object
+ * through and document command-scoping semantics as an OpenCode runtime gap.
  */
 
-export {};
+export function applyToolConfig(
+  agentDef: AgentDefinition,
+  permission: PermissionConfig | undefined
+): void {
+  if (!permission) {
+    return;
+  }
+
+  agentDef.permission = permission;
+}

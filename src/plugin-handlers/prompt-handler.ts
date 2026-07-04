@@ -1,11 +1,24 @@
+import { AgentDefinition } from "../config/types";
+
 /**
- * Placeholder prompt config handler for Part 0.
+ * Applies per-agent prompt_append content to the OpenCode agent prompt.
  *
- * OpenCode API used: none in Part 0. The existing plugin sets the agent `prompt`
- * from each bundled Markdown file and has no prompt_append support.
+ * OpenCode API used: AgentConfig.prompt. The plugin already sets `prompt` from
+ * bundled Markdown; this handler appends extra config text to that prompt and
+ * never replaces the base prompt.
  *
- * Remaining gaps: prompt_append schema/type support and prompt concatenation are
- * deferred to Part 4.
+ * Remaining gaps: none for prompt_append; system/instructions aliases are not
+ * used because the proven OpenCode field is `prompt`.
  */
 
-export {};
+export function applyPromptConfig(
+  agentDef: AgentDefinition,
+  promptAppend: string | undefined
+): void {
+  if (!promptAppend) {
+    return;
+  }
+
+  const basePrompt = agentDef.prompt ?? "";
+  agentDef.prompt = `${basePrompt}\n\n${promptAppend}`;
+}

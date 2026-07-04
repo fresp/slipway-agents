@@ -1,12 +1,98 @@
+import { z } from "zod";
+
 /**
- * Placeholder schema module for Part 0.
+ * Zod validators for slipway.json.
  *
- * OpenCode API used: none. Part 0 is a behavior-neutral refactor, so validation
- * remains exactly as before: JSON parsing happens in loader.ts and malformed
- * files warn + skip. Zod validation mirroring slipway.schema.json is introduced
- * in Part 1 after the zod runtime dependency is added.
+ * OpenCode API used: none. This module validates local plugin configuration
+ * before the config hook maps it onto OpenCode agent definitions.
  *
- * Remaining gaps: no schema validation is exported yet.
+ * Remaining gaps: OpenCode-specific runtime semantics for permission.bash object
+ * command matching are not defined here; this module only validates shape.
  */
 
-export {};
+export const permissionActionSchema = z.enum(["ask", "allow", "deny"]);
+
+export const permissionSchema = z
+  .object({
+    edit: permissionActionSchema.optional(),
+    webfetch: permissionActionSchema.optional(),
+    task: permissionActionSchema.optional(),
+    bash: z
+      .union([permissionActionSchema, z.record(z.string(), permissionActionSchema)])
+      .optional(),
+  })
+  .strict();
+
+export const ralphLoopConfigSchema = z
+  .object({
+    enabled: z.boolean().optional(),
+    max_iterations: z.number().int().min(1).optional(),
+    strategy: z.enum(["reset", "continue"]).optional(),
+    block_on_exhaustion: z.boolean().optional(),
+  })
+  .strict();
+
+export const hookConfigSchema = z
+  .object({
+    url: z.string(),
+    method: z.enum(["POST", "GET"]).default("POST").optional(),
+    headers: z.record(z.string(), z.string()).optional(),
+    template: z.string().optional(),
+  })
+  .strict();
+
+export const hooksSchema = z
+  .object({
+    on_step_complete: hookConfigSchema.optional(),
+    on_block: hookConfigSchema.optional(),
+    on_pipeline_complete: hookConfigSchema.optional(),
+    on_user_input_required: hookConfigSchema.optional(),
+  })
+  .strict();
+
+export const categoryConfigSchema = z
+  .object({
+    model: z.string(),
+    fallback_model: z.string().optional(),
+    description: z.string().optional(),
+  })
+  .strict();
+
+export const agentConfigSchema = z
+  .object({
+    model: z.string(),
+    fallback_model: z.string().optional(),
+    mode: z.enum(["primary", "subagent", "all"]).optional(),
+    description: z.string().optional(),
+    category: z.string().optional(),
+    prompt_append: z.string().optional(),
+    permission: permissionSchema.optional(),
+    ralph_loop: ralphLoopConfigSchema.optional(),
+  })
+  .strict();
+
+export const slipwayConfigSchema = z
+  .object({
+    $schema: z.string().optional(),
+    version: z.string().regex(/^\d+\.\d+\.\d+$/),
+    ralph_loop: ralphLoopConfigSchema.optional(),
+    hooks: hooksSchema.optional(),
+    agents: z.record(z.string(), agentConfigSchema),
+    categories: z.record(z.string(), categoryConfigSchema).optional(),
+  })
+  .strict();
+
+export type SlipwayConfigFromSchema = z.infer<typeof slipwayConfigSchema>;
+
+export function validateSlipwayConfig(input: unknown): SlipwayConfigFromSchema | null {
+  const result = slipwayConfigSchema.safeParse(input);
+
+  if (result.success) {
+    return result.data;
+  }
+
+  console.warn(
+    `[slipway-agents] Invalid slipway config — using defaults. ${z.prettifyError(result.error)}`
+  );
+  return null;
+}
