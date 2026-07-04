@@ -513,7 +513,7 @@ Triggered when the user signals that implementation is complete and docs need to
 
 ### STEP S1 — Sync
 
-If `.ai/implementation-state.md` exists and Status is not complete, warn the user that implementation may still be in progress before syncing docs; if Status is `blocked` or the latest Test Results show `Gate result: manual review required`, preserve that distinction in the warning and do not treat it as a completed build.
+If `.ai/implementation-state.md` exists and Status is not complete, warn the user that implementation may still be in progress before syncing docs; if Status is `blocked` or the latest Test Results show `Gate result: verify-blocked` or `Gate result: manual review required`, preserve that distinction in the warning and do not treat it as a completed build.
 
 Call `chronicler`.
 

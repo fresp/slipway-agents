@@ -14,8 +14,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   to record verification with a structured Test Results block before it can be
   treated as complete.
 - Verification failure handling now preserves the existing one-retry rule: retry
-  once automatically after addressing the concrete failure, then halt through the
-  Escalation Protocol on a consistent second failure.
+  once automatically after addressing the concrete failure, then mark the gate
+  `verify-blocked` and halt through the Escalation Protocol on a consistent
+  second failure.
 - `[manual review required]` tasks now have an explicit non-automated gate path:
   record the artifact or reviewer evidence needed instead of inventing a verify
   command.
