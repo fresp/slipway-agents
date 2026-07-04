@@ -8,20 +8,24 @@ Contributions are welcome — new agents, agent upgrades, skill improvements, bu
 
 ```
 slipway-agents/
-├── slipway.md                     # Orchestrator — routes between subagents
 ├── slipway.json                   # Model assignments — edit this to change models
 ├── slipway.schema.json            # JSON schema for slipway.json
 ├── opencode.json                  # Plugin registration for OpenCode
 ├── package.json                   # Root package — this is what gets published to npm
-├── subagents/                     # One .md file per agent
+├── subagents/                     # Orchestrator + one .md file per subagent
+│   └── slipway.md                 # Orchestrator — routes between subagents
 ├── skills/slipway/                # Skills invoked by agents
-│   └── bootstrap-from-prd/
-├── packages/slipway-plugin/       # TypeScript plugin for model enforcement
-│   └── src/index.ts
+│   ├── bootstrap-from-prd/
+│   └── session-log/
+├── src/                           # TypeScript CLI, plugin, services, and utils
+│   ├── commands/                  # install, update, doctor, status, uninstall
+│   ├── services/                  # opencode.json and slipway.json mutations
+│   ├── utils/                     # filesystem, paths, logger helpers
+│   └── index.ts                   # OpenCode plugin entrypoint
 └── docs/                          # Installation and usage guides
 ```
 
-Each agent is a single Markdown file with YAML frontmatter. The orchestrator (`slipway.md`) routes between them. The plugin (`packages/slipway-plugin/src/index.ts`) enforces the model assignments from `slipway.json` at runtime.
+Each agent is a single Markdown file with YAML frontmatter. The orchestrator (`slipway.md`) routes between them. The plugin (`src/index.ts`) enforces the model assignments from `slipway.json` at runtime.
 
 ---
 
@@ -108,7 +112,7 @@ Rules:
 
 ---
 
-## Plugin changes (`packages/slipway-plugin/`)
+## Plugin and CLI changes (`src/`)
 
 The plugin must work without crashing even when:
 - `slipway.json` is absent (no-op, not an error)
@@ -124,7 +128,7 @@ Run `npm run typecheck` from the repo root before submitting a PR.
 
 There are no automated tests yet. Manual testing process:
 
-1. Install the plugin locally: `npm run build` from repo root (builds `packages/slipway-plugin/dist/`), then set the `plugin` field in your project's `opencode.json` to an absolute path to the repo root.
+1. Install the plugin locally: `npm run build` from repo root (builds `dist/`), then set the `plugin` field in your project's `opencode.json` to an absolute path to the repo root.
 2. Create a scratch project, run `@slipway I want to build [idea]`, and walk through the pipeline.
 3. Verify the agent table in `slipway.md` matches what actually ran.
 4. If you changed model assignments, verify the correct model is selected in the OpenCode session header.

@@ -15,22 +15,22 @@ slipway-agents takes a raw product idea or existing PRD and drives it through a 
 
 | Stage                | Agent              | What happens                                                                       |
 | -------------------- | ------------------ | ---------------------------------------------------------------------------------- |
-| **Input**            | `slipway`          | Detects mode: bootstrap, reverse-engineer, extend, or sync                         |
+| **Input**            | `slipway`          | Runs STEP 0 session reconciliation, then detects mode: bootstrap, reverse-engineer, extend, or sync |
 | **Reverse-engineer** | `cartographer`     | Scans existing codebase → inferred docs 02–10 + gap-fill briefing for chartmaker   |
 | **PRD**              | `chartmaker`       | Structured Q&A → complete `01-prd.md` with P0/P1/P2 priority ranking              |
 | **Docs**             | `hullwright`     | Invokes `bootstrap-from-prd` skill → docs `02`–`10` + `AGENT.md` |
 | **Review**           | `bosun`            | Cross-doc + `AGENT.md` contract validation, per-doc health scores, severity-ranked findings 0–100 |
 | **Review**           | optimize loop      | Up to 2 cycles to resolve Critical findings before continuing                      |
 | **Security**         | `gunner`           | Auth, secrets, attack surface audit — PASS / CONDITIONAL / BLOCK gate              |
-| **Plan**             | `rigger`           | Phase breakdown → `.ai/planning/` with S/M/L sizing, dependency graph, and time/cost estimate |
+| **Plan**             | `rigger`           | Phase breakdown → `.ai/planning/` with S/M/L sizing, dependency graph, Flow Graph-aware ordering, and time/cost estimate |
 | **Grooming**         | `coxswain`         | Lead Dev + QA + DevOps + Complexity Audit lenses → unified synthesis report        |
-| **Build**            | Sisyphus / omo.dev | Implements based on `AGENT.md` + planning docs                                     |
+| **Build**            | Sisyphus / omo.dev | Implements based on `AGENT.md` + planning docs, recording the Execution Verification Gate before completion |
 | **Extend**           | `shipwright`       | New feature arrives → scoped PRD update + targeted doc rebuild                     |
 | **Sync**             | `chronicler`       | Post-build drift detection → DRIFT / INTENTIONAL / UNKNOWN classification          |
 | **Sync**             | `surveyor`         | Run `@slipway validate schema` separately if DB schema validation is needed              |
-| **Resolve Conflicts** | `caulker` | Post-merge semantic conflict detection and resolution across docs and `AGENT.md` |
+| **Resolve Conflicts** | `caulker` | Post-merge semantic conflict detection and resolution across docs and `AGENT.md`; also supports STEP 0 headless reconciliation |
 
-After a multi-contributor merge or rebase touches `.ai/docs/` or `AGENT.md`, run `@slipway resolve-conflicts` to have `caulker` catch and resolve semantic conflicts that a clean git merge doesn't flag.
+After a multi-contributor merge or rebase touches `.ai/docs/` or `AGENT.md`, run `@slipway resolve-conflicts` to have `caulker` catch and resolve semantic conflicts that a clean git merge doesn't flag. Generated operational-flow docs now include Flow Graph tables, and post-build sync preserves verification-gate context from implementation records.
 
 ---
 
@@ -137,6 +137,8 @@ https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/docs/guid
 
 **Manual install:**
 
+Use this only as a fallback if you cannot run the CLI installer.
+
 ```bash
 git clone https://github.com/fresp/slipway-agents ~/.config/opencode/agents/slipway-agents
 ```
@@ -153,6 +155,8 @@ Add to `opencode.json`:
 ```
 
 Full guide: [docs/guide/installation.md](docs/guide/installation.md)
+
+**CLI commands:** `install`, `update`, `doctor`, `status`, and `uninstall`. The CLI `doctor` checks local installation health; `/slipway-doctor` is the separate in-session pipeline diagnostic.
 
 ---
 
@@ -185,7 +189,6 @@ Full guide: [docs/guide/installation.md](docs/guide/installation.md)
 
 # Estimate time and cost from existing plan (runs rigger in estimate-only mode)
 @slipway estimate
-@slipway estimate
 
 # Sync docs after implementation
 @slipway sync docs
@@ -202,10 +205,10 @@ slipway walks you through each step with a `yes / no` prompt — you never need 
 
 | Command | What it does |
 |---------|-------------|
-| `/slipway-init` | Initialize slipway in a new project — creates `.ai/` directories and state files |
+| `/slipway-init` | Start a new pipeline run — routes to chartmaker or hullwright based on project state |
 | `/slipway-status` | Show current pipeline and implementation state without running anything |
 | `/slipway-resume` | Resume an interrupted pipeline from the last completed step |
-| `/slipway-doctor` | Read-only pre-flight diagnostic for config, docs, state, agents, and declarative-only settings |
+| `/slipway-doctor` | Read-only pre-flight diagnostic for config, docs, state, agents, declarative-only settings, and session reconciliation health |
 
 Full reference: [docs/slash-commands.md](docs/slash-commands.md)
 
@@ -219,7 +222,7 @@ Copy `slipway.json` to your project root and edit it. The plugin picks it up aut
 // slipway.local.json — takes precedence over slipway.json
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "agents": {
     "slipway":      { "model": "amazon-bedrock/us.anthropic.claude-opus-4-8",   "fallback_model": "amazon-bedrock/us.anthropic.claude-sonnet-5" },
     "chartmaker":   { "model": "amazon-bedrock/us.anthropic.claude-sonnet-5", "fallback_model": "amazon-bedrock/us.anthropic.claude-haiku-4-5" },

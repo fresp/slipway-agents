@@ -9,6 +9,8 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.10.0] — 2026-07-05
+
 ### Added (Batch 15 — Execution Protocol Examples)
 - `hullwright` now embeds the Execution Protocol with an explicit caution-over-speed
   tradeoff line, while preserving the existing non-negotiable framing for
