@@ -85,6 +85,34 @@ These files are not subject to this skill's block/auto-merge logic:
 
 ---
 
+## Session doc cross-reference (optional context)
+
+When `.ai/sessions/*.md` files are available, caulker may use them as
+supporting context for the conflict report — never as classification input.
+Classification (additive / diverged-block / additive-overlapping-block) is
+determined purely by the structural unit comparison rules above. Session docs
+never change a classification result; they only enrich the report with
+`contributor`, `branch`, and `topic` when a matching unit ID is found.
+
+Matching rule: for a blocked unit (e.g. `FR-021`, `ADR-014`,
+`POST /checkout`), scan `.ai/sessions/*.md` Touched Units tables for a row with
+the same unit type and unit ID. If found, use that session doc's `contributor`,
+`branch`, and `topic` frontmatter fields to fill in caulker's existing report
+placeholders (`branch: [name], contributor: [name if known]`) instead of
+leaving them as "if known" guesses.
+
+If multiple session docs reference the same unit ID (e.g. two sessions both
+touched `FR-021`), include all matching sessions in the report — do not pick
+one arbitrarily.
+
+If no matching session doc exists for a unit, fall back to caulker's existing
+behavior (branch/contributor from git blame or "unknown" — whatever caulker
+already does today). This is a pure enrichment, never a requirement — caulker
+must produce a complete, correct report even if `.ai/sessions/` is empty or
+absent.
+
+---
+
 ## Output shape reused by caulker
 
 This skill does not produce its own output file — it is invoked mid-run by `caulker`, which uses these classifications to populate the Step 3–5 report format defined in `subagents/caulker.md`. This skill's only responsibility is the classification rules above; formatting and user interaction remain caulker's.

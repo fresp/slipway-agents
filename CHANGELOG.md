@@ -19,6 +19,21 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   decision-making behavior changed. Nothing in the current pipeline reads
   `.ai/sessions/` yet — that lands in a later batch.
 
+### Added (Batch 11 — Caulker Headless Mode)
+- `doc-merge-resolution` skill: caulker may now cross-reference
+  `.ai/sessions/*.md` Touched Units tables to enrich conflict reports with
+  `contributor`/`branch`/`topic` context. This is enrichment only — session
+  docs never influence classification, and caulker works unchanged if
+  `.ai/sessions/` is empty or absent.
+- `caulker` gains a headless invocation mode: returns a structured
+  `{ clean, auto_merged, blocked }` result instead of an interactive prompt,
+  for future use by another agent or orchestrator step. Classification rules,
+  auto-merge behavior, and the changelog contract are identical between
+  interactive and headless modes — only how blocked items are communicated
+  changes.
+- This batch does not wire any caller to headless mode yet — that lands in a
+  later batch (orchestrator STEP 0 reconciliation).
+
 ---
 
 ## [0.9.0] — 2026-07-04

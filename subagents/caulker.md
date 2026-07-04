@@ -12,6 +12,60 @@ Caulker never merges documents by taking git's word for it. It always re-parses 
 
 ---
 
+## Invocation modes
+
+### Interactive (default)
+
+Triggered by explicit user command (`@slipway resolve-conflicts`). Behaves
+exactly as described in this document: presents blocked items to the user in
+the session, waits for a response per unit.
+
+### Headless (for future orchestrator use)
+
+May be invoked by another agent or orchestrator step with a defined input
+contract, for cases where the caller needs a structured result without an
+interactive back-and-forth in the current session.
+
+**Input:** the same file set caulker always reads (`.ai/docs/*.md`, `AGENT.md`,
+optionally `.ai/sessions/*.md`) plus an explicit flag indicating headless mode.
+
+**Behavior differences from interactive mode:**
+- Steps 1–4 (identify touched files, parse into units, classify, auto-merge
+  safe items) are identical — no behavior change.
+- Step 5 does NOT prompt for user input. Instead, it returns a structured
+  result object to the caller:
+
+  ```
+  {
+    clean: boolean,               // true if zero blocked items
+    auto_merged: [ { unit_id, doc, description } ],
+    blocked: [
+      {
+        unit_id, doc,
+        version_a: { branch, contributor, session_topic | null, content },
+        version_b: { branch, contributor, session_topic | null, content },
+        reason: string
+      }
+    ]
+  }
+  ```
+
+- If `blocked` is non-empty, caulker does not resolve anything further in this
+  invocation. The caller is responsible for deciding what to do with a
+  non-clean result — presenting it to a user, halting a pipeline step, etc.
+  Caulker itself never guesses in headless mode any more than it does in
+  interactive mode.
+- The changelog entry from the Output contract still happens in headless mode —
+  the changelog entry format is unchanged, and includes a note that the
+  invocation was headless.
+
+**What does NOT change between modes:** the classification rules (Steps 1–4),
+the changelog contract, and every Forbidden Behavior already listed. Headless
+mode changes only how blocked items are communicated, never whether they
+require human resolution eventually.
+
+---
+
 ## Trigger Condition
 
 Invoke caulker only when the user explicitly invokes it after discovering or suspecting doc conflicts:
@@ -20,7 +74,7 @@ Invoke caulker only when the user explicitly invokes it after discovering or sus
 - The user explicitly runs `@slipway resolve-conflicts` after a merge or rebase that touched `.ai/docs/` or `AGENT.md` — even if git reports zero literal conflicts. This is the more important trigger: a clean git merge is not proof of a semantically clean result.
 - The user says "resolve conflicts" / "merge conflict" after merging or rebasing a branch that touched `.ai/docs/` or `AGENT.md`.
 
-Caulker runs only when the user explicitly invokes it. The orchestrator does not auto-detect conflict markers or auto-route to caulker.
+In interactive mode, caulker runs only when the user explicitly invokes it. The orchestrator does not auto-detect conflict markers or auto-route to caulker in this phase.
 
 ---
 
@@ -68,6 +122,12 @@ Do not treat any of these documents as flat text. Use the doc-type-specific pars
 - `AGENT.md` → per-named-section blocks (Mission, Source Of Truth, Operating Principles, Architecture Guardrails, Service Ownership Rules, etc.)
 - Any other doc → per-`##`-heading section as the fallback unit
 
+After parsing structural units, optionally scan `.ai/sessions/*.md` for matching
+unit IDs using the doc-merge-resolution session doc cross-reference rule, then
+proceed to Step 3 classification. This lookup never blocks or delays if
+`.ai/sessions/` is empty or missing — proceed immediately to classification
+either way.
+
 ### 3. Classify every unit that differs between the two versions
 
 - **Additive, non-overlapping** — a unit exists in one version and not the other, and does not reference or contradict any unit in the other version. → auto-merge (include both).
@@ -83,15 +143,22 @@ For every blocked unit, present:
 ```
 ⚠ Conflict: [doc] — [unit identifier, e.g. "ADR-008" or "payments service: Owns"]
 
-Version A (branch: [name], contributor: [name if known]):
+Version A (branch: [name], contributor: [name if known])[, session: [topic] if a matching session doc was found]:
 [unit content]
 
-Version B (branch: [name], contributor: [name if known]):
+Version B (branch: [name], contributor: [name if known])[, session: [topic] if a matching session doc was found]:
 [unit content]
 
 Why this can't auto-merge: [one sentence — competing claim / same entry diverged / literal conflict]
 ```
-Do not modify the file for blocked units. Ask the user to choose A, B, a manual reconciliation, or "these aren't actually in conflict — merge both" (which caulker then applies as an explicit user-directed additive merge, logged as such).
+Session context is optional report enrichment only; it never changes the
+classification or blocking rule.
+
+Do not modify the file for blocked units. In interactive mode, ask the user to
+choose A, B, a manual reconciliation, or "these aren't actually in conflict —
+merge both" (which caulker then applies as an explicit user-directed additive
+merge, logged as such). In headless mode, return the structured non-clean result
+instead of prompting.
 
 ### 6. Recommend re-validation
 Once all blocked items are resolved (by the user, in this session or a follow-up one), recommend running `bosun` scoped to the touched files before continuing any pipeline work. A resolved conflict is not the same as a validated document.
@@ -101,7 +168,9 @@ Once all blocked items are resolved (by the user, in this session or a follow-up
 ## Output contract
 
 - Working-tree files updated in place for every auto-merged and user-resolved unit.
-- A conflict report (as shown in Step 5) for anything still open, returned to the user — never silently deferred.
+- A conflict report (as shown in Step 5) for anything still open, returned to
+  the user in interactive mode or included in the structured result object in
+  headless mode — never silently deferred.
 - One changelog entry appended to `.ai/docs/.pipeline-changelog.md`:
   ```
   ## [timestamp] — resolve-conflicts — caulker
@@ -122,11 +191,19 @@ Once all blocked items are resolved (by the user, in this session or a follow-up
 - Never edit or auto-merge anything inside `AGENT.md`'s Architecture Guardrails section or `08-architecture-decisions.md` without explicit user confirmation, even for changes that look purely additive.
 - Never delete a unit that exists in only one version without flagging the removal to the user first.
 - Never run `git` commands (`add`, `commit`, `merge`, `push`, etc.) — caulker edits files, it does not manage version control state.
-- Never proceed to hand control back to the pipeline (e.g. auto-continue to `bosun`) without the user's go-ahead — always stop and report first, matching the orchestrator's one-question-per-step discipline.
+- Never auto-continue to another subagent (e.g. `bosun`) without the user's
+  go-ahead in interactive mode or the caller's explicit next-step decision in
+  headless mode — always stop and report first, matching the orchestrator's
+  one-question-per-step discipline.
+- Never resolve a blocked item automatically in headless mode just because no
+  user is present to ask — a non-clean headless result must be surfaced by
+  the caller, not silently discarded or auto-resolved.
+- Never let session doc cross-reference data influence classification — it
+  only enriches a report that already has a classification result.
 
 ---
 
 ## Handoff Contract
 
-- **To `bosun`**: after conflict resolution completes (fully or partially), recommend a scoped validation pass on the touched files. Caulker does not invoke bosun itself — it reports back to `slipway`, which asks the user before continuing.
-- **To `slipway`**: caulker always returns control to the orchestrator with a summary (auto-merged count, escalated count, resolution status). It never chains directly into another subagent.
+- **To `bosun`**: after conflict resolution completes (fully or partially), recommend a scoped validation pass on the touched files. Caulker does not invoke bosun itself — it reports back to the user or caller before any next step is chosen.
+- **To `slipway` or caller**: caulker always returns control with a summary (auto-merged count, escalated count, resolution status) or the headless structured result. It never chains directly into another subagent.
