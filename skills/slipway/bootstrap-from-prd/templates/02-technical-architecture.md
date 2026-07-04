@@ -1,7 +1,11 @@
 # [Project Name] Technical Architecture
 
 Version: 1.0
-Status: Frozen
+Status: [frozen/draft/omitted]
+<!-- GENERATION RULE: Status value comes from the STEP 2.5 doc suite decision recorded in
+.ai/docs/.manifest.md. An omitted doc is never generated, so real output carries frozen
+(after STEP 5 validation passes) or draft (mid-generation/regeneration). Content-stability
+rules for frozen docs are unchanged: versioned edits only, no silent rewrites. -->
 
 ---
 

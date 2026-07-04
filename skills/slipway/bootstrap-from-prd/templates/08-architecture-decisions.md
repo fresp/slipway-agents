@@ -1,7 +1,11 @@
 # [Project Name] Architecture Decisions
 
 Version: 1.0
-Status: Frozen
+Status: [frozen/draft/omitted]
+<!-- GENERATION RULE: Status value comes from the STEP 2.5 doc suite decision recorded in
+.ai/docs/.manifest.md. An omitted doc is never generated, so real output carries frozen
+(after STEP 5 validation passes) or draft (mid-generation/regeneration). Content-stability
+rules for frozen docs are unchanged: versioned edits only, no silent rewrites. -->
 
 ---
 
@@ -62,5 +66,7 @@ VALIDATION RULES:
 - ADR numbering must be sequential with no gaps
 - Every Out of Scope item from the PRD must appear as an ADR
 - Every NFR that constrains architecture (not just implementation) must appear as an ADR
-- Status must remain "Frozen" — do not change it
+- ADR content is immutable once approved — the header Status field follows the manifest
+  lifecycle (draft during generation, frozen after validation), but no ADR's decision text
+  may be silently revised regardless of the header value
 -->

@@ -33,10 +33,10 @@ Equivalent to asking `@slipway where are we?` or `@slipway show me the current p
 Pipeline status — [mode]
 
 Last completed step: [step name]
-Inspector: [health score]/100 — [last run timestamp]
-Security audit: [PASS | CONDITIONAL | BLOCK | never]
-Groomer: [Ready to Plan | Conditional | Blocked | never]
-Estimator: [completed | never]
+Bosun: [health score]/100 — [last run timestamp]
+Security audit (gunner): [PASS | CONDITIONAL | BLOCK | never]
+Coxswain: [Ready to Plan | Conditional | Blocked | never]
+Purser: [completed | never]
 Optimize cycles: [N]/2
 
 Next step: [step name and what it does]

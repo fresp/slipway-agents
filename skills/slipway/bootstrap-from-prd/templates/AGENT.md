@@ -14,10 +14,17 @@ When you need guidance, use the minimum number of documents required and resolve
 
 <!--
 GENERATION RULE:
-- List only the docs actually generated for this project
+- Derive this list from .ai/docs/.manifest.md — include only docs whose manifest status
+  is not "omitted". Drop any line whose doc is omitted (e.g. remove the 09 line for a
+  project that omitted topology diagrams). Do not hardcode the 10-file default set.
 - Default order below is correct for most projects — adjust only if the PRD implies
   a different authority hierarchy (e.g. a supplementary PRD that overrides the main PRD)
-- Insert supplementary PRDs (.ai/docs/11-*.md etc.) between .ai/docs/01-prd.md and .ai/docs/10-planning-rules.md
+- Insert supplementary PRDs (.ai/docs/11-*-prd.md etc.) between .ai/docs/01-prd.md and .ai/docs/10-planning-rules.md
+- EXTENSION INSERTION RULE: extension docs (manifest Extensions table — agent-owned
+  reports like a future 11-security-audit.md) are appended AFTER .ai/docs/10-planning-rules.md,
+  at the lowest priority, ordered by doc number. Rationale: extensions are derived reports;
+  on conflict, the source docs they were derived from must win. Only extension docs whose
+  manifest status is "frozen" are listed — draft extension reports are not source of truth.
 - This list must be identical to the Source Of Truth list in .ai/docs/10-planning-rules.md
 -->
 

@@ -28,7 +28,7 @@ Run when: the orchestrator hands off a fresh `.ai/docs/01-prd.md` with no `.ai/d
 Invoke the skill in its default `bootstrap` mode:
 1. Confirm `.ai/docs/01-prd.md` exists and is readable.
 2. Invoke `bootstrap-from-prd` skill, default mode.
-3. The skill will: read the PRD, build the Requirement Model, generate `.ai/docs/02`–`10` in order, compile `AGENT.md`, run cross-document validation, and report.
+3. The skill will: read the PRD, build the Requirement Model, select the doc suite and write `.ai/docs/.manifest.md` (its STEP 2.5), generate the selected docs in order, compile `AGENT.md`, run cross-document validation, and report.
 4. Relay the skill's exact completion report to the orchestrator — do not paraphrase away the validation status or version numbers.
 
 ### Full Rebuild
@@ -36,7 +36,7 @@ Invoke the skill in its default `bootstrap` mode:
 Run when: the orchestrator (or user, via the orchestrator) explicitly requests a full regeneration of all engineering docs — typically after a major PRD revision that invalidates most prior architecture decisions.
 
 Invoke the skill in `rebuild` mode:
-1. Confirm the user actually wants this — a rebuild discards `.ai/docs/02` through `.ai/docs/10-planning-rules.md` and bumps every document's major version. This is destructive to prior content (though the PRD and supplementary PRDs are preserved per the skill's own rule).
+1. Confirm the user actually wants this — a rebuild discards the docs listed `frozen`/`draft` in `.ai/docs/.manifest.md` (fallback: `02` through `10-planning-rules.md` if no manifest exists) and bumps every document's major version. This is destructive to prior content (though the PRD, supplementary PRDs, and extension docs owned by other agents are preserved per the skill's own rule).
 2. Invoke `bootstrap-from-prd` skill, `rebuild` mode.
 3. Relay the skill's report, including the new major version numbers.
 
@@ -71,7 +71,7 @@ If the required input is missing or the PRD fails the completeness checklist, do
 
 | Mode | Output |
 |---|---|
-| Full Bootstrap | `.ai/docs/02-10*.md` + `AGENT.md`, all at `Version: 1.0` |
+| Full Bootstrap | `.ai/docs/.manifest.md` + the selected docs from `02`–`10` + `AGENT.md`, all at `Version: 1.0` |
 | Full Rebuild | Same files, major version incremented |
 | Partial Regeneration | Only the impacted files, minor version incremented; all others untouched |
 

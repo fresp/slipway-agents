@@ -74,21 +74,28 @@ Lens C readiness signal: **Ready** / **Conditional** / **Blocked**
 
 #### Lens D: Complexity Audit
 
-Focus: scope creep, over-engineering, blast radius, and verify quality.
+Full checklist: `skills/slipway/groomer-complexity-audit/SKILL.md`.
 
-For each task implied by the docs, check:
+Focus: scope creep, over-engineering, blast radius, verify quality, sizing red flags, hidden coupling between phases, and phase-split signals.
+
+For each task or phase implied by the docs (and defined in `.ai/planning/` if rigger has already run), check:
 - **Scope creep** — does the task spec ask for more than what the PRD and docs define? Are features being added that were not explicitly requested?
 - **Over-engineering** — are there abstractions, configurability, or flexibility assumptions that no functional requirement justifies?
 - **Blast radius** — does the planned implementation touch more files, modules, or services than the requirement demands?
 - **Verify quality** — are the acceptance criteria (and `Verify:` fields, if rigger has already run) concrete and scope-aware? "Works correctly" is not a verify condition.
+- **Sizing red flags** — does any task's S/M/L label understate its real complexity (e.g. an S task crossing an ownership boundary, or with more acceptance criteria than its bucket plausibly covers)?
+- **Hidden coupling** — do two phases or tasks marked independent actually share a resource (same table, config surface, external credential) or an implicit ordering the dependency graph doesn't show?
+- **Phase split signals** — is any phase too large or too mixed to plan coherently (10+ tasks, unrelated milestones bundled, 3+ L tasks with no parallelism)?
 
-Output: a list of tasks with flags `[OVERSCOPED]`, `[OVERENGINEERED]`, or `[VERIFY_WEAK]`, each followed by one sentence of reasoning.
+Output: a list of tasks/phases with flags `[OVERSCOPED]`, `[OVERENGINEERED]`, `[VERIFY_WEAK]`, `[SIZING_RISK]`, `[HIDDEN_COUPLING]`, or `[SPLIT_RECOMMENDED]`, each followed by one sentence of reasoning.
 
 Example:
 ```
-[OVERSCOPED]     TASK-04 Auth middleware — spec asks for JWT validation; task description also adds refresh token rotation, which is not in the PRD.
-[OVERENGINEERED] TASK-07 Config loader — implements a plugin system for a single config file read once at startup.
-[VERIFY_WEAK]    TASK-11 Rate limiting — acceptance criterion is "requests are rate limited"; not verifiable without a threshold and a test command.
+[OVERSCOPED]        TASK-04 Auth middleware — spec asks for JWT validation; task description also adds refresh token rotation, which is not in the PRD.
+[OVERENGINEERED]    TASK-07 Config loader — implements a plugin system for a single config file read once at startup.
+[VERIFY_WEAK]       TASK-11 Rate limiting — acceptance criterion is "requests are rate limited"; not verifiable without a threshold and a test command.
+[HIDDEN_COUPLING]   Phase 2 ↔ Phase 3 — both write the tenant config collection; marked parallel but will serialize on schema agreement.
+[SPLIT_RECOMMENDED] Phase 4 — bundles reporting and billing (unrelated milestones); split at the billing boundary.
 ```
 
 If no flags are raised, write: `No scope, complexity, or verify issues found.`
@@ -126,9 +133,11 @@ Sort the deduplicated, conflict-flagged finding list by impact on the build:
 Flagged tasks from Lens D must be resolved before the unified output is final:
 - `[OVERSCOPED]` and `[OVERENGINEERED]` flags are treated as **Conditional** findings — they carry forward into planning as caveats the implementer must honor.
 - `[VERIFY_WEAK]` flags are treated as **Conditional** findings — rigger must revise the affected task's `Verify:` field or flag it to the orchestrator before planning is committed.
-- If any Lens D flag affects a task that is on the critical path, escalate it to **Blocked** status.
+- `[SIZING_RISK]` and `[SPLIT_RECOMMENDED]` flags are treated as **Conditional** findings — rigger must re-size the affected task or split the affected phase (or flag it to the orchestrator) before planning is committed.
+- `[HIDDEN_COUPLING]` flags are treated as **Conditional** findings — rigger must add the missing dependency edge (or mark the affected tasks `parallel: false`) before planning is committed.
+- If any Lens D flag affects a task or phase that is on the critical path, escalate it to **Blocked** status.
 
-Never let an `[OVERSCOPED]`, `[OVERENGINEERED]`, or `[VERIFY_WEAK]` flag pass silently into the unified output without an explicit disposition (merged into a Conditional finding, or escalated to Blocked).
+Never let any Lens D flag (`[OVERSCOPED]`, `[OVERENGINEERED]`, `[VERIFY_WEAK]`, `[SIZING_RISK]`, `[HIDDEN_COUPLING]`, `[SPLIT_RECOMMENDED]`) pass silently into the unified output without an explicit disposition (merged into a Conditional finding, or escalated to Blocked).
 
 **2e. Determine combined gate signal**
 
@@ -223,7 +232,7 @@ If grooming surfaces a need for additional documentation beyond the standard `02
 - Never return four separate lens reports — only the unified synthesis output.
 - Never skip Step 2 synthesis, even if all lenses agree on everything.
 - Never mark combined signal as Ready to Plan if any lens returned Blocked or if Lens D raised any flags on critical-path tasks.
-- Never let an `[OVERSCOPED]`, `[OVERENGINEERED]`, or `[VERIFY_WEAK]` flag pass silently into the output without an explicit Conditional or Blocked disposition.
+- Never let any Lens D flag (`[OVERSCOPED]`, `[OVERENGINEERED]`, `[VERIFY_WEAK]`, `[SIZING_RISK]`, `[HIDDEN_COUPLING]`, `[SPLIT_RECOMMENDED]`) pass silently into the output without an explicit Conditional or Blocked disposition.
 - Never omit the Inter-lens conflicts section — write "No conflicts" explicitly if none.
 - Never omit the Dynamic doc recommendations section — write "No additional docs recommended" if none.
 - Never produce a summary that contradicts the gate signal (e.g. summary that sounds optimistic when gate is Blocked).

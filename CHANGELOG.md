@@ -7,6 +7,48 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [Unreleased]
+
+### Added
+- **Doc suite manifest** (`.ai/docs/.manifest.md`) — the generated doc suite is no longer a
+  rigid 02–10 set. The `bootstrap-from-prd` skill now runs a Doc Suite Selection step
+  (STEP 2.5) that decides per baseline doc whether it is generated or `omitted` (currently
+  only `09-topology-and-architecture-diagrams.md` is omittable, for single-service systems
+  with no queue/cache/integration topology), and records every decision in the manifest.
+  Statuses: `frozen` / `draft` / `omitted`. Content-stability rules for frozen docs are
+  unchanged — only suite *membership* became flexible. The manifest also defines an
+  Extensions table for future agent-owned report docs (e.g. a gunner security-audit doc).
+- `groomer-complexity-audit` skill — the previously skill-less Complexity Audit lens
+  (coxswain Lens D) now has a skill file, extended with three new flags: `[SIZING_RISK]`
+  (S/M/L label understates real complexity), `[HIDDEN_COUPLING]` (phases marked independent
+  that share a resource), `[SPLIT_RECOMMENDED]` (phase should be split before planning).
+
+### Changed
+- `bootstrap-from-prd` Rebuild mode deletes docs per the manifest (never `01-prd.md`,
+  supplementary PRDs, or other agents' extension docs); falls back to the hardcoded 02–10
+  deletion for legacy projects without a manifest.
+- Doc templates 02–10: hardcoded `Status: Frozen` header replaced with a
+  `Status: [frozen/draft/omitted]` placeholder driven by the manifest decision.
+- `AGENT.md` and `10-planning-rules.md` templates: Source Of Truth lists are now derived
+  from the manifest (non-omitted docs only), with a documented insertion rule for extension
+  docs (appended after `10-planning-rules.md`, lowest priority, frozen extensions only).
+- `rigger` pre-flight stale check and `bosun` missing-doc rules are manifest-aware:
+  `omitted` docs are skipped without penalty; docs listed `frozen`/`draft` but absent on
+  disk remain Critical findings. Both fall back to legacy behavior without a manifest.
+- `coxswain` Lens D check list and synthesis dispositions extended to cover the three new
+  complexity flags.
+- README "What gets generated" tree now includes `.ai/docs/.manifest.md` and
+  `.ai/planning/future-scope.md` (rigger, conditional), credits caulker's log line in
+  `.pipeline-changelog.md`, and notes that gunner/purser/surveyor report to the session
+  (stdout by design) rather than writing files.
+
+### Fixed
+- Stale pre-rename agent names: `inspector` → `bosun` in `bootstrap-from-prd/SKILL.md` and
+  `groomer-lead-dev/SKILL.md`; `Inspector`/`Groomer`/`Estimator` → `Bosun`/`Coxswain`/`Purser`
+  in `docs/slash-commands.md`'s `/slipway-status` output format.
+
+---
+
 ## [0.7.1] — 2026-07-03
 
 ### Added

@@ -11,10 +11,12 @@ Reads the full validated doc suite and produces a phased implementation plan in 
 
 ## Pre-flight: stale check
 
-**Before producing any plan output**, check whether `.ai/planning/` already exists with a prior plan.
+**Before producing any plan output**, read `.ai/docs/.manifest.md` to determine the active doc set: every Baseline and Extensions doc whose status is not `omitted`. If no manifest exists (legacy project), fall back to treating all `.ai/docs/*.md` files present on disk as the active set. Never assume a fixed `01`–`10` range.
+
+Then check whether `.ai/planning/` already exists with a prior plan.
 
 If it does:
-1. Compare the last-modified timestamps of all `.ai/docs/*.md` files against the timestamp of the most recent planning file.
+1. Compare the last-modified timestamps of every active doc against the timestamp of the most recent planning file.
 2. If any doc is newer than the most recent planning file, halt and report:
 
 ```
@@ -38,7 +40,7 @@ If `.ai/planning/` does not exist, proceed directly to planning.
 
 ## Inputs required
 
-- All `.ai/docs/01-prd.md` through `.ai/docs/10-planning-rules.md` (and any `11-*.md` docs)
+- All active docs per `.ai/docs/.manifest.md` (Baseline + Extensions, excluding `omitted`). Fallback when no manifest exists: `.ai/docs/01-prd.md` through `.ai/docs/10-planning-rules.md` plus any `11-*.md` docs
 - `AGENT.md`
 - Bosun's final findings list (so tasks can carry forward accepted Should-fix caveats)
 - Coxswain's caveats list (Conditional findings to embed as acceptance criteria in relevant tasks)

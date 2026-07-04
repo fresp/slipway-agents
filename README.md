@@ -65,6 +65,7 @@ Model assignments live in [`slipway.json`](slipway.json) and are enforced at run
 | `groomer-lead-dev`   | `coxswain`     | Lead Dev lens — architecture, implementation risk, tech debt   |
 | `groomer-qa`         | `coxswain`     | QA lens — testability, edge cases, acceptance criteria gaps    |
 | `groomer-devops`     | `coxswain`     | DevOps/Cloud lens — infra, deployment, observability readiness |
+| `groomer-complexity-audit` | `coxswain` | Complexity Audit lens — sizing red flags, hidden phase coupling, phase-split signals |
 | `doc-merge-resolution` | `caulker`    | Per-doc-type unit parsing + divergence classification rules for semantic conflict resolution |
 
 ---
@@ -76,24 +77,29 @@ A single pipeline run from a raw idea produces:
 ```
 .ai/
 ├── docs/
+│   ├── .manifest.md                       ← doc suite manifest — which docs exist and why (hullwright)
 │   ├── 01-prd.md                          ← product requirements (chartmaker)
 │   ├── 02-technical-architecture.md        ┐
 │   ├── 03-service-boundaries.md            │
 │   ├── 04-data-models.md                   │
 │   ├── 05-api-specifications.md            ├─ hullwright via bootstrap-from-prd skill
-│   ├── 06-operational-flows.md             │
-│   ├── 07-engineering-standards.md         │
+│   ├── 06-operational-flows.md             │ (09 may be omitted for single-service
+│   ├── 07-engineering-standards.md         │  systems — recorded in .manifest.md)
 │   ├── 08-architecture-decisions.md        │
 │   ├── 09-topology-diagrams.md             │
 │   ├── 10-planning-rules.md               ┘
 │   ├── .pipeline-state.md                 ← resume state across sessions
-│   └── .pipeline-changelog.md             ← audit trail of every pipeline run
+│   └── .pipeline-changelog.md             ← audit trail of every pipeline run,
+│                                            incl. caulker conflict-resolution log
 ├── planning/
 │   ├── 00-overview.md                     ┐ dependency graph + critical path
 │   ├── 01-phase-*.md                      ├─ rigger — S/M/L sizing, parallel flags,
-│   └── ...                               ┘ context load hints per task
+│   ├── ...                               ┘ context load hints per task
+│   └── future-scope.md                    ← deferred P2 requirements (rigger, only when P2s are deferred)
 └── AGENT.md                               ← implementation instructions for Sisyphus
 ```
+
+`gunner` (security audit), `purser` (time/cost estimate), and `surveyor` (schema check) report to the session by design rather than writing files — their results are recorded in `.pipeline-state.md` and `.pipeline-changelog.md`.
 
 ---
 

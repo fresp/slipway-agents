@@ -1,7 +1,11 @@
 # [Project Name] Planning Rules
 
 Version: 1.0
-Status: Frozen
+Status: [frozen/draft/omitted]
+<!-- GENERATION RULE: Status value comes from the STEP 2.5 doc suite decision recorded in
+.ai/docs/.manifest.md. An omitted doc is never generated, so real output carries frozen
+(after STEP 5 validation passes) or draft (mid-generation/regeneration). Content-stability
+rules for frozen docs are unchanged: versioned edits only, no silent rewrites. -->
 
 ---
 
@@ -25,8 +29,17 @@ The agent is not the system architect.
 Read these documents before planning. Priority order (higher wins on conflict):
 
 <!--
-GENERATION RULE: List only the docs that were actually generated for this project.
+GENERATION RULE: Derive this list from .ai/docs/.manifest.md — include only docs whose
+manifest status is not "omitted". The default priority order below is correct for most
+projects; drop any line whose doc is omitted (e.g. remove the 09 line for a project that
+omitted topology diagrams).
 Insert any supplementary PRDs between the main PRD and this document.
+EXTENSION INSERTION RULE: extension docs (manifest Extensions table — agent-owned reports
+like a future 11-security-audit.md) are appended AFTER this document, at the lowest
+priority, ordered by doc number. Only extension docs whose manifest status is "frozen"
+are listed — draft extension reports are not source of truth. Rationale: extensions are
+derived reports; on conflict, the source docs they were derived from must win. Apply this
+rule identically in AGENT.md's Source Of Truth section — the two lists must stay identical.
 Do not include docs that don't exist.
 -->
 
