@@ -9,6 +9,37 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.8.0] — 2026-07-04
 
+### Added (Batch 6 — plugin runtime enforcement)
+- Refactored the TypeScript plugin from a monolithic `src/index.ts` into focused modules for
+  config loading/validation, agent config application, model resolution, prompt append handling,
+  permission passthrough, lifecycle hooks, logging, and hardcoded model safety chains while
+  preserving the existing OpenCode `server -> config` export shape.
+- Wired Zod-backed config validation and layered config loading from global
+  `~/.config/opencode/slipway.json`, project-root `slipway.json`, and project-root
+  `slipway.local.json`. Project-local config overrides lower-priority sources, while
+  security-sensitive `hooks.<event>` and `agents.<name>.permission` blocks replace atomically to
+  avoid cross-source hook-header inheritance or partial permission broadening.
+- Wired proactive model/category fallback resolution in the plugin: explicit agent model,
+  category model, agent fallback, category fallback, then hardcoded per-agent safety chains. The
+  selected startup model is assigned through the config hook and the resolved chain is recorded in
+  `agent.options.slipway_fallback_chain`.
+- Wired native OpenCode `AgentConfig.permission` passthrough for configured `edit`, `webfetch`,
+  `task`, and `bash` permission blocks; added `prompt_append` support that appends to bundled
+  agent prompts without replacing them.
+- Wired plugin-level HTTP dispatch for lifecycle-like OpenCode events only: session-error-like
+  events dispatch `hooks.on_block`, and session-complete/finish-like events dispatch
+  `hooks.on_pipeline_complete`.
+
+### Known gaps (Batch 6)
+- Reactive model retry is not implemented because it requires a `client.config.patch()` API that
+  is not exposed by the proven OpenCode plugin surface used in this repo.
+- Object-form `permission.bash` command allowlist semantics remain OpenCode-runtime-defined and
+  unverified, especially for shell builtins such as `command`.
+- `hooks.on_step_complete`, gate-specific hook details, and `hooks.on_user_input_required` remain
+  Slipway orchestrator prompt events, not plugin lifecycle events.
+- `ralph_loop` remains orchestrator prompt/state behavior; the plugin validates the field but does
+  not drive Bosun's optimize-loop decisions.
+
 ### Added (Batch 5 — parallel grooming + pipeline hooks)
 - `coxswain` now dispatches its Lead Dev, QA, DevOps, and Complexity Audit grooming lenses in
   parallel when the runtime supports it, with automatic fallback to the previous sequential

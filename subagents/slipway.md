@@ -58,7 +58,7 @@ On successful completion of a mutating step, move that step's lock entry from
 
 ## Model Configuration
 
-Model assignments for every subagent are defined in `slipway.json` at the project root. The `slipway-agents` plugin reads this file at session startup and injects the assignments into OpenCode via `client.config.patch()`.
+Model assignments for every subagent are defined in `slipway.json` at the project root. The `slipway-agents` plugin reads this file at session startup and injects assignments into OpenCode by mutating `input.agent` in the config hook.
 
 **Resolution order** (per agent, at session startup):
 1. **Primary model** — `agents.[name].model` in `slipway.json`. Used if the model is available.
