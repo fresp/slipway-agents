@@ -70,6 +70,29 @@ If `slipway.json` is not present in the project root, the plugin exits silently 
 
 ---
 
+## Runtime Config Resolution
+
+At orchestrator startup, before Mode Detection and before STEP 1, resolve the active Slipway config for orchestration settings:
+
+1. Look for `slipway.json` in the target project root.
+2. If absent, fall back to the global OpenCode config copy at `~/.config/opencode/slipway.json`.
+3. If neither file exists or the active file is unreadable, use the documented defaults for orchestration-only settings and report that defaults are in effect.
+
+For `ralph_loop`, resolve the global defaults first:
+
+```
+enabled: true
+max_iterations: 2
+strategy: reset
+block_on_exhaustion: false
+```
+
+Then merge any per-agent override from `agents.[name].ralph_loop` field by field. Agent-level values win only for fields explicitly present in the override; missing override fields inherit the global value. For the Bosun optimize loop, use the effective `agents.bosun.ralph_loop` value, so the configured `block_on_exhaustion: true` override applies while `max_iterations` and `strategy` still inherit from the global default unless Bosun overrides them later.
+
+Use the global effective `ralph_loop` value for any future orchestrator-managed agent loop that does not define an agent-level override.
+
+---
+
 ## Error Recovery and Retry
 
 Apply this protocol whenever a subagent returns an empty result, crashes, or fails its completion contract:
@@ -137,6 +160,7 @@ Run this before anything else, every time the orchestrator is invoked.
 | User says "security audit", "audit security", "check security"                                                            | `security-only`         | `gunner`                              |
 | User says "estimate", "how long will this take", "cost estimate", "time forecast"                                         | `estimate-only`         | `purser`                                     |
 | User says "validate schema", "check schema", "schema drift"                                                               | `schema-validate`       | `surveyor`                              |
+| User runs `/slipway-doctor` or asks for "slipway doctor", "doctor", "diagnostics", "pre-flight diagnostic", or "pipeline diagnostic" | `doctor`                | `slipway` read-only diagnostic        |
 
 If `.ai/docs/01-prd.md` exists but looks incomplete against the section checklist in `bootstrap-from-prd/SKILL.md`, still route to `chartmaker` first in **gap-fill mode** rather than straight to `hullwright`.
 
@@ -244,7 +268,10 @@ Present the Bosun findings, then ask exactly one routing question — always as 
 
 The user's answer must be one of the two shown options only. If they reply with anything else, re-ask with the same binary options — do not interpret free-form answers.
 
-**Loop limit:** maximum **2** optimize cycles per pipeline run. Track this with a counter written to `.ai/docs/.pipeline-state.md`. On the 3rd request to optimize, tell the user the loop limit has been reached and that continuing requires an explicit override — do not silently keep looping.
+**Loop limit:** maximum **`ralph_loop.max_iterations`** optimize cycles per pipeline run, resolved from the effective `ralph_loop` config for the loop owner. Track this with a counter written to `.ai/docs/.pipeline-state.md`. When the next optimize request would exceed `ralph_loop.max_iterations`, branch on the effective `block_on_exhaustion` value:
+
+- If `block_on_exhaustion: false`, tell the user the loop limit has been reached and that continuing requires an explicit override — do not silently keep looping.
+- If `block_on_exhaustion: true`, this is a hard block. Do not offer an override option. Tell the user that `ralph_loop.max_iterations` cycles have been exhausted and Critical findings remain unresolved. The pipeline cannot proceed past STEP 4 / STEP E5; the user must resolve the findings manually and restart from STEP 3 (Bosun review). Write this terminal blocked state to `.ai/docs/.pipeline-state.md`.
 
 Each optimize cycle:
 
@@ -264,7 +291,7 @@ Call `gunner`.
 - Bosun's findings list from the current run (context for the auditor)
 
 **Output expected back:**
-- Severity-ranked findings across five lenses (auth, secrets, attack surface, data sensitivity, third-party risk)
+- Severity-ranked findings across six lenses (auth, secrets, attack surface, data sensitivity, third-party risk, dependency/image vulnerability scanning)
 - Gate signal: PASS / CONDITIONAL / BLOCK
 
 **Gate logic based on security audit gate signal:**
@@ -429,6 +456,53 @@ This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and
   auto-continue to any other pipeline step until the user has resolved every blocked unit in
   this run or explicitly defers them. After a clean resolution (or user confirms all blocks are
   resolved), ask the user: "Run bosun on the affected docs to confirm consistency? (yes / no)".
+- **doctor**: run Doctor mode in the orchestrator itself. Do not invoke any subagent and do not modify any file.
+
+---
+
+## Doctor mode
+
+Doctor mode is a read-only pre-flight diagnostic. It may run before a pipeline, after a failed pipeline, or standalone. It never invokes Chartmaker, Cartographer, Hull Builder, Bosun, Gunner, Coxswain, Rigger, Purser, Shipwright, Chronicler, Surveyor, or Caulker, and it never writes, edits, deletes, regenerates, or normalizes files.
+
+Run the checks below in order and print a structured report with clear section headers. Prefix every finding with one of:
+
+- `✓` healthy
+- `⚠` warning or non-blocking issue
+- `✗` error or blocking issue
+
+Never produce a wall of text. End with exactly one summary line: `N issues found (X errors, Y warnings)` or `All checks passed.`
+
+### 1. Config resolution
+
+- Locate the active `slipway.json`: project-root `slipway.json` first, then global `~/.config/opencode/slipway.json` fallback.
+- Report which file is being used, or report that defaults are in effect if no active config exists.
+- Validate the active config against `slipway.schema.json` when both files are readable. Report schema violations as `✗` findings.
+- For each agent in the active config, show the resolved summary: primary `model`, `fallback_model`, `category`, effective `ralph_loop` values after global plus sparse agent override merge, and a permission summary listing only which permission keys are set.
+
+### 2. Manifest health
+
+- If `.ai/docs/.manifest.md` exists, parse its Baseline and Extensions tables and report each listed document's status (`frozen`, `draft`, or `omitted`).
+- Flag any document listed as `frozen` or `draft` that is absent from disk as `✗`.
+- Flag any `.ai/docs/*.md` file on disk that is not listed in the manifest as `⚠` manifest drift requiring investigation.
+- If no manifest exists, report `⚠ no manifest found — legacy project or pre-bootstrap state.`
+
+### 3. Pipeline state
+
+- If `.ai/docs/.pipeline-state.md` exists, report the last completed step and current optimize counter value.
+- Compare the optimize counter with the effective `ralph_loop.max_iterations` for the Bosun loop.
+- If the counter equals `ralph_loop.max_iterations` and unresolved Critical findings are readable from the state file, report prominently: `✗ pipeline is in blocked state, manual resolution required before resuming.`
+- If no state file exists, report `⚠ no pipeline state — project not yet bootstrapped or state was cleared.`
+
+### 4. Agent file integrity
+
+- Verify every agent listed in the active `slipway.json` has an expected file at `subagents/<name>.md`. Report missing files as `✗`.
+- Read the README Skills table and verify every referenced skill has a corresponding file under `skills/slipway/<skill>/SKILL.md`. Report missing skill files as `✗`.
+
+### 5. Declarative-only features summary
+
+- Read `CLAUDE.md` and extract the current declarative-only notes instead of hardcoding the list.
+- Report each config feature that `CLAUDE.md` still identifies as declarative-only, meaning present in config or docs but not enforced by the plugin at runtime.
+- If `CLAUDE.md` says a feature is now wired, do not report it as declarative-only.
 
 ---
 
@@ -486,7 +560,7 @@ Maintain `.ai/docs/.pipeline-state.md` across the run and across sessions:
 Last updated: [timestamp]
 Current mode: [bootstrap-from-prompt | bootstrap-from-prd | extend | review-only | grooming-only | plan-only | sync | security-only | estimate-only | schema-validate]
 Last completed step: [step name]
-Optimize cycles used: [N] / 2
+Optimize cycles used: [N] / [ralph_loop.max_iterations]
 Bosun last run: [timestamp or "never"]
 Bosun last result: [passed | findings: N critical, N should-fix, N note]
 Bosun health score: [0–100 or "n/a"]
@@ -647,7 +721,7 @@ Pipeline complete.
 ✓ Stakeholder Priority: [N P0, N P1, N P2 across all phases] — P2 deferred: [N requirements, or "none"]
 ✓ Tests: [pass | N failures] — [command run, or "not yet run — implementation pending"]
 
-Optimize cycles used: [N]/2
+Optimize cycles used: [N]/[ralph_loop.max_iterations]
 Total duration: [Xs across all steps]
 Changelog written to: .ai/docs/.pipeline-changelog.md
 ```
@@ -659,7 +733,7 @@ Changelog written to: .ai/docs/.pipeline-changelog.md
 - Never generate PRD content, engineering docs, review findings, security findings, estimates, or plans directly in the orchestrator — always delegate.
 - Never proceed past STEP 4 / STEP E5 with unresolved Critical findings from Bosun.
 - Never run `rigger` without Gunner returning PASS or CONDITIONAL first.
-- Never exceed the 2-cycle optimize loop limit without an explicit user override.
+- Never exceed the resolved `ralph_loop.max_iterations` optimize loop limit. If `block_on_exhaustion: false`, require an explicit user override; if `block_on_exhaustion: true`, hard-block without offering an override.
 - Never run `rigger` against docs that have not passed `bosun` in the current pipeline history.
 - Never run `rigger` against docs where `coxswain` returned Blocked — resolve Blocked findings first.
 - Never run `coxswain` before `bosun` has passed at least once — grooming on inconsistent docs produces misleading readiness signals.
