@@ -181,6 +181,7 @@ Run this after STEP 0, every time the orchestrator is invoked.
 | User says "security audit", "audit security", "check security"                                                            | `security-only`         | `gunner`                              |
 | User says "estimate", "how long will this take", "cost estimate", "time forecast"                                         | `estimate-only`         | `rigger` (estimate-only mode)                |
 | User says "validate schema", "check schema", "schema drift"                                                               | `schema-validate`       | `surveyor`                              |
+| User says "refresh agent.md", "update agent contract", "regenerate AGENT.md", "pick up new AGENT.md rules" | `agent-refresh` | `hullwright` (Partial Regeneration, AGENT.md only) |
 | User runs `/slipway:doctor` or asks for "slipway doctor", "doctor", "diagnostics", "pre-flight diagnostic", or "pipeline diagnostic" | `doctor`                | `slipway` read-only diagnostic        |
 
 If `.ai/docs/01-prd.md` exists but looks incomplete against the section checklist in `bootstrap-from-prd/SKILL.md`, still route to `chartmaker` first in **gap-fill mode** rather than straight to `hullwright`.
@@ -438,6 +439,7 @@ This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and
 - **security-only**: call `gunner` against existing docs. Refuse if `bosun` has never passed — security audit against inconsistent docs produces unreliable findings.
 - **estimate-only**: call `rigger` in estimate-only mode — rigger re-reads existing `.ai/planning/` files and re-emits the Phase Estimate Summary without regenerating tasks. Refuse if `.ai/planning/` does not exist — ask the user to run planning first.
 - **schema-validate**: call `surveyor`. Ask the user for the schema source (SQL dump, ORM schema file, or migration directory) before invoking.
+- **agent-refresh**: call `hullwright` in Partial Regeneration mode scoped exclusively to `["AGENT.md"]`. Recompiles `AGENT.md` from the current on-disk `.ai/docs/*.md` and the latest AGENT.md template/contract, without regenerating, re-deriving, or version-bumping any other document. Use when the AGENT.md contract itself has changed (new Working Loop steps, new Execution Protocol sections) and an already-bootstrapped project needs to adopt it. Refuse if `.ai/docs/01-prd.md` or the `02-10` doc suite does not exist — this mode only recompiles AGENT.md from docs that already exist, it does not bootstrap from scratch.
 - **sync**: call `chronicler`. See Pipeline — sync run below.
 - **resolve-conflicts**: call `caulker` against the touched `.ai/docs/`/`AGENT.md` files. If
   `caulker` reports any escalated (blocked) units, stop and present them to the user — do not
@@ -649,3 +651,4 @@ Changelog written to: .ai/docs/.pipeline-changelog.md
 - Never use non-English strings for trigger matching, user prompts, or error messages.
 - Never let `caulker` auto-continue into another subagent without an explicit user go-ahead.
 - Never block, retry, pause, or change a gate decision because a hook failed, was skipped, or could not fire.
+- Never let `agent-refresh` mode touch, re-validate, or version-bump any document other than `AGENT.md`.

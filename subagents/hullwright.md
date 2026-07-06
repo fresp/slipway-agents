@@ -51,6 +51,18 @@ The base skill's STEP 5 (Cross-Document Validation) already defines this exact b
 3. Bump minor version on only the regenerated docs. Leave all other docs untouched — do not re-write their version field even if untouched content happens to be re-saved.
 4. If regenerating one doc reveals a consistency problem in a doc that wasn't in the original impacted list (e.g. fixing `04-data-models.md` invalidates an API schema reference in `05-api-specifications.md`), add it to the impacted list and regenerate it too — but report this expansion explicitly, don't silently widen scope without telling the orchestrator.
 
+### Contract-Only Refresh (agent-refresh)
+
+Run when: the orchestrator invokes `agent-refresh` mode — the impacted doc list is exactly `["AGENT.md"]`.
+
+This is a narrower case than standard Partial Regeneration:
+1. Confirm `.ai/docs/01-prd.md` and the existing `02-10` doc suite are present and readable. If any required doc is missing, do not proceed — report back to the orchestrator that the precondition isn't met.
+2. Do NOT re-derive the Requirement Model and do NOT regenerate any of docs `02` through `10` — read them as-is, exactly as they currently exist on disk.
+3. Recompile `AGENT.md` using the current `templates/AGENT.md` and the current `bootstrap-from-prd/SKILL.md` AGENT.md section spec, populating every section from the on-disk `02-10` docs (same source mapping as a full bootstrap would use).
+4. Run only the AGENT.md-relevant checks from the skill's STEP 5 Cross-Document Validation (the `AGENT.md`-specific bullets — e.g. no rule not present in a generated doc, Source Of Truth list matches `10-planning-rules.md` exactly) — do not re-run checks that only apply to docs `02-10` cross-consistency, since those docs are untouched.
+5. Bump `AGENT.md`'s own version only (minor bump). Leave every other document's version field untouched.
+6. Report back using the standard skill report format, but explicitly note: "Scope: AGENT.md only — 02-10 docs unchanged."
+
 ---
 
 ---

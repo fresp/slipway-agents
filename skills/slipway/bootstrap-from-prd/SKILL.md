@@ -144,6 +144,8 @@ Rules:
 - **Bootstrap (first run):** all documents start at `Version: 1.0`.
 - **Rebuild (full regeneration):** increment the major version — `1.x → 2.0`, `2.x → 3.0`, etc.
 - **Partial regeneration (validation fix on specific docs):** increment the minor version on only the affected documents — `1.0 → 1.1`, `1.2 → 1.3`, etc. Unaffected documents keep their current version.
+
+Partial Regeneration's impacted doc list may consist of exactly `["AGENT.md"]` as a valid, narrower scope (see `hullwright.md`'s Contract-Only Refresh). In this case, skip Requirement Model re-derivation and regenerate nothing from `02` through `10` — recompile only `AGENT.md` from the current on-disk docs.
 - Never reset a version to `1.0` after a rebuild unless explicitly instructed by the user.
 
 ---

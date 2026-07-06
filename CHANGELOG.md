@@ -12,6 +12,19 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - Register Slipway slash commands dynamically through the OpenCode plugin config hook: `/slipway:init`, `/slipway:status`, `/slipway:resume`, and `/slipway:doctor`. These route to the `slipway` orchestrator at runtime and do not require `.opencode/commands/*.md` files.
 
+## [0.12.0] — 2026-07-06
+
+### Added (Batch 17 — Contract-Only Agent Refresh)
+- New standalone entry point `agent-refresh` — regenerates only `AGENT.md` for an
+  already-bootstrapped project, recompiling it from the current on-disk
+  `.ai/docs/02-10` suite and the latest AGENT.md template/contract, without
+  touching, re-validating, or version-bumping any other document.
+- `hullwright` gains a "Contract-Only Refresh" mode: a narrower case of Partial
+  Regeneration where the impacted doc list is exactly `["AGENT.md"]`.
+- Use case: projects bootstrapped before a contract change (e.g. the 0.11.0
+  session-resume enforcement) can now adopt it without a full rebuild or
+  manual patching.
+
 ## [0.11.0] — 2026-07-06
 
 ### Added (Batch 16 — Session Resume Enforcement)
