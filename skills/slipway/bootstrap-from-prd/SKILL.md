@@ -330,7 +330,7 @@ Every rule in `AGENT.md` must derive from a generated document. Cite the source 
 2. **Source Of Truth** — priority-ordered list of all generated docs; higher priority wins on conflict; no merging, no averaging; supplementary PRDs inserted between `01-prd.md` and `10-planning-rules.md`
 3. **Operating Principles** — numbered one-sentence rules, each derived from one ADR; no principles without an ADR source
 4. **Context Loading Strategy** — task-type map: for each major flow category from `06-operational-flows.md`, list the minimum docs to load
-5. **Working Loop** — numbered step-by-step execution loop for every non-trivial task
+5. **Working Loop** — numbered step-by-step execution loop for every non-trivial task. Must begin with a resume check: before any other step, read `.ai/implementation-state.md` if it exists; if `Status` is not `complete`, resume from `Last completed task` instead of restarting the requested scope from the beginning.
 6. **Architecture Guardrails** — frozen service list (exact names from `02`), frozen topology if applicable, frozen tech stack (exact from `07`), frozen API style (from `07` + ADRs)
 7. **Service Ownership Rules** — per service: owns / must never own (mirrored exactly from `03-service-boundaries.md`)
 8. **Development Strategy** — increment size, ordering preferences, forbidden abstraction patterns (from `07` forbidden patterns + ADRs)

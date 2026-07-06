@@ -93,15 +93,16 @@ When uncertain, read the minimum set that can answer the question. Context disci
 
 Use this loop for every non-trivial task:
 
-1. Identify the exact request.
-2. Load only the relevant source documents.
-3. Locate the owning service.
-4. Confirm the change stays inside the existing boundaries.
-5. Define acceptance criteria before implementation.
-6. Implement the smallest useful increment.
-7. Verify only the affected surface using the task's provided verification command or artifact check.
-8. Record the verification outcome using the Test Results Format below before marking the increment complete.
-9. Stop only when the requested scope is complete and the verification gate is passed, verify-blocked, or explicitly marked `[manual review required]`.
+1. Check for `.ai/implementation-state.md`. If it exists and `Status` is not `complete`, resume from `Last completed task` — do not re-run completed work. If it is absent or `Status: complete`, proceed to step 2.
+2. Identify the exact request.
+3. Load only the relevant source documents.
+4. Locate the owning service.
+5. Confirm the change stays inside the existing boundaries.
+6. Define acceptance criteria before implementation.
+7. Implement the smallest useful increment.
+8. Verify only the affected surface using the task's provided verification command or artifact check.
+9. Record the verification outcome using the Test Results Format below before marking the increment complete.
+10. Stop only when the requested scope is complete and the verification gate is passed, verify-blocked, or explicitly marked `[manual review required]`.
 
 Rules for execution:
 

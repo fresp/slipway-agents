@@ -12,6 +12,24 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - Register Slipway slash commands dynamically through the OpenCode plugin config hook: `/slipway:init`, `/slipway:status`, `/slipway:resume`, and `/slipway:doctor`. These route to the `slipway` orchestrator at runtime and do not require `.opencode/commands/*.md` files.
 
+## [0.11.0] — 2026-07-06
+
+### Added (Batch 16 — Session Resume Enforcement)
+- `templates/AGENT.md` Working Loop now begins with a mandatory resume check:
+  read `.ai/implementation-state.md` before any other step, and resume from
+  `Last completed task` instead of restarting the requested scope if `Status`
+  is not `complete`.
+- `hullwright` now embeds a new `### 0. Resume Before Starting` subsection in
+  the Execution Protocol, ahead of `Think Before Coding`, instructing Sisyphus
+  to check implementation state before taking any action in a new session.
+- This closes the gap left by the earlier ownership transfer of
+  `.ai/implementation-state.md` from `slipway.md` to Sisyphus/AGENT.md: that
+  transfer was previously declarative only, with no concrete instruction in
+  the generated contract. This batch is the first enforcement of it.
+- Scope: this only affects projects bootstrapped or rebuilt with 0.11.0 or
+  later. Existing AGENT.md files already on disk in prior projects are not
+  automatically updated.
+
 ## [0.10.1] — 2026-07-06
 
 ### Changed

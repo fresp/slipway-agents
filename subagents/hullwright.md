@@ -108,6 +108,13 @@ These behavioral guidelines apply to every task in this project.
 They are non-negotiable and take precedence over "getting things done faster."
 Tradeoff: These guidelines bias toward caution over speed. For trivial tasks, use judgment — without softening the non-negotiable requirement for non-trivial work.
 
+### 0. Resume Before Starting
+Before any other action in a new session:
+- Check whether `.ai/implementation-state.md` exists.
+- If it exists and `Status` is not `complete`, treat the task as a continuation: read `Last completed task`, `Current phase`, and any `blocked task log`, and resume from there.
+- Do not re-implement, re-plan, or re-verify work already marked complete in that file.
+- Only start from scratch if the file is absent or explicitly marked `Status: complete`.
+
 ### 1. Think Before Coding
 Before implementing anything:
 - State your assumptions explicitly. If uncertain, ask.
