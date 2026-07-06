@@ -11,48 +11,87 @@ import { resolveModel } from "./model-resolution-handler";
  * `docs/slash-commands.md` and `subagents/slipway.md`.
  */
 
+const SLIPWAY_ORCHESTRATOR_PREAMBLE =
+  "Act inline as the slipway orchestrator (see subagents/slipway.md as your contract) — " +
+  "do NOT attempt to delegate to an agent/subagent named 'slipway' via the task tool, " +
+  "it is not a valid task subagent_type in this runtime. You yourself follow the orchestrator " +
+  "contract: run STEP 0 session reconciliation first, then mode detection. Delegate individual " +
+  "steps only to these valid task subagent_types: chartmaker, cartographer, hullwright, bosun, " +
+  "gunner, coxswain, rigger, shipwright, surveyor, chronicler, caulker. Maintain all state under " +
+  ".ai/docs/ and .ai/sessions/ per the contract. Ask at most one routing question if the request " +
+  "is underspecified; never invent engineering docs yourself — that is always delegated.";
+
 const SLIPWAY_COMMANDS = {
   "slipway:init": {
     description: "Start a new pipeline run.",
     agent: "slipway",
-    template: "@slipway I want to build $ARGUMENTS",
+    template:
+      `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
+      `Build request: $ARGUMENTS\n\n` +
+      `Begin with STEP 0, then detect mode (bootstrap-from-prompt / reverse-engineer / ` +
+      `review-only / groom-only / etc.) from the request above.`,
   },
   "slipway:status": {
     description:
       "Show current pipeline and implementation state without running anything.",
     agent: "slipway",
-    template: "@slipway where are we?",
+    template:
+      `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
+      `Read-only status check: read .ai/docs/.pipeline-state.md and .ai/implementation-state.md ` +
+      `(if present) and report current pipeline step, last completed step, and any blocked state. ` +
+      `Do not invoke any subagent or write any file.`,
   },
   "slipway:resume": {
     description: "Resume from the last completed step.",
     agent: "slipway",
-    template: "@slipway resume $ARGUMENTS",
+    template:
+      `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
+      `Resume request: $ARGUMENTS\n\n` +
+      `Read .ai/docs/.pipeline-state.md to find the last completed step, then continue the ` +
+      `pipeline from the next step forward. Do not restart completed steps.`,
   },
   "slipway:doctor": {
     description:
       "Run read-only diagnostics for config, docs, state, agents, and session reconciliation.",
     agent: "slipway",
-    template: "@slipway run doctor $ARGUMENTS",
+    template:
+      `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
+      `Read-only diagnostic run: $ARGUMENTS\n\n` +
+      `Check slipway.json validity, .ai/docs/ completeness, .ai/pipeline-state.md consistency, ` +
+      `and run STEP 0 session reconciliation as a dry check. Report findings only — make no writes.`,
   },
   "slipway:agent-refresh": {
     description: "Regenerate only AGENT.md from the current docs and latest contract.",
     agent: "slipway",
-    template: "@slipway regenerate AGENT.md",
+    template:
+      `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
+      `Regenerate AGENT.md only, from the current .ai/docs/ and the latest hullwright AGENT.md ` +
+      `template. Do not touch any other file. Delegate the actual generation to hullwright.`,
   },
   "slipway:review": {
     description: "Run a consistency review on existing docs.",
     agent: "slipway",
-    template: "@slipway review",
+    template:
+      `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
+      `Standalone review mode: delegate cross-doc validation to bosun against the existing ` +
+      `.ai/docs/. Report bosun's per-doc health scores and findings; do not proceed to gunner ` +
+      `or planning unless explicitly asked.`,
   },
   "slipway:groom": {
     description: "Run multi-lens grooming on existing docs and plan readiness.",
     agent: "slipway",
-    template: "@slipway groom this",
+    template:
+      `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
+      `Standalone grooming mode: delegate multi-lens grooming (Lead Dev, QA, DevOps, Complexity ` +
+      `Audit) to coxswain against the existing .ai/docs/ and .ai/planning/. Report the synthesis only.`,
   },
   "slipway:sync": {
     description: "Sync docs with implementation reality after a build.",
     agent: "slipway",
-    template: "@slipway sync docs",
+    template:
+      `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
+      `Post-implementation sync: delegate to chronicler to classify drift between .ai/docs/ ` +
+      `and the current codebase, then patch docs incrementally per its contract.`,
   },
 } satisfies Record<string, CommandDefinition>;
 
