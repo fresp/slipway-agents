@@ -60,7 +60,7 @@ bunx slipway-agents@latest status
 
 `status` prints the local install state, installed config version, `~/.config/opencode/slipway.json` path, configured agent count, and whether `~/.config/opencode/slipway.local.json` exists.
 
-Inside OpenCode, `/slipway-doctor` is a different diagnostic: it is an in-session, read-only pipeline check covering project config resolution, manifest health, pipeline state, agent files, declarative-only notes, and session reconciliation health.
+Inside OpenCode, `/slipway:doctor` is a different diagnostic: it is an in-session, read-only pipeline check covering project config resolution, manifest health, pipeline state, agent files, declarative-only notes, and session reconciliation health.
 
 ## Manual install (fallback)
 
@@ -248,7 +248,7 @@ If the user chose a provider other than Anthropic, create project-local `slipway
 
 ### Step 4: Verify in OpenCode
 
-Start an OpenCode session and confirm `@slipway` responds. For pipeline diagnostics inside the session, use `/slipway-doctor`; do not confuse it with the CLI `doctor` command.
+Start an OpenCode session and confirm `@slipway` responds. For pipeline diagnostics inside the session, use `/slipway:doctor`; do not confuse it with the CLI `doctor` command.
 
 ### Step 5: First use
 

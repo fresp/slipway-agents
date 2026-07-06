@@ -181,7 +181,7 @@ Run this after STEP 0, every time the orchestrator is invoked.
 | User says "security audit", "audit security", "check security"                                                            | `security-only`         | `gunner`                              |
 | User says "estimate", "how long will this take", "cost estimate", "time forecast"                                         | `estimate-only`         | `rigger` (estimate-only mode)                |
 | User says "validate schema", "check schema", "schema drift"                                                               | `schema-validate`       | `surveyor`                              |
-| User runs `/slipway-doctor` or asks for "slipway doctor", "doctor", "diagnostics", "pre-flight diagnostic", or "pipeline diagnostic" | `doctor`                | `slipway` read-only diagnostic        |
+| User runs `/slipway:doctor` or asks for "slipway doctor", "doctor", "diagnostics", "pre-flight diagnostic", or "pipeline diagnostic" | `doctor`                | `slipway` read-only diagnostic        |
 
 If `.ai/docs/01-prd.md` exists but looks incomplete against the section checklist in `bootstrap-from-prd/SKILL.md`, still route to `chartmaker` first in **gap-fill mode** rather than straight to `hullwright`.
 

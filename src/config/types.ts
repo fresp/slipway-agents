@@ -9,18 +9,27 @@ export type SlipwayConfig = z.infer<typeof slipwayConfigSchema>;
 export type AgentConfig = SlipwayConfig["agents"][string];
 export type PermissionConfig = NonNullable<AgentConfig["permission"]>;
 export interface AgentDefinition {
-  prompt?: string;
-  model?: string;
-  mode?: string;
+prompt?: string;
+model?: string;
+mode?: string;
+description?: string;
+permission?: PermissionConfig;
+options?: Record<string, unknown>;
+[key: string]: unknown;
+}
+
+export interface CommandDefinition {
+  template: string;
   description?: string;
-  permission?: PermissionConfig;
-  options?: Record<string, unknown>;
-  [key: string]: unknown;
+  agent?: string;
+  model?: string;
+  subtask?: boolean;
 }
 
 export interface Config {
-  agent?: Record<string, AgentDefinition>;
-  [key: string]: unknown;
+agent?: Record<string, AgentDefinition>;
+command?: Record<string, CommandDefinition>;
+[key: string]: unknown;
 }
 
 export interface Hooks {

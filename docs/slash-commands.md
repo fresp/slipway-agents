@@ -1,10 +1,10 @@
 # Slash Commands
 
-slipway-agents registers four slash commands in OpenCode. These are convenience wrappers — they invoke the `slipway` orchestrator with a pre-filled intent, so you never need to remember the exact trigger phrase.
+slipway-agents injects four slash commands into OpenCode at runtime through the plugin's `config` hook. These are convenience wrappers — they invoke the `slipway` orchestrator with a pre-filled intent, so you never need to remember the exact trigger phrase. No `.opencode/commands/*.md` files are required; the commands are registered automatically when the plugin loads.
 
 ---
 
-## `/slipway-init`
+## `/slipway:init`
 
 **What it does:** Starts a new pipeline run from scratch.
 
@@ -19,7 +19,7 @@ Equivalent to typing `@slipway I want to build [idea]` or `@slipway bootstrap fr
 
 ---
 
-## `/slipway-status`
+## `/slipway:status`
 
 **What it does:** Reports the current pipeline state without running any step.
 
@@ -44,7 +44,7 @@ Resume? (yes / no)
 
 ---
 
-## `/slipway-resume`
+## `/slipway:resume`
 
 **What it does:** Resumes the pipeline from the last completed step.
 
@@ -60,7 +60,7 @@ Equivalent to typing `@slipway resume` or `@slipway continue from where we left 
 
 ---
 
-## `/slipway-doctor`
+## `/slipway:doctor`
 
 **What it does:** Runs a read-only pre-flight diagnostic without executing any pipeline step.
 

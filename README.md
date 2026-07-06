@@ -134,10 +134,10 @@ slipway persists state in `.ai/docs/.pipeline-state.md`, so interrupted runs can
 
 | Command | What it does |
 |---|---|
-| `/slipway-init` | Start a new pipeline run. |
-| `/slipway-status` | Show current pipeline and implementation state without running anything. |
-| `/slipway-resume` | Resume from the last completed step. |
-| `/slipway-doctor` | Run read-only diagnostics for config, docs, state, agents, and session reconciliation. |
+| `/slipway:init` | Start a new pipeline run. |
+| `/slipway:status` | Show current pipeline and implementation state without running anything. |
+| `/slipway:resume` | Resume from the last completed step. |
+| `/slipway:doctor` | Run read-only diagnostics for config, docs, state, agents, and session reconciliation. |
 
 Full reference: [docs/slash-commands.md](docs/slash-commands.md)
 
