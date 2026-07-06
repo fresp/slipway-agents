@@ -31,6 +31,14 @@ Additional docs (`11-*.md` etc.) are read if present. Bosun findings from the cu
 
 Audit is organized into six lenses. Apply all six to every run. Do not skip a lens because no obvious issues are apparent — absence of a finding must be explicit, not implied.
 
+### Dispatch (run all six in parallel)
+
+Dispatch all six lenses simultaneously against the same input set. Lenses 1–5 read the same documentation inputs independently; Lens 6 runs its scanner CLIs independently against the project filesystem. Each lens returns its own findings list — these are collected into the report as separate sections, not merged or deduplicated against each other, since the six lenses audit distinct security dimensions rather than overlapping concerns. Unlike coxswain's four grooming lenses, gunner's six lenses require no cross-lens synthesis step before reporting.
+
+If the runtime does not support parallel task dispatch, fall back automatically to sequential execution in this exact order: Lens 1 → Lens 2 → Lens 3 → Lens 4 → Lens 5 → Lens 6. This fallback changes only latency, not semantics or output structure.
+
+Lens isolation rule: no lens may read or depend on another lens's output or findings. Lens 6's scanner results must never inform Lenses 1–5's document review, and vice versa — each lens's conclusions stand on its own input scope only.
+
 ### Lens 1 — Authentication and authorization
 
 Check every API endpoint, service call, and inter-service communication path documented in `05-api-specifications.md` and `03-service-boundaries.md`:
