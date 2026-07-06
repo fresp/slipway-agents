@@ -7,7 +7,7 @@ const slipwayModel = "anthropic/claude-sonnet-5";
 
 function makeSlipwayConfig(): NonNullable<Parameters<typeof applyCommandConfig>[1]> {
   return {
-    version: "0.13.0",
+    version: "0.13.1",
     agents: {
       slipway: {
         model: slipwayModel,
