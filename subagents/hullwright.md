@@ -175,6 +175,70 @@ When delegating to the skill: instruct the skill to include this section as spec
 
 ---
 
+## Self-Check Before Handoff
+
+Before relaying the completion report, verify the generated `AGENT.md` against
+the same criteria bosun will apply during its cross-doc review. Catching these
+here means bosun's first pass is more likely to pass on iteration 1, avoiding
+an optimize-loop re-run.
+
+This is a structural self-check, not a substitute for bosun's review — it
+does not replace or skip STEP 3 (Bosun review) in the orchestrator's pipeline.
+It only reduces the odds of bosun finding avoidable Critical/Should-fix issues
+on content this subagent just generated.
+
+Run this check after compiling `AGENT.md` and before relaying the report back
+to the orchestrator, in every mode (Full Bootstrap, Full Rebuild, Partial
+Regeneration, Contract-Only Refresh) that touches `AGENT.md`.
+
+Check, in order:
+
+1. **Required sections present, in order**: Mission, Source Of Truth,
+   Operating Principles, Context Loading Strategy, Working Loop, Architecture
+   Guardrails, Service Ownership Rules, Development Strategy, Planning Rules,
+   Coding Rules, Runtime Capabilities, Escalation Protocol, Execution Protocol.
+   Missing or out-of-order section → fix before reporting.
+
+2. **No placeholder residue** — scan for `[TBD]`, `[TODO]`, or any bracketed
+   template text left unfilled. Every bracket must be replaced with real
+   project content.
+
+3. **Source Of Truth parity** — the priority-ordered doc list must match
+   `10-planning-rules.md`'s own Source Of Truth section exactly, including
+   any supplementary PRDs and frozen extension docs. No divergence.
+
+4. **Traceability** — every line in Operating Principles must derive from an
+   ADR in `08-architecture-decisions.md`. Remove or re-source any principle
+   that doesn't trace back to one.
+
+5. **Guardrail parity** — Architecture Guardrails' service list must match
+   `02-technical-architecture.md` exactly. Service Ownership Rules must
+   mirror `03-service-boundaries.md`'s owns/must-never-own lists exactly.
+   Frozen tech/API rules must match `07-engineering-standards.md`.
+
+6. **Forbidden Behaviors coverage** — every "must never own" item from
+   `03-service-boundaries.md` must appear somewhere in Forbidden Behaviors.
+
+7. **Project-specific, not generic** — Decision Tree item 5 and Definition
+   Of Done item 6 must reference this project's actual architecture, not
+   template boilerplate.
+
+8. **Golden Rules count** — must be 10 to 15 numbered one-liners. Trim or
+   expand to fit the range.
+
+9. **Safe handoff guidance** — nothing in the Sisyphus/omo execution guidance
+   may authorize an action that conflicts with Runtime Capabilities, service
+   boundaries, or frozen architecture stated elsewhere in the file.
+
+If any check fails, fix it before relaying the completion report. Do not
+report completion with a known-failing self-check item — fixing it here is
+cheaper than letting bosun catch it and trigger an optimize cycle.
+
+This check adds no new file output and does not change the version-bump rules
+above — it only gates what quality gets reported as "done."
+
+---
+
 ## Forbidden Behaviors
 
 - Never write engineering doc content directly — always go through the skill.
@@ -182,6 +246,7 @@ When delegating to the skill: instruct the skill to include this section as spec
 - Never reset a document's version to `1.0` after a rebuild or partial regen unless the user explicitly instructs it (matches the skill's own versioning rule).
 - Never regenerate documents outside the requested scope in Partial Regeneration mode without explicitly reporting the scope expansion.
 - Never proceed if `.ai/docs/01-prd.md` is missing Functional Requirements or Goals — relay this blocker back to the orchestrator instead of attempting to generate around it.
+- Never relay a completion report for a mode that generated or recompiled `AGENT.md` without first running the Self-Check Before Handoff steps.
 
 ## Session Logging
 
