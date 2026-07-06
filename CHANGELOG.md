@@ -12,6 +12,18 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - Register Slipway slash commands dynamically through the OpenCode plugin config hook: `/slipway:init`, `/slipway:status`, `/slipway:resume`, and `/slipway:doctor`. These route to the `slipway` orchestrator at runtime and do not require `.opencode/commands/*.md` files.
 
+## [0.13.0] — 2026-07-06
+
+### Added (Batch 18 — Slash Command Expansion)
+- Four new runtime slash commands registered through the plugin's `config` hook:
+  - `/slipway:agent-refresh` — regenerates only `AGENT.md` from the current docs.
+  - `/slipway:review` — runs Bosun review on existing docs.
+  - `/slipway:groom` — runs coxswain grooming readiness check.
+  - `/slipway:sync` — runs chronicler post-build doc sync.
+- Updated `docs/slash-commands.md` to document all eight registered commands.
+- Updated `command-config-handler.test.ts` to assert the expanded command set.
+
+
 ## [0.12.0] — 2026-07-06
 
 ### Added (Batch 17 — Contract-Only Agent Refresh)

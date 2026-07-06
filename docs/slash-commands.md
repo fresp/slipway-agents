@@ -1,6 +1,6 @@
 # Slash Commands
 
-slipway-agents injects four slash commands into OpenCode at runtime through the plugin's `config` hook. These are convenience wrappers — they invoke the `slipway` orchestrator with a pre-filled intent, so you never need to remember the exact trigger phrase. No `.opencode/commands/*.md` files are required; the commands are registered automatically when the plugin loads.
+slipway-agents injects eight slash commands into OpenCode at runtime through the plugin's `config` hook. These are convenience wrappers — they invoke the `slipway` orchestrator with a pre-filled intent, so you never need to remember the exact trigger phrase. No `.opencode/commands/*.md` files are required; the commands are registered automatically when the plugin loads.
 
 ---
 
@@ -116,3 +116,47 @@ Slipway doctor
 
 N issues found (X errors, Y warnings)
 ```
+---
+
+## `/slipway:agent-refresh`
+
+**What it does:** Regenerates only `AGENT.md` from the current on-disk `.ai/docs/02-10` docs and the latest AGENT.md contract.
+
+Equivalent to typing `@slipway regenerate AGENT.md` or `@slipway update agent contract`.
+
+**When to use:** When the AGENT.md contract has changed (e.g. new Working Loop steps, new Execution Protocol sections) and an already-bootstrapped project needs to adopt the new contract without a full rebuild.
+
+**Behavior:**
+- Refuses if `.ai/docs/01-prd.md` or the `02-10` doc suite does not exist.
+- Does not re-derive the Requirement Model or regenerate any doc `02` through `10`.
+- Bumps `AGENT.md`'s own minor version only; leaves all other versions untouched.
+
+---
+
+## `/slipway:review`
+
+**What it does:** Runs a consistency review on the existing docs.
+
+Equivalent to typing `@slipway review` or `@slipway check consistency`.
+
+**When to use:** Before planning or after editing docs manually, to get Bosun's health score and findings.
+
+---
+
+## `/slipway:groom`
+
+**What it does:** Runs multi-lens grooming on existing docs and reports readiness to plan.
+
+Equivalent to typing `@slipway groom this` or `@slipway is this ready to build?`.
+
+**When to use:** Before committing to a build plan, to surface architecture, QA, DevOps, and complexity risks.
+
+---
+
+## `/slipway:sync`
+
+**What it does:** Syncs docs with implementation reality after a build.
+
+Equivalent to typing `@slipway sync docs` or `@slipway update docs after build`.
+
+**When to use:** After implementation is complete and docs may have drifted from the actual code.

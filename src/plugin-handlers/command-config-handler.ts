@@ -34,6 +34,26 @@ const SLIPWAY_COMMANDS = {
     agent: "slipway",
     template: "@slipway run doctor $ARGUMENTS",
   },
+  "slipway:agent-refresh": {
+    description: "Regenerate only AGENT.md from the current docs and latest contract.",
+    agent: "slipway",
+    template: "@slipway regenerate AGENT.md",
+  },
+  "slipway:review": {
+    description: "Run a consistency review on existing docs.",
+    agent: "slipway",
+    template: "@slipway review",
+  },
+  "slipway:groom": {
+    description: "Run multi-lens grooming on existing docs and plan readiness.",
+    agent: "slipway",
+    template: "@slipway groom this",
+  },
+  "slipway:sync": {
+    description: "Sync docs with implementation reality after a build.",
+    agent: "slipway",
+    template: "@slipway sync docs",
+  },
 } satisfies Record<string, CommandDefinition>;
 
 export async function applyCommandConfig(

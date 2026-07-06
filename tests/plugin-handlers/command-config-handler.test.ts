@@ -16,24 +16,14 @@ function makeSlipwayConfig(): NonNullable<Parameters<typeof applyCommandConfig>[
   };
 }
 
-test("injects the four slipway runtime commands into an empty config", async () => {
+test("injects the eight slipway runtime commands into an empty config", async () => {
   const input: Config = {};
 
   await applyCommandConfig(input, makeSlipwayConfig());
 
-  assert.deepEqual(Object.keys(input.command ?? {}).sort(), [
-    "slipway:doctor",
-    "slipway:init",
-    "slipway:resume",
-    "slipway:status",
-  ]);
+  assert.deepEqual(Object.keys(input.command ?? {}).sort(), ["slipway:agent-refresh", "slipway:doctor", "slipway:groom", "slipway:init", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync"]);
 
-  for (const name of [
-    "slipway:init",
-    "slipway:status",
-    "slipway:resume",
-    "slipway:doctor",
-  ] as const) {
+  for (const name of ["slipway:agent-refresh", "slipway:groom", "slipway:init", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync"] as const) {
     const command = input.command?.[name];
 
     assert.ok(command, `command ${name} should be defined`);
@@ -52,12 +42,7 @@ test("sets the resolved slipway model on each command", async () => {
 
   await applyCommandConfig(input, makeSlipwayConfig());
 
-  for (const name of [
-    "slipway:init",
-    "slipway:status",
-    "slipway:resume",
-    "slipway:doctor",
-  ] as const) {
+  for (const name of ["slipway:agent-refresh", "slipway:groom", "slipway:init", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync"] as const) {
     assert.equal(input.command?.[name]?.model, slipwayModel);
   }
 });
