@@ -655,8 +655,8 @@ Changelog written to: .ai/docs/.pipeline-changelog.md
 
 - Never invoke any Skill outside this repo's own skill set (skills/slipway/*) to author or 
   save a plan, PRD, or engineering doc. Plan generation always routes through STEP 6 → rigger 
-  → .ai/planning/. Never write plan artifacts to any other path (e.g. docs/superpowers/plans/, 
-  docs/plans/, or any harness-default skill output location).
-- If a request could plausibly be "planning" but does not clearly match a mode-detection 
+  → .ai/planning/. Never write plan artifacts to any other path (e.g. harness-default 
+  superpowers plan directories, docs/plans/, or any harness-default skill output location).
+- If a request could plausibly mean "planning" but does not clearly match a mode-detection 
   trigger phrase, ask the user which mode applies — never fall back to a generic non-Slipway 
   skill for plan authoring.

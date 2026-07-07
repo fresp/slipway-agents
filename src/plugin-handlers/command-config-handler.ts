@@ -20,7 +20,8 @@ const SLIPWAY_ORCHESTRATOR_PREAMBLE =
   "gunner, coxswain, rigger, shipwright, surveyor, chronicler, caulker. Never invoke any Skill " +
   "outside this repo's own skill set (skills/slipway/*) to author or save a plan, PRD, or " +
   "engineering doc — plan generation always routes through rigger and is always written to " +
-  ".ai/planning/, never to any other path (e.g. docs/superpowers/plans/, docs/plans/, or any " +
+  ".ai/planning/, never to any other path (e.g. docs/superpowers/" +
+  "plans/, docs/plans/, or any " +
   "other harness-default skill output location). If a request could plausibly mean 'planning' " +
   "but does not clearly match a mode-detection trigger phrase, ask the user which mode applies " +
   "— never fall back to a generic non-Slipway skill for plan authoring. Maintain all state under " +

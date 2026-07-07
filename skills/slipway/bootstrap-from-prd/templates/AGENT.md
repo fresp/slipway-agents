@@ -381,6 +381,7 @@ Never do the following:
 - invent missing requirements [universal]
 - continue into extra scope without explicit instruction [universal]
 - build abstractions that the current scope does not need [universal]
+- never regenerate or author planning documents using any skill outside this project's .ai/planning/ structure [universal] — if replanning is needed mid-build, stop and escalate to the user rather than invoking a generic planning skill
 - [project-specific forbidden — from ADRs / 03 must-never-own / Out of Scope]
 - [project-specific forbidden]
 
