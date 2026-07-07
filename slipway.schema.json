@@ -131,7 +131,24 @@
           "properties": {
             "edit": { "type": "string", "enum": ["ask", "allow", "deny"] },
             "webfetch": { "type": "string", "enum": ["ask", "allow", "deny"] },
-            "task": { "type": "string", "enum": ["ask", "allow", "deny"] },
+            "task": {
+              "anyOf": [
+                { "type": "string", "enum": ["ask", "allow", "deny"] },
+                {
+                  "type": "object",
+                  "additionalProperties": { "type": "string", "enum": ["ask", "allow", "deny"] }
+                }
+              ]
+            },
+            "skill": {
+              "anyOf": [
+                { "type": "string", "enum": ["ask", "allow", "deny"] },
+                {
+                  "type": "object",
+                  "additionalProperties": { "type": "string", "enum": ["ask", "allow", "deny"] }
+                }
+              ]
+            },
             "bash": {
               "description": "Only agents that need shell access (currently: gunner, for vulnerability scanning) should set this. Prefer the object form to scope down to specific commands rather than blanket allow.",
               "anyOf": [

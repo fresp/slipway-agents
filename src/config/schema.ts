@@ -16,7 +16,12 @@ export const permissionSchema = z
   .object({
     edit: permissionActionSchema.optional(),
     webfetch: permissionActionSchema.optional(),
-    task: permissionActionSchema.optional(),
+    task: z
+      .union([permissionActionSchema, z.record(z.string(), permissionActionSchema)])
+      .optional(),
+    skill: z
+      .union([permissionActionSchema, z.record(z.string(), permissionActionSchema)])
+      .optional(),
     bash: z
       .union([permissionActionSchema, z.record(z.string(), permissionActionSchema)])
       .optional(),
