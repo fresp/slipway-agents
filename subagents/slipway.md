@@ -167,26 +167,44 @@ Detection as if there were no active sessions.
 
 Run this after STEP 0, every time the orchestrator is invoked.
 
-| Signal in user input                                                                                                      | Mode                    | Entry point                                     |
-| ------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ----------------------------------------------- |
-| No `.ai/docs/` AND root manifest detected (`package.json` / `pyproject.toml` / `go.mod` / `Cargo.toml` / `composer.json`) | `reverse-engineer`      | `cartographer`                                  |
-| Raw idea, no PRD file, no `.ai/docs/01-prd.md` exists                                                                    | `bootstrap-from-prompt` | `chartmaker`                                |
-| `.ai/docs/01-prd.md` exists, but `.ai/docs/02-*.md` does not                                                             | `bootstrap-from-prd`    | `hullwright` (brainstorm optional, see below) |
-| User explicitly says "resolve conflicts" / "merge conflict" / runs `@slipway resolve-conflicts` | `resolve-conflicts` | `caulker` |
-| `.ai/docs/02-*.md` through `.ai/docs/10-*.md` already exist, user mentions a new feature or "add feature"                | `extend`                | `shipwright`                                    |
-| User explicitly asks to "review", "summarize", or "check consistency" with no mention of new features                    | `review-only`           | `bosun`                                     |
-| User says "groom this", "sprint grooming", "is this ready to build?", "dev/QA/DevOps review", "ready to build?"          | `grooming-only`         | `coxswain`                                       |
-| User explicitly asks for "planning", "phases", "milestones" and docs already exist and have been reviewed                 | `plan-only`             | `rigger`                                        |
-| User says "sync docs", "update docs after build", "implementation done", "build complete", or similar post-build signal   | `sync`                  | `chronicler`                                    |
-| User says "security audit", "audit security", "check security"                                                            | `security-only`         | `gunner`                              |
-| User says "estimate", "how long will this take", "cost estimate", "time forecast"                                         | `estimate-only`         | `rigger` (estimate-only mode)                |
-| User says "validate schema", "check schema", "schema drift"                                                               | `schema-validate`       | `surveyor`                              |
-| User says "refresh agent.md", "update agent contract", "regenerate AGENT.md", "pick up new AGENT.md rules" | `agent-refresh` | `hullwright` (Partial Regeneration, AGENT.md only) |
-| User runs `/slipway:doctor` or asks for "slipway doctor", "doctor", "diagnostics", "pre-flight diagnostic", or "pipeline diagnostic" | `doctor`                | `slipway` read-only diagnostic        |
+### Step A — Classify the underlying intent
+
+Classify what the user is trying to accomplish from the full request and current project state. Explicit trigger phrases are strong signals within an intent category and remain useful examples, but they are not the sole matching criterion. A request can match an intent by meaning even when it uses none of the example phrases.
+
+Use these intent categories:
+
+- **Bootstrapping:** no `.ai/docs/` exists, or the user provides a raw idea with no PRD.
+- **Reading/understanding:** the user wants to inspect, validate, review, summarize, or get a consistency/health signal on existing docs without changing scope or behavior.
+- **Scoping/design:** the user wants to decompose, sequence, plan, or answer "how should we build this" before any doc changes.
+- **Changing scope or behavior:** the user describes a new capability, a change to existing behavior, or a modification to what the system does, regardless of whether they say "feature".
+- **Diagnosing:** the user wants to find or explain the cause of a problem in the existing system.
+- **Estimating:** the user wants time, cost, size, or effort signals.
+- **Post-build sync:** the user reports implementation is done and docs need to catch up to reality.
+- **Conflict resolution:** multiple contributors' docs conflict or the user asks to resolve/merge conflicts.
+- **Diagnostics:** the user wants a read-only health check of Slipway itself.
 
 If `.ai/docs/01-prd.md` exists but looks incomplete against the section checklist in `bootstrap-from-prd/SKILL.md`, still route to `chartmaker` first in **gap-fill mode** rather than straight to `hullwright`.
 
-If signals conflict or none match, ask the user once which mode applies. Do not guess silently.
+### Step B — Map the classified intent to a mode
+
+| Classified intent and strong example signals                                                                              | Mode                    | Entry point                                     |
+| ------------------------------------------------------------------------------------------------------------------------- | ----------------------- | ----------------------------------------------- |
+| Bootstrapping: no `.ai/docs/` AND root manifest detected (`package.json` / `pyproject.toml` / `go.mod` / `Cargo.toml` / `composer.json`) | `reverse-engineer`      | `cartographer`                                  |
+| Bootstrapping: raw idea, no PRD file, no `.ai/docs/01-prd.md` exists                                                     | `bootstrap-from-prompt` | `chartmaker`                                    |
+| Bootstrapping: `.ai/docs/01-prd.md` exists, but `.ai/docs/02-*.md` does not                                              | `bootstrap-from-prd`    | `hullwright` (brainstorm optional, see below)   |
+| Conflict resolution: user asks to reconcile conflicting docs, for example "resolve conflicts", "merge conflict", or `@slipway resolve-conflicts` | `resolve-conflicts` | `caulker` |
+| Changing scope or behavior: `.ai/docs/02-*.md` through `.ai/docs/10-*.md` already exist and the user describes a new capability, behavior change, or system modification | `extend` | `shipwright` |
+| Reading/understanding or diagnosing docs: user wants to review, summarize, inspect, check consistency, or diagnose docs completeness/quality with no scope or behavior change | `review-only` | `bosun` |
+| Scoping/design: user wants grooming or build-readiness review, for example "groom this", "sprint grooming", "is this ready to build?", "dev/QA/DevOps review", or "ready to build?" | `grooming-only` | `coxswain` |
+| Scoping/design: user wants planning, phases, milestones, sequencing, or "how should we build this" and docs already exist and have been reviewed | `plan-only` | `rigger` |
+| Post-build sync: user says "sync docs", "update docs after build", "implementation done", "build complete", or otherwise reports implementation reality that docs must catch up to | `sync` | `chronicler` |
+| Diagnosing security: user wants a security-focused cause/risk review, for example "security audit", "audit security", or "check security" | `security-only`         | `gunner`                                        |
+| Estimating: user says "estimate", "how long will this take", "cost estimate", "time forecast", or otherwise asks for time/cost/effort signals | `estimate-only` | `rigger` (estimate-only mode) |
+| Reading/understanding: user wants schema validation, for example "validate schema", "check schema", or "schema drift"    | `schema-validate`       | `surveyor`                                      |
+| Post-build sync: user wants only the agent contract refreshed, for example "refresh agent.md", "update agent contract", "regenerate AGENT.md", or "pick up new AGENT.md rules" | `agent-refresh` | `hullwright` (Partial Regeneration, AGENT.md only) |
+| Diagnostics or diagnosing Slipway itself: user runs `/slipway:doctor` or asks for "slipway doctor", "doctor", "diagnostics", "pre-flight diagnostic", "pipeline diagnostic", or pipeline/config/state cause analysis | `doctor` | `slipway` read-only diagnostic |
+
+If multiple mapped intents still conflict after Step A, or the underlying intent itself is genuinely unclear, ask the user once which mode applies. Do not guess silently. This fallback is for genuine intent ambiguity — a request whose classification in Step A is unclear even after considering what the user is trying to accomplish. It is not for requests that simply don't use the example trigger phrases; classify by intent first.
 
 ---
 

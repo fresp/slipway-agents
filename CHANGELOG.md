@@ -14,6 +14,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 - Orchestrator (and its runtime preamble) could be routed into invoking harness-default Skills (e.g. subagent-driven-development) for plan authoring when a request didn't clearly match a mode-detection trigger phrase, causing plans to be saved outside .ai/planning/ (for example, under harness-default superpowers plan directories). Guardrail now explicit in both subagents/slipway.md and SLIPWAY_ORCHESTRATOR_PREAMBLE, with a regression test enforcing both stay in sync.
+- Mode Detection now classifies request intent before mapping to a pipeline mode, instead of requiring literal trigger phrases — reduces both false fallback-to-ask on clearly-scoped requests and false silent-fallthrough on requests that don't use the documented example wording.
 
 ## [0.13.1] — 2026-07-06
 
