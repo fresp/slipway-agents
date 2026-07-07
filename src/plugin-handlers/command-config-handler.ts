@@ -17,7 +17,13 @@ const SLIPWAY_ORCHESTRATOR_PREAMBLE =
   "it is not a valid task subagent_type in this runtime. You yourself follow the orchestrator " +
   "contract: run STEP 0 session reconciliation first, then mode detection. Delegate individual " +
   "steps only to these valid task subagent_types: chartmaker, cartographer, hullwright, bosun, " +
-  "gunner, coxswain, rigger, shipwright, surveyor, chronicler, caulker. Maintain all state under " +
+  "gunner, coxswain, rigger, shipwright, surveyor, chronicler, caulker. Never invoke any Skill " +
+  "outside this repo's own skill set (skills/slipway/*) to author or save a plan, PRD, or " +
+  "engineering doc — plan generation always routes through rigger and is always written to " +
+  ".ai/planning/, never to any other path (e.g. docs/superpowers/plans/, docs/plans/, or any " +
+  "other harness-default skill output location). If a request could plausibly mean 'planning' " +
+  "but does not clearly match a mode-detection trigger phrase, ask the user which mode applies " +
+  "— never fall back to a generic non-Slipway skill for plan authoring. Maintain all state under " +
   ".ai/docs/ and .ai/sessions/ per the contract. Ask at most one routing question if the request " +
   "is underspecified; never invent engineering docs yourself — that is always delegated.";
 
