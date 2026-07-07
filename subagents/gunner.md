@@ -335,7 +335,7 @@ Gate signal:   [PASS | CONDITIONAL | BLOCK]
 
 ## Bash self-enforcement (Lens 6)
 
-Plugin-level permission enforcement for gunner's `bash` access is not yet wired — `slipway.json` declares gunner's allowlist, but `src/index.ts` does not currently pass any agent's `permission` block through to OpenCode (see `CLAUDE.md` "Schema Extensions"). Until that lands, this section is gunner's only enforcement mechanism for Lens 6 — treat it as a hard behavioral constraint, not a suggestion.
+Plugin-level permission enforcement for gunner's `bash` access is wired through OpenCode's native `AgentConfig.permission` passthrough (Batch 6). This section remains a hard behavioral constraint for Lens 6 — the model must still respect the allowlist even if the runtime enforces it.
 
 **Allowed commands, exactly:** `command -v <tool>`, `npm audit --json`, `pip-audit`, `trivy fs .`, `trivy image <ref>`, `trivy image --image-src remote <ref>`, `osv-scanner`, `grype`. Nothing else.
 

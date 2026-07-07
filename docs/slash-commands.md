@@ -66,7 +66,7 @@ Equivalent to typing `@slipway resume` or `@slipway continue from where we left 
 
 Equivalent to asking `@slipway run doctor` or `@slipway run pipeline diagnostics`.
 
-**When to use:** Before a pipeline run, after a failed run, before resuming, or standalone when checking whether Slipway config, docs, state, agent files, and declarative-only settings are healthy.
+**When to use:** Before a pipeline run, after a failed run, before resuming, or standalone when checking whether Slipway config, docs, state, agent files, and runtime-wired settings are healthy.
 
 **Behavior:**
 - Does not invoke any subagent.
@@ -76,7 +76,7 @@ Equivalent to asking `@slipway run doctor` or `@slipway run pipeline diagnostics
   2. Manifest health — `.ai/docs/.manifest.md` statuses, missing listed docs, and unlisted docs on disk.
   3. Pipeline state — last completed step, optimize counter, and blocked-state detection when Critical findings remain at the configured loop limit.
   4. Agent file integrity — expected `subagents/<name>.md` files and README-referenced skill files.
-  5. Declarative-only features summary — current declarative-only notes read from `CLAUDE.md`.
+  5. Runtime-wired features summary — confirm which config features are passed through to OpenCode at runtime (per-agent `permission` blocks are wired as of Batch 6).
   6. Session reconciliation health — active vs resolved session counts, stale active sessions older than 3 days, and reconciliation history presence.
 
 **Output symbols:**
@@ -105,8 +105,8 @@ Slipway doctor
 ✓ subagents/slipway.md
 ...
 
-## 5. Declarative-only features summary
-⚠ permission is declarative-only: [source note]
+## 5. Runtime-wired features summary
+✓ permission is runtime-wired via OpenCode `AgentConfig.permission` passthrough
 ...
 
 ## 6. Session reconciliation health

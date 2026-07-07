@@ -508,11 +508,11 @@ Never produce a wall of text. End with exactly one summary line: `N issues found
 - Verify every agent listed in the active `slipway.json` has an expected file at `subagents/<name>.md`. Report missing files as `✗`.
 - Read the README Skills table and verify every referenced skill has a corresponding file under `skills/slipway/<skill>/SKILL.md`. Report missing skill files as `✗`.
 
-### 5. Declarative-only features summary
+### 5. Runtime-wired features summary
 
-- Read `CLAUDE.md` and extract the current declarative-only notes instead of hardcoding the list.
-- Report each config feature that `CLAUDE.md` still identifies as declarative-only, meaning present in config or docs but not enforced by the plugin at runtime.
-- If `CLAUDE.md` says a feature is now wired, do not report it as declarative-only.
+- Review `CHANGELOG.md` and the plugin source (`src/plugin-handlers/tool-config-handler.ts`, `src/plugin-handlers/agent-config-handler.ts`) to identify which config features are now runtime-enforced by OpenCode's native `AgentConfig.permission` passthrough.
+- Report any config feature that is still documented but not passed through to OpenCode at runtime. As of Batch 6, per-agent `permission` blocks (including `edit`, `webfetch`, `task`, `skill`, and `bash`) are wired.
+- If a feature is confirmed wired, do not report it as declarative-only.
 
 ### 6. Session reconciliation health
 

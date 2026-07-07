@@ -180,7 +180,10 @@
       "mode": "subagent",
       "description": "Auth, secrets, attack surface, and dependency/image vulnerability audit — PASS / CONDITIONAL / BLOCK gate",
       "permission": {
-        "edit": "allow",
+        "webfetch": {
+          "api.osv.dev": "allow",
+          "*": "ask"
+        },
         "webfetch": "ask",
         "task": "deny",
         "skill": {
