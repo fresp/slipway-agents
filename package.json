@@ -47,6 +47,7 @@
     "url": "https://github.com/fresp/slipway-agents/issues"
   },
   "devDependencies": {
+    "@types/node": "^26.1.0",
     "typescript": "^5.4.0"
   },
   "peerDependencies": {

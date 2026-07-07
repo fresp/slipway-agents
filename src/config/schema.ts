@@ -15,7 +15,9 @@ export const permissionActionSchema = z.enum(["ask", "allow", "deny"]);
 export const permissionSchema = z
   .object({
     edit: permissionActionSchema.optional(),
-    webfetch: permissionActionSchema.optional(),
+    webfetch: z
+      .union([permissionActionSchema, z.record(z.string(), permissionActionSchema)])
+      .optional(),
     task: z
       .union([permissionActionSchema, z.record(z.string(), permissionActionSchema)])
       .optional(),
