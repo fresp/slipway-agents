@@ -130,7 +130,15 @@
           "description": "Scoped permissions for this agent. Absence of a key means no access to that action at all — this is NOT the same as setting it to 'deny' explicitly, though both result in no access. Most agents should have no permission block at all (doc-only agents never touch bash).",
           "properties": {
             "edit": { "type": "string", "enum": ["ask", "allow", "deny"] },
-            "webfetch": { "type": "string", "enum": ["ask", "allow", "deny"] },
+            "webfetch": {
+              "anyOf": [
+                { "type": "string", "enum": ["ask", "allow", "deny"] },
+                {
+                  "type": "object",
+                  "additionalProperties": { "type": "string", "enum": ["ask", "allow", "deny"] }
+                }
+              ]
+            },
             "task": {
               "anyOf": [
                 { "type": "string", "enum": ["ask", "allow", "deny"] },
