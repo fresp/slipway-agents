@@ -22,7 +22,7 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "tsc -p tsconfig.test.json && node --test dist-test/tests/plugin-handlers/command-config-handler.test.js",
+    "test": "tsc -p tsconfig.test.json && node --test dist-test/tests/plugin-handlers/command-config-handler.test.js dist-test/tests/config/step-e0-baseline-gate.test.js",
     "prepublishOnly": "npm run build",
     "clean": "rm -rf dist dist-test"
   },
