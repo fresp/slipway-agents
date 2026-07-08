@@ -1,6 +1,6 @@
 # Slash Commands
 
-slipway-agents injects eight slash commands into OpenCode at runtime through the plugin's `config` hook. These are convenience wrappers — they invoke the `slipway` orchestrator with a pre-filled intent, so you never need to remember the exact trigger phrase. No `.opencode/commands/*.md` files are required; the commands are registered automatically when the plugin loads.
+slipway-agents injects nine slash commands into OpenCode at runtime through the plugin's `config` hook. These are convenience wrappers — they invoke the `slipway` orchestrator with a pre-filled intent, so you never need to remember the exact trigger phrase. No `.opencode/commands/*.md` files are required; the commands are registered automatically when the plugin loads.
 
 ---
 
@@ -161,3 +161,24 @@ Equivalent to typing `@slipway groom this` or `@slipway is this ready to build?`
 Equivalent to typing `@slipway sync docs` or `@slipway update docs after build`.
 
 **When to use:** After implementation is complete and docs may have drifted from the actual code.
+---
+
+## `/slipway:learnings-review`
+
+**What it does:** Reviews pending learnings entries and presents approve/reject/defer options for promotion candidates.
+
+Equivalent to typing `@slipway learnings review` or `@slipway show patterns`.
+
+**When to use:** Periodically to triage accumulated learnings, promote verified patterns to the source docs, and archive stale or rejected entries.
+
+**Inputs:**
+- `$ARGUMENTS` optional — a Pattern-Key substring (e.g. `security.auth`) or priority filter (e.g. `high`); empty means "all `status: pending` entries."
+
+**Behavior:**
+- Reads `.ai/learnings/memory.md` and filters to `status: pending` entries.
+- Groups entries by Pattern-Key, showing Recurrence-Count, First-Seen, Last-Seen, Source, and Summary per entry.
+- For each entry, asks exactly `(approve / reject / defer)`.
+- **approve** → tells the user the specific existing mechanism to use (e.g. "run `shipwright` to add this as an `11-*.md` extension" or "include in next `hullwright` partial regen of `07-engineering-standards.md`"), sets `status: promoted` in `memory.md`, and appends a row to `.ai/learnings/promoted.md` recording the entry ID, target, and timestamp.
+- **reject** → sets `status: wont_fix` in `memory.md`; the next `learnings-capture` write moves it to `archive.md`.
+- **defer** → no change.
+- Never invokes `bosun`, `gunner`, or `hullwright` — read+annotate only, on `.ai/learnings/` exclusively.

@@ -105,6 +105,27 @@ const SLIPWAY_COMMANDS = {
       `Post-implementation sync: delegate to chronicler to classify drift between .ai/docs/ ` +
       `and the current codebase, then patch docs incrementally per its contract.`,
   },
+  "slipway:learnings-review": {
+    description:
+      "Review pending learnings entries and approve/reject/defer promotion candidates.",
+    agent: "slipway",
+    template:
+      `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
+      `Learnings review mode: $ARGUMENTS\n\n` +
+      `Read .ai/learnings/memory.md. If $ARGUMENTS contains a Pattern-Key substring or priority ` +
+      `filter, apply it; otherwise show all status: pending entries. ` +
+      `Group entries by Pattern-Key. For each entry, show Recurrence-Count, First-Seen, ` +
+      `Last-Seen, Source, and Summary. Then ask exactly (approve / reject / defer) per entry. ` +
+      `On approve: do NOT write .ai/docs/ yourself — tell the user the specific existing ` +
+      `mechanism to use (e.g. "run shipwright to add this as an 11-*.md extension" or ` +
+      `"include in next hullwright partial regen of 07-engineering-standards.md"), set ` +
+      `status: promoted in memory.md, and append a row to .ai/learnings/promoted.md ` +
+      `recording the entry ID, pointed-to target, and timestamp. ` +
+      `On reject: set status: wont_fix in memory.md. ` +
+      `On defer: no change. ` +
+      `Never invoke bosun, gunner, or hullwright — this is read+annotate only, ` +
+      `on .ai/learnings/ exclusively.`
+  },
 } satisfies Record<string, CommandDefinition>;
 
 export async function applyCommandConfig(
