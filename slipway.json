@@ -184,7 +184,6 @@
           "api.osv.dev": "allow",
           "*": "ask"
         },
-        "webfetch": "ask",
         "task": "deny",
         "skill": {
           "*": "allow",

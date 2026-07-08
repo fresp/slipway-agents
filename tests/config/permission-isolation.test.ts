@@ -26,12 +26,22 @@ function loadSlipwayConfig() {
       {
         mode?: string;
         permission?: {
+          webfetch?:
+            | "ask"
+            | "allow"
+            | "deny"
+            | Record<string, "ask" | "allow" | "deny">;
           task?:
             | "ask"
             | "allow"
             | "deny"
             | Record<string, "ask" | "allow" | "deny">;
           skill?:
+            | "ask"
+            | "allow"
+            | "deny"
+            | Record<string, "ask" | "allow" | "deny">;
+          bash?:
             | "ask"
             | "allow"
             | "deny"
@@ -143,4 +153,36 @@ test("every subagent has task permission set to exactly deny", () => {
       `subagent ${name} should have permission.task set to exactly "deny"`
     );
   }
+});
+
+test("gunner webfetch permission allows OSV API and asks otherwise", () => {
+  const config = loadSlipwayConfig();
+  const gunner = config.agents.gunner;
+
+  assert.ok(gunner, "gunner agent should exist");
+  assert.ok(gunner.permission, "gunner should have a permission block");
+  assert.ok(
+    gunner.permission.webfetch,
+    "gunner should have a permission.webfetch block"
+  );
+  assert.equal(
+    typeof gunner.permission.webfetch,
+    "object",
+    "gunner permission.webfetch should be an object"
+  );
+  assert.notEqual(
+    gunner.permission.webfetch,
+    null,
+    "gunner permission.webfetch should not be null"
+  );
+
+  const webfetch = gunner.permission.webfetch as Record<string, string>;
+  assert.deepEqual(
+    webfetch,
+    {
+      "api.osv.dev": "allow",
+      "*": "ask",
+    },
+    "gunner permission.webfetch should only allow api.osv.dev and ask for all other hosts"
+  );
 });
