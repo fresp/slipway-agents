@@ -259,6 +259,30 @@ Gate signal:   [PASS | CONDITIONAL | BLOCK]
 
 If the row already exists (a prior run), update it in place — do not duplicate rows. Gunner never edits any other row in the manifest (Baseline or Extensions) — that would overwrite another agent's ownership record.
 
+### Learnings capture
+
+After the manifest row is written and before the stdout summary is produced,
+invoke the `learnings-capture` skill to log candidate learnings to
+`.ai/learnings/memory.md`.
+
+**Candidates:** every CRITICAL and SHOULD-FIX finding across all six lenses.
+NOTE-tier findings, tool-unavailable skips, and "not applicable" lenses are not
+logged — they lack the severity to warrant a learning entry.
+
+For each candidate, invoke `learnings-capture` with:
+- `Pattern-Key`: `security.<lens-topic>.<short-symptom>` where `<lens-topic>` is
+  one of `auth`, `secrets`, `attack-surface`, `data-sensitivity`, `third-party`,
+  `dependencies` (one per lens)
+- `Category`: `security`
+- `Source`: `gunner`
+- `Priority`: `critical` for CRITICAL findings, `high` for SHOULD-FIX findings
+- `Summary`: the finding description, CVE ID (if applicable), and recommendation
+
+This is best-effort and non-blocking, consistent with the `session-log` and
+chronicler Step 6.5 patterns: if `learnings-capture` fails for any item, warn
+in the stdout summary and continue. Do not re-run lenses, modify the gate
+signal, or change any finding solely for learnings logging.
+
 ### Stdout summary format
 
 ```
@@ -363,3 +387,4 @@ Plugin-level permission enforcement for gunner's `bash` access is wired through 
 - Never emit PASS if there are any Critical findings.
 - Never emit BLOCK based solely on Should-fix or Note findings.
 - Never invent security requirements not implied by the PRD or architecture — flag gaps in what is documented, not gaps relative to an imagined stricter standard.
+- Never let learnings-capture failure affect the PASS/CONDITIONAL/BLOCK gate signal.
