@@ -13,7 +13,7 @@ best-effort record for reviewer context and orchestrator STEP 0 reconciliation
 only. Do not treat its generation as a source of truth, routing input,
 validation result, pipeline state, or blocker.
 
-Session files are not listed in `.ai/docs/.manifest.md`, are not `AGENT.md`
+Session files are not listed in `.ai/docs/.manifest.md`, are not `AGENTS.md`
 inputs, are not planning inputs, and must not be consumed by Bosun or Rigger.
 
 ## When to invoke
@@ -127,7 +127,7 @@ reads and writes it.
 - Never overwrite an existing session doc — each session gets a new file,
   unique by timestamp.
 - Never list session docs in `.ai/docs/.manifest.md` or treat them as source of
-  truth docs, planning inputs, or AGENT.md inputs.
+  truth docs, planning inputs, or AGENTS.md inputs.
 - Never transition a session doc's `status` field from within this skill —
   that responsibility belongs exclusively to the orchestrator's STEP 0, per
   the Status lifecycle section above.

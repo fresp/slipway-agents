@@ -415,6 +415,62 @@ Security rules:
 - Credentials must remain encrypted.
 - Webhook signing header is `X-CLOUDWA-SIGNATURE`.
 
+# Runtime Capabilities
+
+Permitted tools:
+
+- Read files inside the repository, including source, configuration, tests, `.ai/docs/`, and `.ai/planning/`.
+- Write files only for the requested implementation slice, generated docs, tests, and `.ai/implementation-state.md`.
+- Run local NodeJS, ExpressJS, React, Vite, TailwindCSS, lint, typecheck, test, migration, and package-manager commands required by the current slice.
+- Use network access only for documented package registries, local development services, and Meta API endpoints required by explicit acceptance criteria.
+- Install packages only when the requested slice cannot be implemented with the existing stack and the dependency does not add a new service, database, queue, worker, framework, or business domain.
+
+Prohibited actions:
+
+- Do not write outside the repository or outside the current implementation scope.
+- Do not run destructive shell commands.
+- Do not push, publish, deploy, or modify shared infrastructure without explicit approval.
+- Do not read, print, commit, or log passwords, access tokens, secrets, Meta credentials, or encrypted credential values.
+- Do not modify production data directly.
+- Do not persist message bodies, media, contacts, attachments, locations, or interactive content.
+
+Escalate before doing:
+
+- Add a new third-party service dependency.
+- Modify CI/CD or deployment pipeline files.
+- Run schema migrations that drop, rename, or rewrite existing data.
+- Change package manager, framework, runtime, database, queue, worker, hosting target, or frozen service topology.
+- Change Meta-compatible request or response behavior outside `meta-api`.
+
+# Escalation Protocol
+
+Escalate immediately when:
+
+- Acceptance criteria are ambiguous and valid interpretations would produce different schemas or API contracts.
+- A verify command fails twice with the same non-flaky failure.
+- A dependency task's output is absent, malformed, or contradicts source documents.
+- Completing the task would cross a Runtime Capabilities boundary.
+
+Escalation procedure:
+
+1. Stop work.
+2. Write `Status: blocked` to `.ai/implementation-state.md` with the specific blocker description.
+3. Output a structured blocked message with the reason, last action taken, and two or three concrete resolution options.
+4. Wait for user input. Do not auto-resolve.
+
+Retry policy:
+
+- If a verify command fails, retry once automatically and log the retry.
+- If the second attempt also fails, escalate.
+- Do not retry more than once without user input.
+
+Do not escalate for:
+
+- Minor code style choices.
+- Missing documentation comments.
+- Test fixtures that need to be created.
+- Small implementation choices that preserve Meta compatibility, service ownership, and frozen architecture.
+
 # Decision Tree
 
 Use this before changing code.
@@ -531,7 +587,7 @@ When uncertain:
 
 Unless explicitly overridden:
 
-- Assume AGENT.md is the only source of execution rules.
+- Assume AGENTS.md is the only source of execution rules.
 - Do not require repeating architecture constraints.
 - Do not require repeating source-of-truth priorities.
 - Do not require repeating service ownership rules.

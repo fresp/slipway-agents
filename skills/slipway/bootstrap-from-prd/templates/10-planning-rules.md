@@ -39,7 +39,7 @@ like a future 11-security-audit.md) are appended AFTER this document, at the low
 priority, ordered by doc number. Only extension docs whose manifest status is "frozen"
 are listed — draft extension reports are not source of truth. Rationale: extensions are
 derived reports; on conflict, the source docs they were derived from must win. Apply this
-rule identically in AGENT.md's Source Of Truth section — the two lists must stay identical.
+rule identically in AGENTS.md's Source Of Truth section — the two lists must stay identical.
 Do not include docs that don't exist.
 -->
 
@@ -136,7 +136,7 @@ Do not start from observability as a primary feature.
 
 <!--
 VALIDATION RULES:
-- Source-of-truth priority order must exactly match AGENT.md Source Of Truth section
+- Source-of-truth priority order must exactly match AGENTS.md Source Of Truth section
 - Source-of-truth list must only include docs that were actually generated
 - Forbidden behaviors must not contradict any ADR in 08-architecture-decisions.md
 - Implementation order must be consistent with dependencies in 06-operational-flows.md

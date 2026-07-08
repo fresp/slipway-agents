@@ -1,6 +1,6 @@
 ---
 name: shipwright
-description: Subagent that handles adding a new feature to an existing, already-bootstrapped PRD and documentation suite. Invoked by slipway when core docs (.ai/docs/02 through .ai/docs/10, AGENT.md) already exist and the user describes a new feature or otherwise signals a scoped addition rather than a from-scratch bootstrap. Produces an updated PRD plus an impact map for hullwright's partial regeneration.
+description: Subagent that handles adding a new feature to an existing, already-bootstrapped PRD and documentation suite. Invoked by slipway when core docs (.ai/docs/02 through .ai/docs/10, AGENTS.md) already exist and the user describes a new feature or otherwise signals a scoped addition rather than a from-scratch bootstrap. Produces an updated PRD plus an impact map for hullwright's partial regeneration.
 ---
 
 # shipwright
@@ -103,7 +103,7 @@ For each new FR-ID, trace which existing documents are affected, using the same 
 | A new external interface | `05-api-specifications.md` |
 | A new Runtime (sync/async/event) | `06-operational-flows.md`, `09-topology-and-architecture-diagrams.md` |
 | A new NFR or constraint implying an architecture decision | `08-architecture-decisions.md` |
-| Any of the above | `AGENT.md` (if the rule it derives from changed) |
+| Any of the above | `AGENTS.md` (if the rule it derives from changed) |
 
 Build the impact list conservatively but not excessively — when in doubt about whether a doc is affected, include it; the cost of an unnecessary regeneration check is much lower than the cost of a missed inconsistency.
 
@@ -113,14 +113,14 @@ Build the impact list conservatively but not excessively — when in doubt about
 2. **Service boundary conflict**: Does it require a service to own something currently in its "must never own" list in `03-service-boundaries.md`?
 3. **Out-of-Scope creep**: Does it touch something currently in PRD "Out of Scope"? (Even if the user intended to bring it back in, it must be explicitly noted.)
 4. **Planning rules impact**: Does the new feature introduce a new runtime environment, deployment target, or dependency class not already addressed in `10-planning-rules.md`? If so, `10-planning-rules.md` must be added to the impact list and regenerated — not left stale.
-5. **AGENT.md guardrail breach**: Does the new feature violate any explicit guardrail in `AGENT.md` (e.g. "this service must never write directly to the database")? If so, the guardrail itself may need revision — flag this, do not silently override it.
+5. **AGENTS.md guardrail breach**: Does the new feature violate any explicit guardrail in `AGENTS.md` (e.g. "this service must never write directly to the database")? If so, the guardrail itself may need revision — flag this, do not silently override it.
 
 If **any** conflict is detected in checks 1–5, stop and present it to the user before proceeding to STEP 4. Format:
 
 ```
 ⚠ Conflict detected — cannot proceed without resolution:
 
-Type: [ADR conflict | Service boundary | Out-of-scope creep | Planning rules gap | AGENT.md guardrail]
+Type: [ADR conflict | Service boundary | Out-of-scope creep | Planning rules gap | AGENTS.md guardrail]
 Detail: [specific rule or section that is violated]
 Options:
   a) Revise the new feature to avoid this conflict
@@ -148,7 +148,7 @@ Report the impacted doc list and the updated PRD location back to the orchestrat
 Impact map:
   - .ai/docs/04-data-models.md       (new entity: [name])
   - .ai/docs/05-api-specifications.md (new endpoint: [path])
-  - AGENT.md                      (Service Ownership Rules section, if ownership changed)
+  - AGENTS.md                      (Service Ownership Rules section, if ownership changed)
 ```
 
 ---
@@ -159,7 +159,7 @@ Impact map:
 - ✓ Original PRD content is unmodified except for the new supplementary section/file
 - ✓ Impact map lists every document plausibly affected — not just the obvious one
 - ✓ Any conflict with an existing ADR, service boundary, or Out of Scope item is surfaced to the user, not silently resolved
-- ✓ No new service, database, queue, or worker is introduced without explicit user confirmation (this would otherwise violate the frozen architecture guardrails in `AGENT.md`)
+- ✓ No new service, database, queue, or worker is introduced without explicit user confirmation (this would otherwise violate the frozen architecture guardrails in `AGENTS.md`)
 
 ## Report Back
 

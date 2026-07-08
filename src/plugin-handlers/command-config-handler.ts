@@ -68,12 +68,17 @@ const SLIPWAY_COMMANDS = {
       `and run STEP 0 session reconciliation as a dry check. Report findings only — make no writes.`,
   },
   "slipway:agent-refresh": {
-    description: "Regenerate only AGENT.md from the current docs and latest contract.",
+    description: "Regenerate only AGENTS.md from the current docs and latest contract.",
     agent: "slipway",
     template:
       `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
-      `Regenerate AGENT.md only, from the current .ai/docs/ and the latest hullwright AGENT.md ` +
-      `template. Do not touch any other file. Delegate the actual generation to hullwright.`,
+      `Regenerate AGENTS.md only, from the current .ai/docs/ and the latest hullwright AGENTS.md ` +
+      `template. Delegate the actual generation to hullwright. If project-root AGENT` +
+      `.md exists and AGENTS.md does not, tell hullwright to recompile into AGENTS.md, ` +
+      `remove AGENT` +
+      `.md after the plural artifact is written, and report "Migrated: AGENT` +
+      `.md -> AGENTS.md". If AGENTS.md already exists, refresh it normally and report ` +
+      `"No migration needed." Do not touch any other file.`,
   },
   "slipway:review": {
     description: "Run a consistency review on existing docs.",

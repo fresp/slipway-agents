@@ -24,7 +24,7 @@ This skill runs as an independent parallel lens — do not read or depend on out
 
 Load only what you need for this lens:
 
-1. `AGENT.md` (Coding Rules section — env vars, stack)
+1. `AGENTS.md` (Coding Rules section — env vars, stack)
 2. `.ai/docs/01-prd.md` (NFRs and Constraints)
 3. `.ai/docs/02-technical-architecture.md`
 4. `.ai/docs/06-operational-flows.md`
@@ -55,7 +55,7 @@ If yes: is there a document describing environment differences and per-environme
 If not, flag: `environment-config.md` may be needed as an additional doc.
 
 ### 3. Secrets and Env Var Surface
-From `07-engineering-standards.md` and `AGENT.md` Coding Rules:
+From `07-engineering-standards.md` and `AGENTS.md` Coding Rules:
 list every environment variable referenced. For each, classify:
 - **Defined**: source is explicit (e.g. "injected from AWS Secrets Manager", "from CI/CD secret")
 - **Undefined**: env var is referenced but no source is stated

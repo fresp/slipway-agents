@@ -24,7 +24,7 @@ This skill runs as an independent parallel lens — do not read or depend on out
 
 Load only what you need for this lens:
 
-1. `AGENT.md`
+1. `AGENTS.md`
 2. `.ai/docs/02-technical-architecture.md`
 3. `.ai/docs/03-service-boundaries.md`
 4. `.ai/docs/05-api-specifications.md`

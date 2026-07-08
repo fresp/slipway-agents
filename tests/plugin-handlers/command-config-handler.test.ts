@@ -86,6 +86,22 @@ test("does not require a slipway config", async () => {
   );
 });
 
+test("agent-refresh targets AGENTS.md and documents legacy migration", async () => {
+  const input: Config = {};
+  const legacyArtifact = "AGENT" + ".md";
+  const currentArtifact = "AGENTS.md";
+
+  await applyCommandConfig(input, makeSlipwayConfig());
+
+  const command = input.command?.["slipway:agent-refresh"];
+  assert.ok(command, "slipway:agent-refresh should be defined");
+  assert.ok(command.description?.includes(currentArtifact));
+  assert.ok(command.template.includes(`Regenerate ${currentArtifact} only`));
+  assert.ok(command.template.includes(`latest hullwright ${currentArtifact} template`));
+  assert.ok(command.template.includes(`Migrated: ${legacyArtifact} -> ${currentArtifact}`));
+  assert.ok(command.template.includes("No migration needed."));
+});
+
 test("keeps slash command templates and plan-authoring guardrails Slipway-local", async () => {
   const input: Config = {};
 
@@ -134,7 +150,7 @@ test("keeps slash command templates and plan-authoring guardrails Slipway-local"
   for (const filePath of [
     "subagents/slipway.md",
     "src/plugin-handlers/command-config-handler.ts",
-    "skills/slipway/bootstrap-from-prd/templates/AGENT.md",
+    "skills/slipway/bootstrap-from-prd/templates/AGENTS.md",
   ]) {
     assert.equal(
       readFileSync(filePath, "utf8").includes("docs/superpowers/plans"),

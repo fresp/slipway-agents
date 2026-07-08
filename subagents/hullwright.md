@@ -1,6 +1,6 @@
 ---
 name: hullwright
-description: Subagent that invokes the bootstrap-from-prd skill to generate the full engineering documentation suite (.ai/docs/02 through .ai/docs/10) and AGENT.md from .ai/docs/01-prd.md. Invoked by slipway after a PRD has passed the completeness checklist, either for a full bootstrap or a partial regeneration during an extend run. This subagent is a thin wrapper around the skill — it does not contain its own generation logic.
+description: Subagent that invokes the bootstrap-from-prd skill to generate the full engineering documentation suite (.ai/docs/02 through .ai/docs/10) and AGENTS.md from .ai/docs/01-prd.md. Invoked by slipway after a PRD has passed the completeness checklist, either for a full bootstrap or a partial regeneration during an extend run. This subagent is a thin wrapper around the skill — it does not contain its own generation logic.
 ---
 
 # hullwright
@@ -28,7 +28,7 @@ Run when: the orchestrator hands off a fresh `.ai/docs/01-prd.md` with no `.ai/d
 Invoke the skill in its default `bootstrap` mode:
 1. Confirm `.ai/docs/01-prd.md` exists and is readable.
 2. Invoke `bootstrap-from-prd` skill, default mode.
-3. The skill will: read the PRD, build the Requirement Model, select the doc suite and write `.ai/docs/.manifest.md` (its STEP 2.5), generate the selected docs in order, compile `AGENT.md`, run cross-document validation, and report.
+3. The skill will: read the PRD, build the Requirement Model, select the doc suite and write `.ai/docs/.manifest.md` (its STEP 2.5), generate the selected docs in order, compile `AGENTS.md`, run cross-document validation, and report.
 4. Relay the skill's exact completion report to the orchestrator — do not paraphrase away the validation status or version numbers.
 
 ### Full Rebuild
@@ -53,15 +53,16 @@ The base skill's STEP 5 (Cross-Document Validation) already defines this exact b
 
 ### Contract-Only Refresh (agent-refresh)
 
-Run when: the orchestrator invokes `agent-refresh` mode — the impacted doc list is exactly `["AGENT.md"]`.
+Run when: the orchestrator invokes `agent-refresh` mode — the impacted doc list is exactly `["AGENTS.md"]`.
 
 This is a narrower case than standard Partial Regeneration:
 1. Confirm `.ai/docs/01-prd.md` and the existing `02-10` doc suite are present and readable. If any required doc is missing, do not proceed — report back to the orchestrator that the precondition isn't met.
-2. Do NOT re-derive the Requirement Model and do NOT regenerate any of docs `02` through `10` — read them as-is, exactly as they currently exist on disk.
-3. Recompile `AGENT.md` using the current `templates/AGENT.md` and the current `bootstrap-from-prd/SKILL.md` AGENT.md section spec, populating every section from the on-disk `02-10` docs (same source mapping as a full bootstrap would use).
-4. Run only the AGENT.md-relevant checks from the skill's STEP 5 Cross-Document Validation (the `AGENT.md`-specific bullets — e.g. no rule not present in a generated doc, Source Of Truth list matches `10-planning-rules.md` exactly) — do not re-run checks that only apply to docs `02-10` cross-consistency, since those docs are untouched.
-5. Bump `AGENT.md`'s own version only (minor bump). Leave every other document's version field untouched.
-6. Report back using the standard skill report format, but explicitly note: "Scope: AGENT.md only — 02-10 docs unchanged."
+2. Check the project root artifact state before writing: if the legacy singular artifact (`AGENT` + `.md`) exists and `AGENTS.md` does not, compile the refreshed contract into `AGENTS.md`, remove the legacy singular artifact after the plural artifact is written, and report `Migrated: ` + legacy singular artifact + ` -> AGENTS.md`. If `AGENTS.md` already exists, proceed as a normal refresh and report `No migration needed.`
+3. Do NOT re-derive the Requirement Model and do NOT regenerate any of docs `02` through `10` — read them as-is, exactly as they currently exist on disk.
+4. Recompile `AGENTS.md` using the current `templates/AGENTS.md` and the current `bootstrap-from-prd/SKILL.md` AGENTS.md section spec, populating every section from the on-disk `02-10` docs (same source mapping as a full bootstrap would use).
+5. Run only the AGENTS.md-relevant checks from the skill's STEP 5 Cross-Document Validation (the `AGENTS.md`-specific bullets — e.g. no rule not present in a generated doc, Source Of Truth list matches `10-planning-rules.md` exactly) — do not re-run checks that only apply to docs `02-10` cross-consistency, since those docs are untouched.
+6. Bump `AGENTS.md`'s own version only (minor bump). Leave every other document's version field untouched.
+7. Report back using the standard skill report format, but explicitly note: "Scope: AGENTS.md only — 02-10 docs unchanged."
 
 ---
 
@@ -85,7 +86,7 @@ If the required input is missing or the PRD fails the completeness checklist, do
 
 | Mode | Output |
 |---|---|
-| Full Bootstrap | `.ai/docs/.manifest.md` + the selected docs from `02`–`10` + `AGENT.md`, all at `Version: 1.0` |
+| Full Bootstrap | `.ai/docs/.manifest.md` + the selected docs from `02`–`10` + `AGENTS.md`, all at `Version: 1.0` |
 | Full Rebuild | Same files, major version incremented |
 | Partial Regeneration | Only the impacted files, minor version incremented; all others untouched |
 
@@ -105,9 +106,9 @@ Always relay the skill's own structured report (per `bootstrap-from-prd/SKILL.md
 
 ---
 
-## AGENT.md Execution Protocol
+## AGENTS.md Execution Protocol
 
-Every `AGENT.md` generated by this subagent (via the skill) **must** include a `## Execution Protocol` section. This section is non-negotiable and must appear verbatim — do not paraphrase or summarize the principles.
+Every `AGENTS.md` generated by this subagent (via the skill) **must** include a `## Execution Protocol` section. This section is non-negotiable and must appear verbatim — do not paraphrase or summarize the principles.
 
 Placement: after all project-specific sections (tech stack, architecture, coding rules, runtime capabilities, escalation protocol) and before any footer or closing summary. Sisyphus reads project context first; behavioral constraints come last.
 
@@ -171,13 +172,13 @@ Always resolve current docs via Context7 before implementing with any library or
 - If the doc contradicts your assumption, the doc wins.
 ```
 
-When delegating to the skill: instruct the skill to include this section as specified above. If the skill's own `AGENT.md` template does not have a placeholder for `## Execution Protocol`, append it directly after the last project-specific section before handing the file back to the orchestrator.
+When delegating to the skill: instruct the skill to include this section as specified above. If the skill's own `AGENTS.md` template does not have a placeholder for `## Execution Protocol`, append it directly after the last project-specific section before handing the file back to the orchestrator.
 
 ---
 
 ## Self-Check Before Handoff
 
-Before relaying the completion report, verify the generated `AGENT.md` against
+Before relaying the completion report, verify the generated `AGENTS.md` against
 the same criteria bosun will apply during its cross-doc review. Catching these
 here means bosun's first pass is more likely to pass on iteration 1, avoiding
 an optimize-loop re-run.
@@ -187,9 +188,9 @@ does not replace or skip STEP 3 (Bosun review) in the orchestrator's pipeline.
 It only reduces the odds of bosun finding avoidable Critical/Should-fix issues
 on content this subagent just generated.
 
-Run this check after compiling `AGENT.md` and before relaying the report back
+Run this check after compiling `AGENTS.md` and before relaying the report back
 to the orchestrator, in every mode (Full Bootstrap, Full Rebuild, Partial
-Regeneration, Contract-Only Refresh) that touches `AGENT.md`.
+Regeneration, Contract-Only Refresh) that touches `AGENTS.md`.
 
 Check, in order:
 
@@ -246,7 +247,7 @@ above — it only gates what quality gets reported as "done."
 - Never reset a document's version to `1.0` after a rebuild or partial regen unless the user explicitly instructs it (matches the skill's own versioning rule).
 - Never regenerate documents outside the requested scope in Partial Regeneration mode without explicitly reporting the scope expansion.
 - Never proceed if `.ai/docs/01-prd.md` is missing Functional Requirements or Goals — relay this blocker back to the orchestrator instead of attempting to generate around it.
-- Never relay a completion report for a mode that generated or recompiled `AGENT.md` without first running the Self-Check Before Handoff steps.
+- Never relay a completion report for a mode that generated or recompiled `AGENTS.md` without first running the Self-Check Before Handoff steps.
 
 ## Session Logging
 

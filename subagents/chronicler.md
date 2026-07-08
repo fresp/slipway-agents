@@ -82,7 +82,7 @@ For each doc in scope, identify claims that can be verified against the implemen
 - Service boundaries → check against actual service structure
 - Environment variables / secrets → check against actual config or `.env.example`
 - Operational flows → check against actual controller / handler logic
-- AGENT.md instructions → check whether Sisyphus followed them or adapted them
+- AGENTS.md instructions → check whether Sisyphus followed them or adapted them
 
 ### Step 3 — Diff and classify
 

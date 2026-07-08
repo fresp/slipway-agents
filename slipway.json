@@ -71,7 +71,7 @@
       "fallback_model": "anthropic/claude-haiku-4-5",
       "category": "standard",
       "mode": "subagent",
-      "description": "Invokes bootstrap-from-prd skill → .ai/docs/02–10 + AGENT.md",
+      "description": "Invokes bootstrap-from-prd skill → .ai/docs/02–10 + AGENTS.md",
       "permission": {
         "task": "deny",
         "skill": {
@@ -210,7 +210,7 @@
       "fallback_model": "anthropic/claude-sonnet-5",
       "category": "deep",
       "mode": "subagent",
-      "description": "Post-merge semantic conflict resolution across .ai/docs/ and AGENT.md — never silently resolves true contradictions",
+      "description": "Post-merge semantic conflict resolution across .ai/docs/ and AGENTS.md — never silently resolves true contradictions",
       "permission": {
         "task": "deny",
         "skill": {

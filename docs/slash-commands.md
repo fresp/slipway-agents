@@ -120,16 +120,17 @@ N issues found (X errors, Y warnings)
 
 ## `/slipway:agent-refresh`
 
-**What it does:** Regenerates only `AGENT.md` from the current on-disk `.ai/docs/02-10` docs and the latest AGENT.md contract.
+**What it does:** Regenerates only `AGENTS.md` from the current on-disk `.ai/docs/02-10` docs and the latest AGENTS.md contract.
 
-Equivalent to typing `@slipway regenerate AGENT.md` or `@slipway update agent contract`.
+Equivalent to typing `@slipway regenerate AGENTS.md` or `@slipway update agent contract`.
 
-**When to use:** When the AGENT.md contract has changed (e.g. new Working Loop steps, new Execution Protocol sections) and an already-bootstrapped project needs to adopt the new contract without a full rebuild.
+**When to use:** When the AGENTS.md contract has changed (e.g. new Working Loop steps, new Execution Protocol sections) and an already-bootstrapped project needs to adopt the new contract without a full rebuild.
 
 **Behavior:**
 - Refuses if `.ai/docs/01-prd.md` or the `02-10` doc suite does not exist.
 - Does not re-derive the Requirement Model or regenerate any doc `02` through `10`.
-- Bumps `AGENT.md`'s own minor version only; leaves all other versions untouched.
+- Migrates projects that still have only the legacy singular agent contract by writing `AGENTS.md`, removing the legacy file, and reporting the migration; if `AGENTS.md` already exists, reports `No migration needed.`
+- Bumps `AGENTS.md`'s own minor version only; leaves all other versions untouched.
 
 ---
 

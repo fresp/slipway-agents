@@ -7,7 +7,7 @@ description: Chartmaker. Structured Q&A from raw input → complete .ai/docs/01-
 
 Converts unstructured input — a raw idea, a half-written PRD, a Notion export, a one-line prompt — into a complete `.ai/docs/01-prd.md` that satisfies the section checklist required by the `bootstrap-from-prd` skill.
 
-This subagent's only deliverable is the PRD. It never writes `.ai/docs/02` onward and never touches `AGENT.md`.
+This subagent's only deliverable is the PRD. It never writes `.ai/docs/02` onward and never touches `AGENTS.md`.
 
 ---
 

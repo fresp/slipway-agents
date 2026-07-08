@@ -2,7 +2,7 @@
 
 Used by: `caulker`
 
-Purpose: Define, per document type, what counts as a "unit" for structural comparison, and the exact rules for classifying a divergence between two versions of that unit. This skill exists because `.ai/docs/*.md` and `AGENT.md` are structured documents wearing markdown as a serialization format — a git line-diff cannot see their structure, so this skill defines it explicitly.
+Purpose: Define, per document type, what counts as a "unit" for structural comparison, and the exact rules for classifying a divergence between two versions of that unit. This skill exists because `.ai/docs/*.md` and `AGENTS.md` are structured documents wearing markdown as a serialization format — a git line-diff cannot see their structure, so this skill defines it explicitly.
 
 ---
 
@@ -66,7 +66,7 @@ Unit: one collection/table schema block, and within it, one field definition.
 
 ---
 
-## `AGENT.md`
+## `AGENTS.md`
 
 Unit: one named top-level section, per the standard section list (Mission, Source Of Truth, Operating Principles, Context Loading Strategy, Working Loop, Architecture Guardrails, Service Ownership Rules, Development Strategy, Planning Rules, Coding Rules, Runtime Capabilities, Escalation Protocol).
 

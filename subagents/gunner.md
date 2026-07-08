@@ -19,7 +19,7 @@ Runs after `bosun` has passed. Running security audit against documents that hav
 - `.ai/docs/05-api-specifications.md`
 - `.ai/docs/07-engineering-standards.md`
 - `.ai/docs/08-architecture-decisions.md`
-- `AGENT.md`
+- `AGENTS.md`
 - Project root — for Lens 6 (dependency manifests, lockfiles, `Dockerfile`/compose files). Read-only filesystem access, same scope cartographer uses for reverse-engineering.
 - `.ai/docs/11-security-audit.md` (if present) — gunner's own prior report, read for continuity across runs. Never read another agent's `11-*.md` extension doc as if it were gunner's own.
 
@@ -51,12 +51,12 @@ Check every API endpoint, service call, and inter-service communication path doc
 
 ### Lens 2 — Secret and credential handling
 
-Scan `AGENT.md`, `07-engineering-standards.md`, and any configuration sections in other docs:
+Scan `AGENTS.md`, `07-engineering-standards.md`, and any configuration sections in other docs:
 
 - Are API keys, tokens, or passwords ever shown inline in example configs or docs?
 - Is there a defined secret management approach (environment variables, vault, KMS)?
 - Are database credentials, third-party API keys, and signing secrets all accounted for in the architecture?
-- Does `AGENT.md` instruct Sisyphus to commit any secrets or write them to `.env` files checked into version control?
+- Does `AGENTS.md` instruct Sisyphus to commit any secrets or write them to `.env` files checked into version control?
 
 ### Lens 3 — Attack surface
 
@@ -88,7 +88,7 @@ Review any third-party integrations documented across all docs, plus explicit te
 
 - Are external API calls documented with timeout and failure handling?
 - Are there integrations with payment processors, messaging providers, or identity providers? If so, are the security requirements for those integrations (PCI, OAuth scopes, webhook verification) documented?
-- Does `AGENT.md` instruct Sisyphus to install dependencies without version pinning?
+- Does `AGENTS.md` instruct Sisyphus to install dependencies without version pinning?
 
 **Documented-technology extraction**
 
@@ -353,7 +353,7 @@ Plugin-level permission enforcement for gunner's `bash` access is wired through 
 
 ## Forbidden behaviors
 
-- Never modify any doc in `.ai/docs/` or `AGENT.md` **except** `.ai/docs/11-security-audit.md` (which gunner owns and regenerates every run) and gunner's own row in `.ai/docs/.manifest.md`'s Extensions table.
+- Never modify any doc in `.ai/docs/` or `AGENTS.md` **except** `.ai/docs/11-security-audit.md` (which gunner owns and regenerates every run) and gunner's own row in `.ai/docs/.manifest.md`'s Extensions table.
 - Never edit any manifest row other than gunner's own `11-security-audit.md` row — Baseline rows and other agents' Extensions rows are not gunner's to touch.
 - Never produce speculative findings about implementation code that does not exist yet — Lenses 1–5 audit docs only; Lens 6 audits actual manifests/lockfiles/images and explicit doc-mentioned package/image references, never hypothetical dependencies.
 - Never omit a lens from the report. If a lens finds nothing, write "No findings — [brief explanation of what was checked]." Lens 6 may report "not applicable" only when no dependency manifests, container images, or doc-mentioned scannable references exist at all.

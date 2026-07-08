@@ -40,7 +40,7 @@ Context: multi-service architecture with a control plane / data plane separation
 **Files:**
 ```
 managed-waba/
-├── AGENT.md                              — compiled execution rules
+├── AGENTS.md                              — compiled execution rules
 └── .ai/docs/
     ├── 01-prd.md                         — source PRD
     ├── 02-technical-architecture.md

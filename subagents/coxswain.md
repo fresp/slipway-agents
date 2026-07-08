@@ -14,7 +14,7 @@ The orchestrator never sees four separate reports. It always sees one.
 ## Inputs required
 
 - `.ai/docs/01-prd.md` through `.ai/docs/10-planning-rules.md` (and any `11-*.md` docs)
-- `AGENT.md`
+- `AGENTS.md`
 - Bosun's findings list from the current pipeline run (so coxswain knows which issues are already identified vs. newly surfaced)
 
 ---
@@ -38,7 +38,7 @@ Check:
 - Are there architectural decisions in `08` that create implementation complexity that downstream docs do not account for?
 - Does `10-planning-rules.md` contain constraints that contradict common implementation patterns for the stated stack?
 - Are there features in the PRD that have no clear home in the service boundary or data model docs?
-- Does `AGENT.md` contain instructions that are ambiguous or contradictory?
+- Does `AGENTS.md` contain instructions that are ambiguous or contradictory?
 - Are there dependencies on external systems (third-party APIs, external services) that have no fallback or error handling specified?
 
 Lens A readiness signal: **Ready** / **Conditional** / **Blocked**
@@ -56,7 +56,7 @@ Check:
 - Are there data model fields that could cause edge case failures if not validated? (e.g. nullable fields used in business logic, unbounded string fields used in comparisons)
 - Does `05-api-specifications.md` specify error response shapes, or only success responses?
 - Are there integration points between services where test boundaries are unclear?
-- Does `AGENT.md` specify any testing approach or does it leave it entirely to Sisyphus's judgment?
+- Does `AGENTS.md` specify any testing approach or does it leave it entirely to Sisyphus's judgment?
 - Are there user flows in the PRD that have no corresponding operational flow in `06`?
 
 Lens B readiness signal: **Ready** / **Conditional** / **Blocked**

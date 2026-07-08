@@ -41,7 +41,7 @@ If `.ai/planning/` does not exist, proceed directly to planning.
 ## Inputs required
 
 - All active docs per `.ai/docs/.manifest.md` (Baseline + Extensions, excluding `omitted`). Fallback when no manifest exists: `.ai/docs/01-prd.md` through `.ai/docs/10-planning-rules.md` plus any `11-*.md` docs
-- `AGENT.md`
+- `AGENTS.md`
 - Bosun's final findings list (so tasks can carry forward accepted Should-fix caveats)
 - Coxswain's caveats list (Conditional findings to embed as acceptance criteria in relevant tasks)
 - `.ai/docs/11-security-audit.md` (if present, per manifest Extensions) — gunner's CONDITIONAL/Should-fix findings feed the same acceptance-criteria-embedding mechanism as coxswain's caveats (see "Coxswain and gunner caveats carried forward" below)
@@ -232,7 +232,7 @@ Guidelines:
 - Always include the doc that defines the entity or service this task builds.
 - Always include `10-planning-rules.md` if the task involves any architectural decision.
 - Include `08-architecture-decisions.md` if the task touches an area where an ADR exists.
-- Include `AGENT.md` for every task (Sisyphus's implementation contract).
+- Include `AGENTS.md` for every task (Sisyphus's implementation contract).
 - Do not include docs that have no bearing on this task (e.g. do not include `09-topology-diagrams.md` for a pure business logic task with no infrastructure changes).
 
 ---

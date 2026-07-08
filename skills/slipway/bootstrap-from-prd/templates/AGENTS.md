@@ -321,6 +321,67 @@ Security rules:
 - [Encryption requirement — from 07 Security Rules]
 - [Signing rule if applicable — from 07 Security Rules]
 
+# Runtime Capabilities
+
+<!--
+GENERATION RULE: Derive every item from 07-engineering-standards.md, 09-topology-and-architecture-diagrams.md, and 10-planning-rules.md.
+If a capability is not addressed in those docs, choose the restrictive option and mark it as an assumption.
+Do not authorize tools, commands, network access, package installation, deployment, or secret access not supported by the docs.
+-->
+
+Permitted tools:
+
+- Read files inside [allowed source, config, docs, and test paths].
+- Write files only inside [allowed implementation, docs, tests, and generated artifact paths].
+- Run [test commands from 07], [lint/typecheck commands from 07], and [migration or package-manager commands explicitly permitted by 07/10].
+- Use network access only for [documented package registries, local services, or deployment targets].
+- Install packages only when [10-planning-rules.md approval condition].
+
+Prohibited actions:
+
+- Do not write outside [allowed write scope].
+- Do not run destructive shell commands.
+- Do not push, publish, deploy, or modify shared infrastructure without explicit approval.
+- Do not read, print, commit, or log secrets.
+- Do not modify production data directly.
+
+Escalate before doing:
+
+- Add a new third-party service dependency.
+- Modify CI/CD or deployment pipeline files.
+- Run schema migrations that drop, rename, or rewrite existing data.
+- Change package manager, framework, runtime, database, queue, worker, or hosting target.
+- Cross any service ownership boundary in this file.
+
+# Escalation Protocol
+
+Escalate immediately when:
+
+- Acceptance criteria are ambiguous and valid interpretations would produce different schemas or API contracts.
+- A verify command fails twice with the same non-flaky failure.
+- A dependency task's output is absent, malformed, or contradicts source documents.
+- Completing the task would cross a Runtime Capabilities boundary.
+
+Escalation procedure:
+
+1. Stop work.
+2. Write `Status: blocked` to `.ai/implementation-state.md` with the specific blocker description.
+3. Output a structured blocked message with the reason, last action taken, and two or three concrete resolution options.
+4. Wait for user input. Do not auto-resolve.
+
+Retry policy:
+
+- If a verify command fails, retry once automatically and log the retry.
+- If the second attempt also fails, escalate.
+- Do not retry more than once without user input.
+
+Do not escalate for:
+
+- Minor code style choices.
+- Missing documentation comments.
+- Test fixtures that need to be created.
+- Small implementation choices that preserve source-of-truth constraints.
+
 # Decision Tree
 
 Use this before changing code.
@@ -458,7 +519,7 @@ GENERATION RULE:
 
 Unless explicitly overridden:
 
-- Assume AGENT.md is the only source of execution rules.
+- Assume AGENTS.md is the only source of execution rules.
 - Do not require repeating architecture constraints.
 - Do not require repeating source-of-truth priorities.
 - Do not require repeating service ownership rules.

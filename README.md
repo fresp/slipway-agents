@@ -21,7 +21,7 @@ Restart OpenCode. See the [installation guide](docs/guide/installation.md) for d
 | Input | `slipway` | Reconciles sessions, detects intent, and routes the next pipeline step. |
 | Reverse-engineer | `cartographer` | Existing codebase in → inferred docs `02`–`10` + gap-fill briefing out. |
 | PRD | `chartmaker` | Raw idea or partial PRD in → complete `01-prd.md` out. |
-| Docs | `hullwright` | Validated PRD in → docs `02`–`10` + target-project `AGENT.md` out. |
+| Docs | `hullwright` | Validated PRD in → docs `02`–`10` + target-project `AGENTS.md` out. |
 | Review | `bosun` | Cross-doc consistency check → health score + severity-ranked findings. |
 | Grooming | `coxswain` | Planning or pre-build checkpoint → Lead Dev, QA, DevOps, and complexity synthesis. |
 | Security | `gunner` | Auth, secrets, attack surface, and dependency audit → PASS / CONDITIONAL / BLOCK. |
@@ -43,8 +43,8 @@ For full behavior, see [`CHANGELOG.md`](CHANGELOG.md) and the relevant files in 
 | `slipway` | Any `@slipway` intent → routed pipeline step with state and gate enforcement. | `claude-opus-4-8` |
 | `chartmaker` | Raw idea or partial PRD → complete `.ai/docs/01-prd.md`. | `claude-sonnet-5` |
 | `cartographer` | Existing codebase with missing docs → inferred `.ai/docs/` suite with confidence markers. | `claude-sonnet-5` |
-| `hullwright` | Validated PRD → full engineering doc suite `02`–`10` + `AGENT.md`. | `claude-sonnet-5` |
-| `bosun` | Generated docs and `AGENT.md` → health score + severity-ranked findings. | `claude-opus-4-8` |
+| `hullwright` | Validated PRD → full engineering doc suite `02`–`10` + `AGENTS.md`. | `claude-sonnet-5` |
+| `bosun` | Generated docs and `AGENTS.md` → health score + severity-ranked findings. | `claude-opus-4-8` |
 | `gunner` | Reviewed docs → `.ai/docs/11-security-audit.md` + security gate signal. | `claude-opus-4-8` |
 | `coxswain` | Planning/build readiness checkpoint → grooming synthesis across four lenses. | `claude-sonnet-5` |
 | `rigger` | Security-cleared docs → phased plan, dependency graph, and time/cost estimate. | `claude-sonnet-5` |
@@ -61,7 +61,7 @@ Model assignments live in [`slipway.json`](slipway.json). See [Overriding models
 
 | Skill | Used by | What it does |
 |---|---|---|
-| `bootstrap-from-prd` | `hullwright` | PRD → docs `02`–`10` + `AGENT.md`. |
+| `bootstrap-from-prd` | `hullwright` | PRD → docs `02`–`10` + `AGENTS.md`. |
 | `groomer-lead-dev` | `coxswain` | Architecture, implementation risk, and tech-debt lens. |
 | `groomer-qa` | `coxswain` | Testability, edge cases, and acceptance-criteria lens. |
 | `groomer-devops` | `coxswain` | Infrastructure, deployment, and observability lens. |
@@ -73,7 +73,7 @@ Model assignments live in [`slipway.json`](slipway.json). See [Overriding models
 
 ## What gets generated
 
-A full run writes the implementation context under `.ai/`, then leaves the target-project `AGENT.md` for coding agents.
+A full run writes the implementation context under `.ai/`, then leaves the target-project `AGENTS.md` for coding agents.
 
 ```
 .ai/
@@ -98,7 +98,7 @@ A full run writes the implementation context under `.ai/`, then leaves the targe
 │   └── future-scope.md
 ├── sessions/
 │   └── {branch-slug}-{topic-slug}-{timestamp}.md
-└── AGENT.md
+└── AGENTS.md
 ```
 
 `docs/` holds the PRD, architecture, audit, state, and changelog artifacts. `planning/` holds the phased implementation plan and deferred scope when needed. `sessions/` holds best-effort notes that STEP 0 can reconcile across branches.

@@ -1,6 +1,6 @@
 ---
 name: slipway
-description: Primary orchestrator agent for the PRD-to-implementation pipeline. Invoke this agent whenever the user wants to go from a raw idea or PRD all the way to engineering documentation, AGENT.md, and a phased implementation plan — or wants to extend that documentation when a new feature shows up, run a security audit, get a time and cost estimate, or sync docs after implementation. This agent does not write engineering docs itself; it routes work to specialized subagents in subagents/ and enforces step order, handoff contracts, and loop limits between them.
+description: Primary orchestrator agent for the PRD-to-implementation pipeline. Invoke this agent whenever the user wants to go from a raw idea or PRD all the way to engineering documentation, AGENTS.md, and a phased implementation plan — or wants to extend that documentation when a new feature shows up, run a security audit, get a time and cost estimate, or sync docs after implementation. This agent does not write engineering docs itself; it routes work to specialized subagents in subagents/ and enforces step order, handoff contracts, and loop limits between them.
 ---
 
 # slipway
@@ -17,7 +17,7 @@ This agent never generates engineering content directly. It decides **which suba
 | ----------------- | ---------------------------------- | ------------------------------------------------------------------------------------------- |
 | Chartmaker        | `subagents/chartmaker.md`          | Raw prompt / partial PRD → complete `.ai/docs/01-prd.md`                                    |
 | Cartographer      | `subagents/cartographer.md`        | Reverse-engineers existing codebase → `.ai/docs/02`–`10` with confidence markers            |
-| Hull Builder      | `subagents/hullwright.md`        | Invokes the `bootstrap-from-prd` skill → `.ai/docs/02`–`10` + `AGENT.md`                   |
+| Hull Builder      | `subagents/hullwright.md`        | Invokes the `bootstrap-from-prd` skill → `.ai/docs/02`–`10` + `AGENTS.md`                   |
 | Bosun         | `subagents/bosun.md`           | Cross-doc validation + per-doc health score breakdown + severity-ranked findings            |
 | Gunner  | `subagents/gunner.md`    | Auth, secrets, and attack surface audit — PASS / CONDITIONAL / BLOCK gate                   |
 | Coxswain           | `subagents/coxswain.md`             | Multi-lens sprint grooming (Lead Dev, QA, DevOps, Complexity Audit) + cross-lens synthesis  |
@@ -25,7 +25,7 @@ This agent never generates engineering content directly. It decides **which suba
 | Shipwright        | `subagents/shipwright.md`          | Update existing docs when a new feature is introduced                                       |
 | Chronicler        | `subagents/chronicler.md`          | Post-implementation doc sync — classify drift, patch incrementally                         |
 | Surveyor  | `subagents/surveyor.md`    | Post-implementation DB schema vs `04-data-models.md` consistency check                     |
-| Caulker | `subagents/caulker.md` | Post-merge semantic conflict resolution across `.ai/docs/` and `AGENT.md` |
+| Caulker | `subagents/caulker.md` | Post-merge semantic conflict resolution across `.ai/docs/` and `AGENTS.md` |
 
 Hull Builder is the only subagent that invokes the `bootstrap-from-prd` skill directly. Every other subagent reads and writes plain markdown files and hands off through the filesystem, never through shared memory.
 
@@ -108,7 +108,7 @@ than the current git branch, OR more than one active session from different
 branches than each other, call `caulker` in headless mode (per
 subagents/caulker.md's Headless invocation mode section), passing all active
 session doc paths as additional context alongside the standard `.ai/docs/*.md`
-and `AGENT.md` input.
+and `AGENTS.md` input.
 
 If there is exactly one active session and it belongs to the current branch,
 skip the caulker call — a single contributor's own active session on their
@@ -201,7 +201,7 @@ If `.ai/docs/01-prd.md` exists but looks incomplete against the section checklis
 | Diagnosing security: user wants a security-focused cause/risk review, for example "security audit", "audit security", or "check security" | `security-only`         | `gunner`                                        |
 | Estimating: user says "estimate", "how long will this take", "cost estimate", "time forecast", or otherwise asks for time/cost/effort signals | `estimate-only` | `rigger` (estimate-only mode) |
 | Reading/understanding: user wants schema validation, for example "validate schema", "check schema", or "schema drift"    | `schema-validate`       | `surveyor`                                      |
-| Post-build sync: user wants only the agent contract refreshed, for example "refresh agent.md", "update agent contract", "regenerate AGENT.md", or "pick up new AGENT.md rules" | `agent-refresh` | `hullwright` (Partial Regeneration, AGENT.md only) |
+| Post-build sync: user wants only the agent contract refreshed, for example "refresh agent.md", "update agent contract", "regenerate AGENTS.md", or "pick up new AGENTS.md rules" | `agent-refresh` | `hullwright` (Partial Regeneration, AGENTS.md only) |
 | Diagnostics or diagnosing Slipway itself: user runs `/slipway:doctor` or asks for "slipway doctor", "doctor", "diagnostics", "pre-flight diagnostic", "pipeline diagnostic", or pipeline/config/state cause analysis | `doctor` | `slipway` read-only diagnostic |
 
 If multiple mapped intents still conflict after Step A, or the underlying intent itself is genuinely unclear, ask the user once which mode applies. Do not guess silently. This fallback is for genuine intent ambiguity — a request whose classification in Step A is unclear even after considering what the user is trying to accomplish. It is not for requests that simply don't use the example trigger phrases; classify by intent first.
@@ -225,7 +225,7 @@ Call `chartmaker`.
 
 ---
 
-### STEP 2 — Build Docs + AGENT.md
+### STEP 2 — Build Docs + AGENTS.md
 
 Call `hullwright`.
 
@@ -234,7 +234,7 @@ Call `hullwright`.
 
 **Output expected back:**
 - `.ai/docs/02-technical-architecture.md` through `.ai/docs/10-planning-rules.md`
-- `AGENT.md`
+- `AGENTS.md`
 - The skill's own internal validation report (from `bootstrap-from-prd` STEP 5)
 
 **Gate before STEP 3:** Hull Builder reports "Validation: passed" from the skill itself. If the skill reports failures, Hull Builder loops internally — the orchestrator does not intervene. It only proceeds once Hull Builder hands back a passed report.
@@ -247,7 +247,7 @@ Call `bosun`.
 
 **Input handed to subagent:**
 - All of `.ai/docs/01-prd.md` through `.ai/docs/10-planning-rules.md`
-- `AGENT.md`
+- `AGENTS.md`
 
 **Output expected back:**
 - Per-doc health score breakdown table (all docs scored before findings list)
@@ -265,7 +265,7 @@ Call `coxswain`.
 
 **Input handed to subagent:**
 - All of `.ai/docs/01-prd.md` through `.ai/docs/10-planning-rules.md`
-- `AGENT.md`
+- `AGENTS.md`
 - Bosun's findings list (so coxswain knows which issues are already identified vs. newly surfaced)
 
 **Output expected back:**
@@ -322,7 +322,7 @@ Call `gunner`.
 
 **Input handed to subagent:**
 - All of `.ai/docs/02-technical-architecture.md` through `.ai/docs/10-planning-rules.md`
-- `AGENT.md`
+- `AGENTS.md`
 - Bosun's findings list from the current run (context for the auditor)
 
 **Output expected back:**
@@ -361,7 +361,7 @@ Call `coxswain` with the full planning context.
 
 **Input handed to subagent:**
 - All validated docs from `.ai/docs/`
-- `AGENT.md`
+- `AGENTS.md`
 - Bosun's final findings list
 - `.ai/planning/` — so coxswain's lenses can evaluate build readiness against the actual plan
 
@@ -389,7 +389,7 @@ Triggered when core docs already exist and the user describes a new feature.
 
 Call `shipwright` directly. Brainstorm is not re-run from scratch — `shipwright` owns its own scoped Q&A for the new feature only.
 
-**Input:** New feature description (raw prompt or short PRD addendum) + all existing `.ai/docs/*.md` and `AGENT.md`.
+**Input:** New feature description (raw prompt or short PRD addendum) + all existing `.ai/docs/*.md` and `AGENTS.md`.
 
 **Output:** Updated `.ai/docs/01-prd.md` (new feature appended, not a rewrite) + list of impacted downstream docs.
 
@@ -457,9 +457,9 @@ This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and
 - **security-only**: call `gunner` against existing docs. Refuse if `bosun` has never passed — security audit against inconsistent docs produces unreliable findings.
 - **estimate-only**: call `rigger` in estimate-only mode — rigger re-reads existing `.ai/planning/` files and re-emits the Phase Estimate Summary without regenerating tasks. Refuse if `.ai/planning/` does not exist — ask the user to run planning first.
 - **schema-validate**: call `surveyor`. Ask the user for the schema source (SQL dump, ORM schema file, or migration directory) before invoking.
-- **agent-refresh**: call `hullwright` in Partial Regeneration mode scoped exclusively to `["AGENT.md"]`. Recompiles `AGENT.md` from the current on-disk `.ai/docs/*.md` and the latest AGENT.md template/contract, without regenerating, re-deriving, or version-bumping any other document. Use when the AGENT.md contract itself has changed (new Working Loop steps, new Execution Protocol sections) and an already-bootstrapped project needs to adopt it. Refuse if `.ai/docs/01-prd.md` or the `02-10` doc suite does not exist — this mode only recompiles AGENT.md from docs that already exist, it does not bootstrap from scratch.
+- **agent-refresh**: call `hullwright` in Partial Regeneration mode scoped exclusively to `["AGENTS.md"]`. Recompiles `AGENTS.md` from the current on-disk `.ai/docs/*.md` and the latest AGENTS.md template/contract, without regenerating, re-deriving, or version-bumping any other document. Use when the AGENTS.md contract itself has changed (new Working Loop steps, new Execution Protocol sections) and an already-bootstrapped project needs to adopt it. Refuse if `.ai/docs/01-prd.md` or the `02-10` doc suite does not exist — this mode only recompiles AGENTS.md from docs that already exist, it does not bootstrap from scratch. If the target project still has only the legacy singular artifact (`AGENT` + `.md`), tell hullwright to write `AGENTS.md`, remove the legacy file, and report the migration; if `AGENTS.md` already exists, report `No migration needed.`
 - **sync**: call `chronicler`. See Pipeline — sync run below.
-- **resolve-conflicts**: call `caulker` against the touched `.ai/docs/`/`AGENT.md` files. If
+- **resolve-conflicts**: call `caulker` against the touched `.ai/docs/`/`AGENTS.md` files. If
   `caulker` reports any escalated (blocked) units, stop and present them to the user — do not
   auto-continue to any other pipeline step until the user has resolved every blocked unit in
   this run or explicitly defers them. After a clean resolution (or user confirms all blocks are
@@ -641,7 +641,7 @@ At the end of a full pipeline run:
 Pipeline complete.
 
 ✓ .ai/docs/01-prd.md
-✓ .ai/docs/02–10 (engineering docs) + AGENT.md
+✓ .ai/docs/02–10 (engineering docs) + AGENTS.md
 ✓ Bosun: [health score]/100 — [band label]
 ✓ Security audit: [PASS | CONDITIONAL] — [N caveats carried to planning]
 ✓ Grooming: [Ready to Plan | Conditional] — Lead Dev: [R/C/B] | QA: [R/C/B] | DevOps: [R/C/B]
@@ -669,7 +669,7 @@ Changelog written to: .ai/docs/.pipeline-changelog.md
 - Never use non-English strings for trigger matching, user prompts, or error messages.
 - Never let `caulker` auto-continue into another subagent without an explicit user go-ahead.
 - Never block, retry, pause, or change a gate decision because a hook failed, was skipped, or could not fire.
-- Never let `agent-refresh` mode touch, re-validate, or version-bump any document other than `AGENT.md`.
+- Never let `agent-refresh` mode touch, re-validate, or version-bump any document other than `AGENTS.md`.
 
 - Never invoke any Skill outside this repo's own skill set (skills/slipway/*) to author or 
   save a plan, PRD, or engineering doc. Plan generation always routes through STEP 6 → rigger 

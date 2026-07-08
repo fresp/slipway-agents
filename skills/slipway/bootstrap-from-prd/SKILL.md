@@ -1,13 +1,13 @@
 ---
 name: bootstrap-from-prd
-description: Generate a complete engineering documentation suite and AGENT.md from a Product Requirement Document (PRD). Use this skill whenever a user provides a PRD or product spec and wants to generate technical architecture docs, service boundaries, data models, API specs, operational flows, engineering standards, architecture decisions, topology diagrams, planning rules, or an AGENT.md file. Also trigger when the user says "bootstrap project", "generate docs from PRD", "create engineering docs", "build agent.md", or "rebuild documentation". This skill produces implementation-ready documentation that AI agents and engineers can use directly.
+description: Generate a complete engineering documentation suite and AGENTS.md from a Product Requirement Document (PRD). Use this skill whenever a user provides a PRD or product spec and wants to generate technical architecture docs, service boundaries, data models, API specs, operational flows, engineering standards, architecture decisions, topology diagrams, planning rules, or an AGENTS.md file. Also trigger when the user says "bootstrap project", "generate docs from PRD", "create engineering docs", "build agent.md", or "rebuild documentation". This skill produces implementation-ready documentation that AI agents and engineers can use directly.
 ---
 
 # bootstrap-from-prd
 
 Generate a complete, consistent engineering documentation suite from a Product Requirement Document (PRD).
 
-The output is a set of numbered markdown files under `.ai/docs/` plus an `AGENT.md` that consolidates all execution rules for AI coding agents.
+The output is a set of numbered markdown files under `.ai/docs/` plus an `AGENTS.md` that consolidates all execution rules for AI coding agents.
 
 ---
 
@@ -21,25 +21,25 @@ Run when: no argument, or `bootstrap`
 - Extract business requirements
 - Select the doc suite (STEP 2.5) and write `.ai/docs/.manifest.md`
 - Generate the selected engineering documents in order
-- Compile `AGENT.md`
+- Compile `AGENTS.md`
 - Validate cross-document consistency
 
 ### Rebuild
 
 Run when: `rebuild`
 
-- Read `.ai/docs/.manifest.md`. Delete every doc it lists with status `frozen` or `draft` (Baseline and Extensions owned by this skill), plus `AGENT.md`. Never delete `.ai/docs/01-prd.md`, supplementary PRDs (files ending in `-prd.md`), or extension docs owned by other agents (Extensions rows whose Owner Agent is not this skill — deleting another agent's report loses information this skill cannot regenerate).
-- **Legacy fallback:** if no `.manifest.md` exists, delete the hardcoded set `02` through `10-planning-rules.md` and `AGENT.md`, preserving `.ai/docs/01-prd.md` and any supplementary PRDs (files prefixed `11-` or higher that end in `-prd.md`).
+- Read `.ai/docs/.manifest.md`. Delete every doc it lists with status `frozen` or `draft` (Baseline and Extensions owned by this skill), plus `AGENTS.md`. Never delete `.ai/docs/01-prd.md`, supplementary PRDs (files ending in `-prd.md`), or extension docs owned by other agents (Extensions rows whose Owner Agent is not this skill — deleting another agent's report loses information this skill cannot regenerate).
+- **Legacy fallback:** if no `.manifest.md` exists, delete the hardcoded set `02` through `10-planning-rules.md` and `AGENTS.md`, preserving `.ai/docs/01-prd.md` and any supplementary PRDs (files prefixed `11-` or higher that end in `-prd.md`).
 - Re-run STEP 2.5 (the PRD may have changed since the last suite selection) and rewrite `.manifest.md`
 - Regenerate all selected engineering documents from scratch
-- Rebuild `AGENT.md` from regenerated documentation
+- Rebuild `AGENTS.md` from regenerated documentation
 
 ---
 
 ## Core Principles
 
 - PRD is the business source of truth. Never invent requirements.
-- Generate engineering documents before `AGENT.md`.
+- Generate engineering documents before `AGENTS.md`.
 - Every document has a single responsibility.
 - Prefer deterministic generation over creativity.
 - Maintain consistency across all documents.
@@ -95,7 +95,7 @@ If `.ai/docs/01-prd.md` is missing one or more expected sections:
 ├── 08-architecture-decisions.md
 ├── 09-topology-and-architecture-diagrams.md   (unless omitted per STEP 2.5)
 └── 10-planning-rules.md
-AGENT.md
+AGENTS.md
 ```
 
 ---
@@ -145,7 +145,7 @@ Rules:
 - **Rebuild (full regeneration):** increment the major version — `1.x → 2.0`, `2.x → 3.0`, etc.
 - **Partial regeneration (validation fix on specific docs):** increment the minor version on only the affected documents — `1.0 → 1.1`, `1.2 → 1.3`, etc. Unaffected documents keep their current version.
 
-Partial Regeneration's impacted doc list may consist of exactly `["AGENT.md"]` as a valid, narrower scope (see `hullwright.md`'s Contract-Only Refresh). In this case, skip Requirement Model re-derivation and regenerate nothing from `02` through `10` — recompile only `AGENT.md` from the current on-disk docs.
+Partial Regeneration's impacted doc list may consist of exactly `["AGENTS.md"]` as a valid, narrower scope (see `hullwright.md`'s Contract-Only Refresh). In this case, skip Requirement Model re-derivation and regenerate nothing from `02` through `10` — recompile only `AGENTS.md` from the current on-disk docs. For existing projects that still have only the legacy singular artifact (`AGENT` + `.md`) at project root, write the refreshed contract to `AGENTS.md`, remove the legacy singular artifact after the plural file is written, and report `Migrated: ` + legacy singular artifact + ` -> AGENTS.md`; if `AGENTS.md` already exists, report `No migration needed.`
 - Never reset a version to `1.0` after a rebuild unless explicitly instructed by the user.
 
 ---
@@ -297,7 +297,7 @@ Generate in this exact order, **skipping any doc marked `omitted` in `.manifest.
 
 After generating the base 9 documents (02–10), scan the PRD for signals that imply additional documents beyond the default set. These are documents that don't apply to every project but are critical for specific types of systems.
 
-Run this scan before compiling `AGENT.md`:
+Run this scan before compiling `AGENTS.md`:
 
 | Signal in PRD | Implied additional doc | Number |
 |---|---|---|
@@ -311,7 +311,7 @@ Run this scan before compiling `AGENT.md`:
 - Number sequentially starting at 11 (or continuing from the highest existing supplementary PRD number).
 - Do not generate a dynamic doc if the PRD only mentions the trigger keyword briefly or in an example — the signal must be a material requirement.
 - Apply the same per-document completion contracts philosophy: the dynamic doc must be self-consistent and traceable to FR-IDs.
-- Add every generated dynamic doc to `10-planning-rules.md`'s source-of-truth list, to `AGENT.md`'s Source Of Truth section, and as a row in `.manifest.md`'s Baseline table. The `bosun` subagent validates this list — if it's hardcoded to `02–10`, it will miss dynamic docs.
+- Add every generated dynamic doc to `10-planning-rules.md`'s source-of-truth list, to `AGENTS.md`'s Source Of Truth section, and as a row in `.manifest.md`'s Baseline table. The `bosun` subagent validates this list — if it's hardcoded to `02–10`, it will miss dynamic docs.
 
 If a dynamic doc is triggered, report it at the end of STEP 3 before proceeding to STEP 4:
 ```
@@ -320,13 +320,13 @@ If a dynamic doc is triggered, report it at the end of STEP 3 before proceeding 
 
 ---
 
-### STEP 4 — Compile AGENT.md
+### STEP 4 — Compile AGENTS.md
 
-Generate `AGENT.md` only after all engineering documents have passed their contracts.
+Generate `AGENTS.md` only after all engineering documents have passed their contracts.
 
-Every rule in `AGENT.md` must derive from a generated document. Cite the source doc in a comment if the rule is non-obvious. Do not introduce new architecture or requirements.
+Every rule in `AGENTS.md` must derive from a generated document. Cite the source doc in a comment if the rule is non-obvious. Do not introduce new architecture or requirements.
 
-`AGENT.md` must include these sections in this order:
+`AGENTS.md` must include these sections in this order:
 
 1. **Mission** — one paragraph: what system this repo implements, what the agent's job is (implement, not redesign), what the agent explicitly is not
 2. **Source Of Truth** — priority-ordered list of all generated docs; higher priority wins on conflict; no merging, no averaging; supplementary PRDs inserted between `01-prd.md` and `10-planning-rules.md`
@@ -367,11 +367,11 @@ Verify:
 - ✓ Every operational flow in `06` matches the architecture in `02`
 - ✓ Every ADR in `08` is reflected consistently across `02`, `03`, `07`
 - ✓ No rule in `07` contradicts any ADR in `08`
-- ✓ `AGENT.md` contains no rule not present in a generated doc
-- ✓ Source-of-truth list in `10` matches Source Of Truth section in `AGENT.md` exactly
+- ✓ `AGENTS.md` contains no rule not present in a generated doc
+- ✓ Source-of-truth list in `10` matches Source Of Truth section in `AGENTS.md` exactly
 - ✓ `.manifest.md` Baseline table has a row for `01-prd.md` and every doc 02–10 (generated or `omitted`) — no doc is silently absent
 - ✓ Every doc listed `frozen` or `draft` in `.manifest.md` exists on disk; no doc exists on disk that the manifest lists as `omitted`
-- ✓ Source Of Truth lists in `10` and `AGENT.md` contain exactly the manifest's non-`omitted` docs (plus extension docs per the insertion rule in `templates/AGENT.md`)
+- ✓ Source Of Truth lists in `10` and `AGENTS.md` contain exactly the manifest's non-`omitted` docs (plus extension docs per the insertion rule in `templates/AGENTS.md`)
 
 **If validation fails:**
 - Identify the affected documents
@@ -391,7 +391,7 @@ After completion, output:
   - .ai/docs/08-architecture-decisions.md (v1.0)
   - .ai/docs/02-technical-architecture.md (v1.0)
   - [... all files with versions]
-  - AGENT.md
+  - AGENTS.md
   - .ai/docs/.manifest.md
 
 ✓ Omitted docs: [list with one-line reason each, or "none"]
@@ -421,7 +421,7 @@ Templates do not define project-specific content.
 - `templates/07-engineering-standards.md`
 - `templates/09-topology-and-architecture-diagrams.md`
 - `templates/10-planning-rules.md`
-- `templates/AGENT.md`
+- `templates/AGENTS.md`
 
 ---
 
@@ -459,6 +459,6 @@ The skill is complete only when:
 - All documents selected in STEP 2.5 have been generated, and `.ai/docs/.manifest.md` records every baseline doc's status (including omissions)
 - Every document has passed its per-document completion contract
 - Cross-document validation passes with no failures
-- `AGENT.md` is derived exclusively from the generated documentation
+- `AGENTS.md` is derived exclusively from the generated documentation
 - Versions are correctly applied to all documents
 - The report has been delivered to the user
