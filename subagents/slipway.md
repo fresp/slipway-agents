@@ -207,6 +207,7 @@ If `.ai/docs/01-prd.md` exists but looks incomplete against the section checklis
 | Reading/understanding: user wants schema validation, for example "validate schema", "check schema", or "schema drift"    | `schema-validate`       | `surveyor`                                      |
 | Post-build sync: user wants only the agent contract refreshed, for example "refresh AGENTS.md", "update agent contract", "regenerate AGENTS.md", or "pick up new AGENTS.md rules" | `agent-refresh` | `hullwright` (Partial Regeneration, AGENTS.md only) |
 | Diagnostics or diagnosing Slipway itself: user runs `/slipway:doctor` or asks for "slipway doctor", "doctor", "diagnostics", "pre-flight diagnostic", "pipeline diagnostic", or pipeline/config/state cause analysis | `doctor` | `slipway` read-only diagnostic |
+| Reading/understanding: user says "learnings review", "review learnings", "show patterns", "what have you learned", or `/slipway:learnings-review` | `learnings-review` | `slipway` (self, read-mostly) |
 
 If multiple mapped intents still conflict after Step A, or the underlying intent itself is genuinely unclear, ask the user once which mode applies. Do not guess silently. This fallback is for genuine intent ambiguity — a request whose classification in Step A is unclear even after considering what the user is trying to accomplish. It is not for requests that simply don't use the example trigger phrases; classify by intent first.
 
@@ -260,6 +261,32 @@ Call `bosun`.
 - Overall health score 0–100
 
 **Gate before STEP 3.5:** Bosun must always return, even with zero findings. "No subagent output" is not a valid result — if Bosun returns nothing, re-invoke it once before surfacing an error.
+
+### STEP 3.1 — Learnings capture (Bosun findings)
+
+After Bosun's report is received and before proceeding to STEP 3.5, invoke the
+`learnings-capture` skill to log Bosun's findings as candidate learnings in
+`.ai/learnings/memory.md`.
+
+**Candidates:** every Critical and Should-fix finding from Bosun's structured
+findings list. Note-tier findings are not logged — they lack the severity to
+warrant a learning entry.
+
+For each candidate, invoke `learnings-capture` with:
+- `Pattern-Key`: `validation.<doc-short-name>.<short-symptom>` (e.g.
+  `validation.prd.missing-tenant-isolation`, `validation.agents.broken-reference`)
+- `Category`: `validation`
+- `Source`: `slipway` (orchestrator, on Bosun's behalf — Bosun itself never writes)
+- `Priority`: `critical` for Critical findings, `high` for Should-fix findings
+- `Summary`: the finding title, location (doc name + section), and the issue
+  description
+
+This is best-effort and non-blocking, consistent with the `session-log`,
+chronicler Step 6.5, and gunner learnings-capture patterns: if
+`learnings-capture` fails for any item, warn to stdout and continue. Do not
+re-invoke Bosun, modify the gate decision, or change any finding solely for
+learnings logging. This step does not appear in the State Tracking step list —
+it is a non-gating side-effect of STEP 3, not a pipeline step.
 
 ---
 
@@ -488,6 +515,7 @@ This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and
   auto-continue to any other pipeline step until the user has resolved every blocked unit in
   this run or explicitly defers them. After a clean resolution (or user confirms all blocks are
   resolved), ask the user: "Run bosun on the affected docs to confirm consistency? (yes / no)".
+- **learnings-review**: read `.ai/learnings/memory.md` and present pending entries grouped by Pattern-Key, with proposed actions (promote / archive / discard). Never invokes bosun, gunner, or hullwright — read+annotate only, on `.ai/learnings/` exclusively.
 - **doctor**: run Doctor mode in the orchestrator itself. Do not invoke any subagent and do not modify any file.
 
 ---
