@@ -14,6 +14,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 - Register Slipway slash commands dynamically through the OpenCode plugin config hook: `/slipway:init`, `/slipway:status`, `/slipway:resume`, and `/slipway:doctor`. These route to the `slipway` orchestrator at runtime and do not require `.opencode/commands/*.md` files.
+- STEP E0 Baseline Reconciliation Gate in the extend pipeline — ensures existing docs are validated by Bosun (health score ≥ 60) before extension work begins. Prevents extending inconsistent baseline docs, closing the gap identified when `hullwright`'s Execution Protocol failed due to lack of a validation step. Gate is load-bearing with clear skip/block conditions and enforced via Forbidden Behaviors.
 
 ### Fixed
 - Orchestrator (and its runtime preamble) could be routed into invoking harness-default Skills (e.g. subagent-driven-development) for plan authoring when a request didn't clearly match a mode-detection trigger phrase, causing plans to be saved outside .ai/planning/ (for example, under harness-default superpowers plan directories). Guardrail now explicit in both subagents/slipway.md and SLIPWAY_ORCHESTRATOR_PREAMBLE, with a regression test enforcing both stay in sync.

@@ -389,6 +389,26 @@ New feature during build → route to `shipwright` (extend mode).
 
 Triggered when core docs already exist and the user describes a new feature.
 
+### STEP E0 — Baseline Reconciliation Gate
+
+Runs before STEP E1 on every extend invocation. Ensures the existing doc suite is in a consistent, validated state before extension work begins.
+
+**Gate logic:**
+
+1. **Check `.ai/docs/.pipeline-state.md`** for a `Bosun last run` field and a `Bosun health score` field.
+2. **Skip condition:** If `Bosun last run` is not `"never"` AND `Bosun health score` ≥ 60, proceed directly to STEP E1 — the baseline docs are already validated.
+3. **Block condition:** If `Bosun last run` is `"never"` OR `Bosun health score` < 60 OR the pipeline-state file does not exist, STOP and report:
+
+```
+⚠ Baseline docs have not been validated by Bosun.
+Extension work cannot begin on inconsistent docs.
+→ Run `bosun` (STEP 3) first, then retry the extend request.
+```
+
+**Never bypass this gate.** Extension on unvalidated baseline docs produces unreliable downstream results — this is the lesson from `hullwright`'s Execution Protocol failing due to lack of a validation step.
+
+---
+
 ### STEP E1 — Extend
 
 Call `shipwright` directly. Brainstorm is not re-run from scratch — `shipwright` owns its own scoped Q&A for the new feature only.
@@ -669,6 +689,7 @@ Changelog written to: .ai/docs/.pipeline-changelog.md
 - Never run `rigger` against docs where `coxswain` returned Blocked — resolve Blocked findings first.
 - Never run `coxswain` before `bosun` has passed at least once — grooming on inconsistent docs produces misleading readiness signals.
 - Never run `gunner` before `bosun` has passed at least once.
+- Never run STEP E1 (extend) without STEP E0 (Baseline Reconciliation Gate) passing first — extension on unvalidated baseline docs produces unreliable downstream results.
 - Never restart the entire pipeline from STEP 1 on a mid-pipeline PRD edit if the edit is additive and the existing PRD checklist still passes — restart from the earliest step that is actually invalidated.
 - Never use non-English strings for trigger matching, user prompts, or error messages.
 - Never let `caulker` auto-continue into another subagent without an explicit user go-ahead.
