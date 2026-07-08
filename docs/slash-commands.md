@@ -75,7 +75,7 @@ Equivalent to asking `@slipway run doctor` or `@slipway run pipeline diagnostics
   1. Config resolution — active `slipway.json`, schema validation, resolved per-agent model/category/ralph-loop/permission summary.
   2. Manifest health — `.ai/docs/.manifest.md` statuses, missing listed docs, and unlisted docs on disk.
   3. Pipeline state — last completed step, optimize counter, and blocked-state detection when Critical findings remain at the configured loop limit.
-  4. Agent file integrity — expected `subagents/<name>.md` files and README-referenced skill files.
+  4. Agent runtime integrity — Slipway agents registered by the plugin; package-local `subagents/<name>.md` files are checked only when running from the plugin repository.
   5. Runtime-wired features summary — confirm which config features are passed through to OpenCode at runtime (per-agent `permission` blocks are wired as of Batch 6).
   6. Session reconciliation health — active vs resolved session counts, stale active sessions older than 3 days, and reconciliation history presence.
 
@@ -102,7 +102,7 @@ Slipway doctor
 ...
 
 ## 4. Agent file integrity
-✓ subagents/slipway.md
+✓ Slipway agents registered by plugin
 ...
 
 ## 5. Runtime-wired features summary
