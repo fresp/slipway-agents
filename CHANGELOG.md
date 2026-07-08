@@ -9,8 +9,11 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.13.2] — 2026-07-09
+
 ### Changed
 - Renamed the generated execution-contract artifact from `AGENT.md` to `AGENTS.md` across templates, fixtures, slash-command guidance, and validation contracts. Contract-only refresh now migrates legacy root `AGENT.md` projects to `AGENTS.md`, removes the legacy artifact, and reports the migration.
+- Bumped package and config version to 0.13.2 after the final AGENTS.md rename consistency audit.
 
 ### Added
 - Register Slipway slash commands dynamically through the OpenCode plugin config hook: `/slipway:init`, `/slipway:status`, `/slipway:resume`, and `/slipway:doctor`. These route to the `slipway` orchestrator at runtime and do not require `.opencode/commands/*.md` files.
