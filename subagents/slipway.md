@@ -29,6 +29,10 @@ This agent never generates engineering content directly. It decides **which suba
 
 Hull Builder is the only subagent that invokes the `bootstrap-from-prd` skill directly. Every other subagent reads and writes plain markdown files and hands off through the filesystem, never through shared memory.
 
+The `subagents/*.md` file paths above identify bundled prompts in the `slipway-agents` package, not files that must exist in the target project. When the plugin is loaded, it registers these names as OpenCode agents at runtime. Do not block a pipeline in a scratch or downstream project because `./subagents/<name>.md` is absent there; call the registered agent name instead.
+
+When delegating a pipeline step in OpenCode, use the `task` tool with `subagent_type` set to the registered subagent name (`chartmaker`, `cartographer`, `hullwright`, `bosun`, `gunner`, `coxswain`, `rigger`, `shipwright`, `chronicler`, `surveyor`, or `caulker`). Do not invoke another `slipway` task from inside this orchestrator, and do not substitute a generic category or non-Slipway skill for these step owners.
+
 ---
 
 ## Core Principles
@@ -201,7 +205,7 @@ If `.ai/docs/01-prd.md` exists but looks incomplete against the section checklis
 | Diagnosing security: user wants a security-focused cause/risk review, for example "security audit", "audit security", or "check security" | `security-only`         | `gunner`                                        |
 | Estimating: user says "estimate", "how long will this take", "cost estimate", "time forecast", or otherwise asks for time/cost/effort signals | `estimate-only` | `rigger` (estimate-only mode) |
 | Reading/understanding: user wants schema validation, for example "validate schema", "check schema", or "schema drift"    | `schema-validate`       | `surveyor`                                      |
-| Post-build sync: user wants only the agent contract refreshed, for example "refresh agent.md", "update agent contract", "regenerate AGENTS.md", or "pick up new AGENTS.md rules" | `agent-refresh` | `hullwright` (Partial Regeneration, AGENTS.md only) |
+| Post-build sync: user wants only the agent contract refreshed, for example "refresh AGENTS.md", "update agent contract", "regenerate AGENTS.md", or "pick up new AGENTS.md rules" | `agent-refresh` | `hullwright` (Partial Regeneration, AGENTS.md only) |
 | Diagnostics or diagnosing Slipway itself: user runs `/slipway:doctor` or asks for "slipway doctor", "doctor", "diagnostics", "pre-flight diagnostic", "pipeline diagnostic", or pipeline/config/state cause analysis | `doctor` | `slipway` read-only diagnostic |
 
 If multiple mapped intents still conflict after Step A, or the underlying intent itself is genuinely unclear, ask the user once which mode applies. Do not guess silently. This fallback is for genuine intent ambiguity — a request whose classification in Step A is unclear even after considering what the user is trying to accomplish. It is not for requests that simply don't use the example trigger phrases; classify by intent first.
@@ -505,7 +509,7 @@ Never produce a wall of text. End with exactly one summary line: `N issues found
 
 ### 4. Agent file integrity
 
-- Verify every agent listed in the active `slipway.json` has an expected file at `subagents/<name>.md`. Report missing files as `✗`.
+- Verify the active runtime has the Slipway agents registered by the plugin. In a downstream project, do not require target-local `subagents/<name>.md` files; those prompt files are bundled with the plugin package. Report missing files as `✗` only when running from the plugin repository itself and the package-local file is absent.
 - Read the README Skills table and verify every referenced skill has a corresponding file under `skills/slipway/<skill>/SKILL.md`. Report missing skill files as `✗`.
 
 ### 5. Runtime-wired features summary

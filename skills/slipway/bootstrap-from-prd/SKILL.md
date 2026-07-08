@@ -1,6 +1,6 @@
 ---
 name: bootstrap-from-prd
-description: Generate a complete engineering documentation suite and AGENTS.md from a Product Requirement Document (PRD). Use this skill whenever a user provides a PRD or product spec and wants to generate technical architecture docs, service boundaries, data models, API specs, operational flows, engineering standards, architecture decisions, topology diagrams, planning rules, or an AGENTS.md file. Also trigger when the user says "bootstrap project", "generate docs from PRD", "create engineering docs", "build agent.md", or "rebuild documentation". This skill produces implementation-ready documentation that AI agents and engineers can use directly.
+description: Generate a complete engineering documentation suite and AGENTS.md from a Product Requirement Document (PRD). Use this skill whenever a user provides a PRD or product spec and wants to generate technical architecture docs, service boundaries, data models, API specs, operational flows, engineering standards, architecture decisions, topology diagrams, planning rules, or an AGENTS.md file. Also trigger when the user says "bootstrap project", "generate docs from PRD", "create engineering docs", "build AGENTS.md", or "rebuild documentation". This skill produces implementation-ready documentation that AI agents and engineers can use directly.
 ---
 
 # bootstrap-from-prd
