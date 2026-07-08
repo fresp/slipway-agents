@@ -141,6 +141,29 @@ Append to `.ai/docs/.pipeline-changelog.md` (never overwrite):
 - Patches summary: [brief description of what changed]
 ```
 
+### Step 6.5 — Learnings capture
+
+After the changelog entry is appended, invoke the `learnings-capture` skill to
+log candidate learnings to `.ai/learnings/memory.md`.
+
+**Candidates:** every DRIFT item classified in Step 3, and every UNKNOWN item
+the user reclassified as "(b) implementation oversight" in Step 4.
+
+For each candidate, invoke `learnings-capture` with:
+- `Pattern-Key`: `sync.drift.<short-symptom>` (DRIFT) or
+  `sync.unknown.<short-symptom>` (user-resolved UNKNOWN)
+- `Category`: `drift`
+- `Source`: `chronicler`
+- `Priority`: inferred from the item's documentation impact (critical for
+  security/auth/financial items, high for data-model or API changes, medium for
+  operational flows, low for cosmetic/minor differences)
+- `Summary`: the classification and what was patched or flagged as tech debt
+
+This is best-effort and non-blocking, consistent with the `session-log` pattern:
+if `learnings-capture` fails for any item, warn in the sync report and continue.
+Do not re-classify items, run new drift detection, or modify any Step 3/4/5
+output solely for learnings logging.
+
 ### Step 7 — Session logging
 
 After patches are applied and the changelog entry is appended, invoke the
@@ -212,3 +235,4 @@ Changelog:      .ai/docs/.pipeline-changelog.md updated
 - Never proceed past Step 3 without completing the UNKNOWN user-input loop first.
 - Never modify `.ai/planning/` files during a sync run — planning is read-only for this agent.
 - Never produce a sync report before all patches have been applied.
+- Never log a learning for an INTENTIONAL item; never let learnings-capture failure block the sync report.
