@@ -6,12 +6,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.13.7] — 2026-07-09
+
+### Fixed
+- **Edit permission audit (full 12-agent pass):** The `slipway` orchestrator was able to write `internal/services/monitor/check.go` directly during a refactor request, violating its "never generates content directly" contract. Root cause: `permission.edit` was absent for `slipway` (and 10 other agents) in `slipway.json`; OpenCode's native `edit` permission resolves absence as permissive rather than deny.
+- **Explicit `permission.edit` for all 12 agents:** `slipway` set to `deny`; `chartmaker`, `cartographer`, `hullwright`, `rigger`, `shipwright`, `chronicler`, `gunner`, `caulker` set to `allow`; `bosun`, `coxswain`, `surveyor` set to `deny`.
+- **`gunner` key made explicit:** `gunner.permission.edit` was previously absent and is now explicitly set to `allow` (gunner writes `.ai/docs/11-security-audit.md`). No further investigation gate needed.
+- **`rigger.md` forbidden behavior added:** "Never write, edit, or execute any file outside `.ai/planning/`; never touch source code, config, or test files directly."
+
+### Notes
+- **Docs-publish routing constraint:** Since `slipway` is now `edit: deny`, any future `docs-publish` skill wiring must invoke `hullwright` (not the orchestrator) to write `/docs/<feature>/TRD.md`. This constraint is recorded here so the next batch does not re-introduce orchestrator-level writes. Do not implement docs-publish wiring itself in this batch — only record the constraint.
+- **Regression test extended:** `tests/config/permission-isolation.test.ts` now asserts every agent has an explicit `permission.edit` key present and verifies each value matches the authoritative table.
+
 ## [0.13.6] — 2026-07-09
 
 ### Changed
 - Bumped package version to 0.13.6.
-
-
 
 ## [0.13.5] — 2026-07-09
 
