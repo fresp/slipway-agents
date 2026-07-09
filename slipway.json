@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/dev/slipway.schema.json",
-  "version": "0.13.4",
+  "version": "0.13.5",
   "ralph_loop": {
     "enabled": true,
     "max_iterations": 2,
@@ -89,7 +89,9 @@
           "*": "deny"
         }
       },
-      "ralph_loop": { "block_on_exhaustion": true }
+      "ralph_loop": {
+        "block_on_exhaustion": true
+      }
     },
     "rigger": {
       "model": "anthropic/claude-sonnet-5",
@@ -114,6 +116,9 @@
         "task": "deny",
         "skill": {
           "*": "deny",
+          "groomer-lead-dev": "allow",
+          "groomer-qa": "allow",
+          "groomer-devops": "allow",
           "groomer-complexity-audit": "allow"
         }
       }
@@ -204,8 +209,18 @@
     }
   },
   "categories": {
-    "quick": { "model": "anthropic/claude-haiku-4-5", "description": "Trivial or pattern-matching tasks — fast and cheap" },
-    "standard": { "model": "anthropic/claude-sonnet-5", "description": "Default for most generation and analysis tasks" },
-    "deep": { "model": "anthropic/claude-opus-4-8", "fallback_model": "anthropic/claude-sonnet-5", "description": "Reasoning-heavy tasks — validation, security audit, orchestration" }
+    "quick": {
+      "model": "anthropic/claude-haiku-4-5",
+      "description": "Trivial or pattern-matching tasks — fast and cheap"
+    },
+    "standard": {
+      "model": "anthropic/claude-sonnet-5",
+      "description": "Default for most generation and analysis tasks"
+    },
+    "deep": {
+      "model": "anthropic/claude-opus-4-8",
+      "fallback_model": "anthropic/claude-sonnet-5",
+      "description": "Reasoning-heavy tasks — validation, security audit, orchestration"
+    }
   }
 }
