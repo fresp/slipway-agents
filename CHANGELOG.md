@@ -6,6 +6,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.13.6] — 2026-07-09
+
+### Changed
+- Bumped package version to 0.13.6.
+
+
 
 ## [0.13.5] — 2026-07-09
 
@@ -645,6 +651,7 @@ Initial release of slipway-agents.
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
 
+[0.13.6]: https://github.com/fresp/slipway-agents/compare/v0.13.5...v0.13.6
 [0.13.5]: https://github.com/fresp/slipway-agents/compare/v0.13.4...v0.13.5
 [0.13.4]: https://github.com/fresp/slipway-agents/compare/v0.13.3...v0.13.4
 [0.7.0]: https://github.com/fresp/slipway-agents/compare/v0.6.1...v0.7.0
