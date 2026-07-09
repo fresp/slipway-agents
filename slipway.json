@@ -15,6 +15,7 @@
       "mode": "primary",
       "description": "Primary orchestrator — routes the pipeline, enforces step order, never generates content directly",
       "permission": {
+        "edit": "deny",
         "task": {
           "*": "deny",
           "chartmaker": "allow",
@@ -43,6 +44,7 @@
       "mode": "subagent",
       "description": "Raw prompt / partial PRD → complete .ai/docs/01-prd.md with P0/P1/P2 ranking",
       "permission": {
+        "edit": "allow",
         "task": "deny",
         "skill": {
           "*": "deny"
@@ -56,6 +58,7 @@
       "mode": "subagent",
       "description": "Reverse-engineers existing codebase into .ai/docs/ with confidence markers",
       "permission": {
+        "edit": "allow",
         "task": "deny",
         "skill": {
           "*": "deny"
@@ -69,6 +72,7 @@
       "mode": "subagent",
       "description": "Invokes bootstrap-from-prd skill → .ai/docs/02–10 + AGENTS.md",
       "permission": {
+        "edit": "allow",
         "task": "deny",
         "skill": {
           "*": "deny",
@@ -101,6 +105,7 @@
       "mode": "subagent",
       "description": "Phase/milestone breakdown → .ai/planning/ with S/M/L sizing, dependency graph, and P0/P1/P2 phase ordering",
       "permission": {
+        "edit": "allow",
         "task": "deny",
         "skill": {
           "*": "deny"
@@ -114,6 +119,7 @@
       "mode": "subagent",
       "description": "Multi-lens sprint grooming (Lead Dev, QA, DevOps, Complexity Audit) with cross-lens synthesis",
       "permission": {
+        "edit": "deny",
         "task": "deny",
         "skill": {
           "*": "deny",
@@ -131,6 +137,7 @@
       "mode": "subagent",
       "description": "Update existing docs when a new feature is introduced — proactive ADR conflict pre-flight before scoping",
       "permission": {
+        "edit": "allow",
         "task": "deny",
         "skill": {
           "*": "deny",
@@ -145,6 +152,7 @@
       "mode": "subagent",
       "description": "Post-implementation doc sync — detect and classify drift (DRIFT / INTENTIONAL / UNKNOWN)",
       "permission": {
+        "edit": "allow",
         "task": "deny",
         "skill": {
           "*": "deny",
@@ -160,6 +168,7 @@
       "mode": "subagent",
       "description": "Post-implementation DB schema vs 04-data-models.md consistency check",
       "permission": {
+        "edit": "deny",
         "task": "deny",
         "skill": {
           "*": "deny"
@@ -173,6 +182,7 @@
       "mode": "subagent",
       "description": "Auth, secrets, attack surface, and dependency/image vulnerability audit — PASS / CONDITIONAL / BLOCK gate",
       "permission": {
+        "edit": "allow",
         "webfetch": "ask",
         "task": "deny",
         "skill": {
@@ -201,6 +211,7 @@
       "mode": "subagent",
       "description": "Post-merge semantic conflict resolution across .ai/docs/ and AGENTS.md — never silently resolves true contradictions",
       "permission": {
+        "edit": "allow",
         "task": "deny",
         "skill": {
           "*": "deny",

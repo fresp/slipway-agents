@@ -292,3 +292,4 @@ If priority tags exist, prefer placing P0 requirements in early phases and defer
 - If priority tags exist, prefer not placing P0 requirements in phases that depend on P2 requirements — but this is a soft preference, not a hard rule.
 - Never omit the Phase Estimate Summary from `00-overview.md`.
 - Never leave `.ai/planning/future-scope.md` unwritten when P2 requirements exist and are being deferred.
+- Never write, edit, or execute any file outside `.ai/planning/`; never touch source code, config, or test files directly.
