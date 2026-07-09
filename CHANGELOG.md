@@ -7,6 +7,13 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.13.4] — 2026-07-09
+
+### Fixed
+- Replaced stale "declarative-only" terminology with "runtime-wired" in `docs/guide/installation.md` to match the rename applied in commit `7ea87cf`.
+- Updated stale example version strings ("v0.13.1") to current release version in `docs/guide/installation.md` and `slipway.schema.json`.
+- Added `description` to `permission.webfetch` in `slipway.schema.json` documenting that the object form is present for schema-compatibility only and must not be used for `webfetch` — the flat string is the only runtime-safe value.
+
 ## [Unreleased]
 
 ### Notes
@@ -636,6 +643,8 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
+
+[0.13.4]: https://github.com/fresp/slipway-agents/compare/v0.13.3...v0.13.4
 [0.7.0]: https://github.com/fresp/slipway-agents/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/fresp/slipway-agents/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/fresp/slipway-agents/compare/v0.5.4...v0.6.0
