@@ -38,8 +38,6 @@ The result is not just generated prose. It is a repeatable engineering workflow 
 
 ## Pipeline
 
-[![slipway-agents pipeline](https://github.com/fresp/slipway-agents/raw/dev/docs/pipeline.png)](https://github.com/fresp/slipway-agents/blob/dev/docs/pipeline.png)
-
 | Stage | Agent | Output |
 |---|---|---|
 | Orchestrate | `slipway` | Detects intent, reconciles sessions, routes the next step, and enforces pipeline order. |
