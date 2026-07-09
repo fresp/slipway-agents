@@ -65,7 +65,11 @@ const SLIPWAY_COMMANDS = {
       `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
       `Read-only diagnostic run: $ARGUMENTS\n\n` +
       `Check slipway.json validity, .ai/docs/ completeness, .ai/pipeline-state.md consistency, ` +
-      `and run STEP 0 session reconciliation as a dry check. Report findings only — make no writes.`,
+      `run STEP 0 session reconciliation as a dry check, and report .ai/learnings/memory.md ` +
+      `learnings health (line count with >90 warning and 100 hard max, pending/promoted/wont_fix ` +
+      `entry counts, wont_fix hygiene, archive/promoted readability). Never invoke ` +
+      `learnings-capture, bosun, gunner, or chronicler for this check. ` +
+      `Report findings only — make no writes.`,
   },
   "slipway:agent-refresh": {
     description: "Regenerate only AGENTS.md from the current docs and latest contract.",

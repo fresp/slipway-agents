@@ -159,3 +159,117 @@ test("keeps slash command templates and plan-authoring guardrails Slipway-local"
     );
   }
 });
+
+// ── Batch G: slipway:doctor template learnings-health contract ──
+
+test("slipway:doctor template mentions learnings health and .ai/learnings", async () => {
+  const input: Config = {};
+
+  await applyCommandConfig(input, makeSlipwayConfig());
+
+  const doctorTemplate = input.command?.["slipway:doctor"]?.template ?? "";
+
+  assert.ok(
+    doctorTemplate.toLowerCase().includes("learnings health") ||
+      doctorTemplate.toLowerCase().includes("learnings-health"),
+    "doctor template must mention learnings health"
+  );
+  assert.ok(
+    doctorTemplate.includes(".ai/learnings"),
+    "doctor template must reference .ai/learnings"
+  );
+});
+
+test("slipway:doctor template mentions memory.md", async () => {
+  const input: Config = {};
+
+  await applyCommandConfig(input, makeSlipwayConfig());
+
+  const doctorTemplate = input.command?.["slipway:doctor"]?.template ?? "";
+
+  assert.ok(
+    doctorTemplate.includes("memory.md"),
+    "doctor template must mention memory.md"
+  );
+});
+
+test("slipway:doctor template mirrors learnings health thresholds and hygiene checks", async () => {
+  const input: Config = {};
+
+  await applyCommandConfig(input, makeSlipwayConfig());
+
+  const doctorTemplate = input.command?.["slipway:doctor"]?.template ?? "";
+
+  assert.ok(
+    doctorTemplate.includes(">90") || doctorTemplate.includes("90"),
+    "doctor template must mention the >90 memory.md warning threshold"
+  );
+  assert.ok(
+    doctorTemplate.includes("100"),
+    "doctor template must mention the hard max of 100 lines"
+  );
+
+  for (const status of ["pending", "promoted", "wont_fix"] as const) {
+    assert.ok(
+      doctorTemplate.includes(status),
+      `doctor template must mention ${status} status counts`
+    );
+  }
+
+  assert.ok(
+    doctorTemplate.toLowerCase().includes("hygiene"),
+    "doctor template must mention wont_fix hygiene"
+  );
+
+  for (const forbidden of ["learnings-capture", "bosun", "gunner", "chronicler"] as const) {
+    assert.ok(
+      doctorTemplate.toLowerCase().includes(forbidden),
+      `doctor template must forbid invoking ${forbidden}`
+    );
+  }
+});
+
+test("slipway:doctor template remains a read-only diagnostic", async () => {
+  const input: Config = {};
+
+  await applyCommandConfig(input, makeSlipwayConfig());
+
+  const doctorTemplate = input.command?.["slipway:doctor"]?.template ?? "";
+
+  assert.ok(
+    doctorTemplate.toLowerCase().includes("read-only"),
+    "doctor template must state it is read-only"
+  );
+  assert.ok(
+    doctorTemplate.toLowerCase().includes("no writes") ||
+      doctorTemplate.toLowerCase().includes("make no writes") ||
+      doctorTemplate.toLowerCase().includes("report findings only"),
+    "doctor template must instruct report-only / no-write behavior"
+  );
+});
+
+test("slipway:doctor template does not imply CLI doctor behavior", async () => {
+  const input: Config = {};
+
+  await applyCommandConfig(input, makeSlipwayConfig());
+
+  const doctorTemplate = input.command?.["slipway:doctor"]?.template ?? "";
+
+  const cliTerms = [
+    "command line",
+    "CLI doctor",
+    "exit code",
+    "terminal",
+    "shell command",
+    "npm run doctor",
+    "npx doctor",
+  ];
+
+  for (const term of cliTerms) {
+    assert.equal(
+      doctorTemplate.toLowerCase().includes(term.toLowerCase()),
+      false,
+      `doctor template must not imply CLI behavior: found "${term}"`
+    );
+  }
+});

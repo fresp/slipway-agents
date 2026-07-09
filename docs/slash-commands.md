@@ -78,6 +78,7 @@ Equivalent to asking `@slipway run doctor` or `@slipway run pipeline diagnostics
   4. Agent runtime integrity — Slipway agents registered by the plugin; package-local `subagents/<name>.md` files are checked only when running from the plugin repository.
   5. Runtime-wired features summary — confirm which config features are passed through to OpenCode at runtime (per-agent `permission` blocks are wired as of Batch 6).
   6. Session reconciliation health — active vs resolved session counts, stale active sessions older than 3 days, and reconciliation history presence.
+  7. Learnings Memory Health — `.ai/learnings/memory.md` line count (warn >90, hard max 100), pending/promoted/wont_fix entry counts, wont_fix hygiene, and archive.md / promoted.md readability. Strictly read-only — never invokes learnings-capture, bosun, gunner, or chronicler.
 
 **Output symbols:**
 - `✓` healthy
@@ -112,6 +113,11 @@ Slipway doctor
 ## 6. Session reconciliation health
 ✓ active sessions: [N], resolved sessions: [N]
 ⚠ no reconciliation history
+...
+
+## 7. Learnings Memory Health
+✓ memory.md: [N] lines, pending: [N], promoted: [N], wont_fix: [N]
+✓ archive.md readable, promoted.md readable
 ...
 
 N issues found (X errors, Y warnings)
