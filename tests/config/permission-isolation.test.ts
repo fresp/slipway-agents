@@ -214,3 +214,42 @@ test("gunner webfetch permission is set to ask", () => {
     "gunner permission.webfetch should be flat string ask (object form crashes OpenCode TUI runtime)"
   );
 });
+
+test("every agent has an explicit permission.edit key with the correct value", () => {
+  const config = loadSlipwayConfig();
+
+  const EXPECTED_EDIT_PERMISSIONS: Record<string, "allow" | "deny"> = {
+    slipway: "deny",
+    chartmaker: "allow",
+    cartographer: "allow",
+    hullwright: "allow",
+    bosun: "deny",
+    rigger: "allow",
+    coxswain: "deny",
+    shipwright: "allow",
+    chronicler: "allow",
+    surveyor: "deny",
+    gunner: "allow",
+    caulker: "allow",
+  };
+
+  for (const name of EXPECTED_AGENTS) {
+    const agent = config.agents[name];
+    assert.ok(agent, `agent ${name} should exist`);
+    assert.ok(agent.permission, `agent ${name} should have a permission block`);
+    assert.ok(
+      "edit" in agent.permission,
+      `agent ${name} should have an explicit permission.edit key (absent resolves to permissive in OpenCode runtime)`
+    );
+    const expectedValue = EXPECTED_EDIT_PERMISSIONS[name];
+    assert.ok(
+      expectedValue !== undefined,
+      `agent ${name} should have an expected edit permission value defined in test`
+    );
+    assert.equal(
+      agent.permission.edit,
+      expectedValue,
+      `agent ${name} permission.edit should be "${expectedValue}" per the authoritative table`
+    );
+  }
+});
