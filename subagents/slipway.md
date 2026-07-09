@@ -189,6 +189,26 @@ Use these intent categories:
 
 If `.ai/docs/01-prd.md` exists but looks incomplete against the section checklist in `bootstrap-from-prd/SKILL.md`, still route to `chartmaker` first in **gap-fill mode** rather than straight to `hullwright`.
 
+#### Routing learnings-capture during mode detection
+
+When Step A cannot classify the underlying intent clearly enough for Step B, or when multiple
+mapped intents still conflict and the user resolves the one-question fallback, log the resolved
+routing correction as a non-blocking, best-effort learning. This captures only routing ambiguity
+that already passes through Mode Detection's ask-once fallback; it does not create a new trigger
+condition or a new pipeline step.
+
+For each learnings-capture item, pass:
+- **Category**: `routing`
+- **Source**: `slipway` (orchestrator-level routing decision)
+- **Pattern-Key**: `routing.<intent-or-mode>.<short-symptom>` (e.g.
+  `routing.planning.ambiguous-plan-vs-groom`, `routing.diagnostics.ambiguous-doctor-vs-review`)
+- **Priority**: `critical` if the avoided misroute would violate a Forbidden Behavior, `high` if
+  it would dispatch the wrong pipeline mode/subagent, otherwise `medium` for ambiguity resolved
+  before dispatch
+
+This is non-blocking and best-effort: if `learnings-capture` fails for any item, warn and
+continue. Do not block, retry, or change any routing decision solely for learnings logging.
+
 ### Step B — Map the classified intent to a mode
 
 | Classified intent and strong example signals                                                                              | Mode                    | Entry point                                     |
@@ -576,6 +596,25 @@ Never produce a wall of text. End with exactly one summary line: `N issues found
   `.ai/docs/.pipeline-state.md`, or `⚠ no reconciliation history` if absent.
 - This check is read-only — Doctor mode never triggers STEP 0 or calls
   caulker. It only reports what it finds.
+
+### 7. Learnings Memory Health
+
+Read `.ai/learnings/memory.md` (if it exists) as a read-only check:
+
+- **Line count**: report the line count. Warn ⚠ if the file exceeds 90 lines; the hard max is
+  100 lines — if it reaches 100, report ⚠ and note the file must be pruned before the next
+  `learnings-capture` write.
+- **Entry counts**: report the number of entries with `status: pending`, `status: promoted`,
+  and `status: wont_fix`.
+- **wont_fix hygiene**: if any entries still carry `status: wont_fix` in `memory.md`, warn ⚠ —
+  these should have been moved to `archive.md` by the next `learnings-capture` cycle.
+- **Companion files**: confirm `.ai/learnings/archive.md` and `.ai/learnings/promoted.md` are
+  readable (or report ⚠ if absent/unreadable).
+
+This check is **strictly read-only** — it never invokes `learnings-capture`, `bosun`, `gunner`,
+or `chronicler`. It does not write, edit, or delete any file. Bosun-originated learnings
+checks in Doctor mode are diagnostic only and do not count toward
+`ralph_loop.block_on_exhaustion` — no behavior change, no gate impact.
 
 ---
 
