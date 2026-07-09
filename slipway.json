@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/dev/slipway.schema.json",
-  "version": "0.13.2",
+  "version": "0.13.3",
   "ralph_loop": {
     "enabled": true,
     "max_iterations": 2,
@@ -180,10 +180,7 @@
       "mode": "subagent",
       "description": "Auth, secrets, attack surface, and dependency/image vulnerability audit — PASS / CONDITIONAL / BLOCK gate",
       "permission": {
-        "webfetch": {
-          "api.osv.dev": "allow",
-          "*": "ask"
-        },
+        "webfetch": "ask",
         "task": "deny",
         "skill": {
           "*": "allow",

@@ -12,6 +12,11 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Notes
 - **Q2 (cost/latency):** The ≤100-line HOT read of `.ai/learnings/memory.md` at `claude-haiku-4-5` tier is unmeasured — revisit if latency complaints surface.
 
+## [0.13.3] — 2026-07-09
+
+### Fixed
+- Replaced the object-form `gunner.permission.webfetch` value (`{"api.osv.dev": "allow", "*": "ask"}`) with the flat string form (`"ask"`) in both the project `slipway.json` and the global `~/.config/opencode/slipway.json` fragments. The object form passed this repo's Zod schema validation but crashed OpenCode's native TUI runtime, which expects `PermissionActionConfig | undefined` for `webfetch`.
+
 ## [0.13.2] — 2026-07-09
 
 ### Changed
