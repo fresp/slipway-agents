@@ -253,3 +253,92 @@ test("Doctor section 7 is read-only and forbids invoking learnings-capture, bosu
     "Section 7 must forbid invoking chronicler"
   );
 });
+
+// ── Phase 4: Implementation phrasing routing + direct source-edit prohibition ──
+
+test("Mode Detection classifies implementation phrasing by underlying requirement not surface wording", async () => {
+  const modeDetection = slipwayContract.slice(
+    slipwayContract.indexOf("## Mode Detection"),
+    slipwayContract.indexOf("## Pipeline — full run")
+  );
+
+  const bootstrapping = modeDetection.slice(
+    modeDetection.indexOf("**Bootstrapping:"),
+    modeDetection.indexOf("**Reading/understanding:")
+  );
+
+  assert.ok(
+    bootstrapping.includes("refactor this service") ||
+      bootstrapping.includes("implement X") ||
+      bootstrapping.includes("build Y"),
+    "Bootstrapping should mention implementation-phrasing examples"
+  );
+  assert.ok(
+    bootstrapping.includes("underlying requirement") ||
+      bootstrapping.includes("classified by"),
+    "Bootstrapping should classify by underlying requirement, not surface phrasing"
+  );
+  assert.ok(
+    bootstrapping.includes("chartmaker"),
+    "Bootstrapping should route implementation phrasing to chartmaker when no docs baseline exists"
+  );
+  assert.ok(
+    bootstrapping.includes("never write source code directly") ||
+      bootstrapping.includes("never write source code"),
+    "Bootstrapping should forbid direct source code writing"
+  );
+
+  const changingScope = modeDetection.slice(
+    modeDetection.indexOf("**Changing scope or behavior:"),
+    modeDetection.indexOf("**Diagnosing:")
+  );
+
+  assert.ok(
+    changingScope.includes("refactor this service") ||
+      changingScope.includes("implement X") ||
+      changingScope.includes("build Y"),
+    "Changing scope should mention implementation-phrasing examples"
+  );
+  assert.ok(
+    changingScope.includes("underlying requirement") ||
+      changingScope.includes("classified by"),
+    "Changing scope should classify by underlying requirement, not surface phrasing"
+  );
+  assert.ok(
+    changingScope.includes("shipwright"),
+    "Changing scope should route implementation phrasing to shipwright when baseline docs exist"
+  );
+  assert.ok(
+    changingScope.includes("never write source code directly") ||
+      changingScope.includes("never write source code"),
+    "Changing scope should forbid direct source code writing"
+  );
+});
+
+test("Forbidden Behaviors prohibit direct source edits and name Sisyphus omo.dev as implementation owner", async () => {
+  const forbiddenBehaviors = slipwayContract.slice(
+    slipwayContract.indexOf("## Forbidden Behaviors")
+  );
+
+  assert.ok(
+    forbiddenBehaviors.includes("Never write, edit, or generate application/source code directly"),
+    "Forbidden Behaviors must include direct source-edit prohibition"
+  );
+  assert.ok(
+    forbiddenBehaviors.includes("refactor this") ||
+      forbiddenBehaviors.includes("implement X") ||
+      forbiddenBehaviors.includes("fix this bug"),
+    "Forbidden Behaviors must include implementation-phrasing examples"
+  );
+  assert.ok(
+    forbiddenBehaviors.includes("chartmaker/shipwright → docs → rigger → plan") ||
+      forbiddenBehaviors.includes("chartmaker/shipwright"),
+    "Forbidden Behaviors must name the normal pipeline"
+  );
+  assert.ok(
+    forbiddenBehaviors.includes("Sisyphus/omo.dev") ||
+      forbiddenBehaviors.includes("Sisyphus"),
+    "Forbidden Behaviors must name Sisyphus/omo.dev as implementation owner"
+  );
+});
+

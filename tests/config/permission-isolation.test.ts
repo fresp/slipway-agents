@@ -19,10 +19,10 @@ const SUBAGENTS = [
 const EXPECTED_AGENTS = ["slipway", ...SUBAGENTS];
 
 const APPROVED_SKILL_ALLOWLIST: Record<string, string[]> = {
-  slipway: ["docs-publish", "learnings-capture"],
+  slipway: ["learnings-capture"],
   chartmaker: [],
   cartographer: [],
-  hullwright: ["bootstrap-from-prd", "session-log"],
+  hullwright: ["bootstrap-from-prd", "session-log", "docs-publish"],
   bosun: [],
   gunner: ["learnings-capture"],
   coxswain: [
@@ -253,3 +253,15 @@ test("every agent has an explicit permission.edit key with the correct value", (
     );
   }
 });
+
+// ── Phase 2: Version sync test ──
+
+test("slipway config version is synced to 0.13.7 before 0.13.8 changelog work", () => {
+  const config = loadSlipwayConfig();
+  assert.equal(
+    (config as any).version,
+    "0.13.7",
+    "slipway.json version should be 0.13.7 after Phase 2 sync"
+  );
+});
+
