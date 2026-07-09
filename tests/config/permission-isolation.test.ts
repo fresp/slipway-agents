@@ -18,6 +18,21 @@ const SUBAGENTS = [
 
 const EXPECTED_AGENTS = ["slipway", ...SUBAGENTS];
 
+const APPROVED_SKILL_ALLOWLIST: Record<string, string[]> = {
+  slipway: ["learnings-capture"],
+  chartmaker: [],
+  cartographer: [],
+  hullwright: ["bootstrap-from-prd", "session-log"],
+  bosun: [],
+  gunner: ["learnings-capture"],
+  coxswain: ["groomer-complexity-audit"],
+  rigger: [],
+  shipwright: ["session-log"],
+  chronicler: ["learnings-capture", "session-log"],
+  surveyor: [],
+  caulker: ["doc-merge-resolution"],
+};
+
 function loadSlipwayConfig() {
   const raw = readFileSync("slipway.json", "utf8");
   return JSON.parse(raw) as {
@@ -52,7 +67,7 @@ function loadSlipwayConfig() {
   };
 }
 
-test("every agent has a skill permission block that denies harness-default planning skills", () => {
+test("every agent has a skill permission block that denies by default and allows only approved skills", () => {
   const config = loadSlipwayConfig();
   const agents = Object.keys(config.agents).sort();
 
@@ -80,18 +95,45 @@ test("every agent has a skill permission block that denies harness-default plann
     const skill = agent.permission.skill as Record<string, string>;
     assert.equal(
       skill["*"],
+      "deny",
+      `agent ${name} should deny skills by default`
+    );
+
+    const expectedAllowedSkills = APPROVED_SKILL_ALLOWLIST[name];
+    assert.ok(
+      expectedAllowedSkills,
+      `agent ${name} should have an approved skill allow-list entry`
+    );
+
+    for (const allowedSkill of expectedAllowedSkills) {
+      assert.equal(
+        skill[allowedSkill],
+        "allow",
+        `agent ${name} should allow approved skill ${allowedSkill}`
+      );
+    }
+
+    const expectedKeys = new Set(["*", ...expectedAllowedSkills]);
+    assert.deepEqual(
+      Object.keys(skill).sort(),
+      Array.from(expectedKeys).sort(),
+      `agent ${name} skill permission should contain no unexpected keys`
+    );
+  }
+});
+
+test("no agent uses the old wildcard-allow skill permission shape", () => {
+  const config = loadSlipwayConfig();
+
+  for (const name of EXPECTED_AGENTS) {
+    const agent = config.agents[name];
+    const skill = agent.permission?.skill as Record<string, string> | undefined;
+
+    assert.ok(skill, `agent ${name} should have a permission.skill block`);
+    assert.notEqual(
+      skill["*"],
       "allow",
-      `agent ${name} should allow skills by default`
-    );
-    assert.equal(
-      skill["superpowers*"],
-      "deny",
-      `agent ${name} should deny superpowers* skills`
-    );
-    assert.equal(
-      skill["subagent-driven-development*"],
-      "deny",
-      `agent ${name} should deny subagent-driven-development* skills`
+      `agent ${name} must not allow all skills by default`
     );
   }
 });

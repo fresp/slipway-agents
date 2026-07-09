@@ -150,6 +150,7 @@
               ]
             },
             "skill": {
+              "description": "Skill permissions must be deny-default allow-lists. Keep the object form flexible for per-pattern ask/allow/deny entries, but do not set \"*\" to \"allow\" for skill because that permits harness-default or external skills to bypass Slipway mode gates. Use \"*\": \"deny\" plus explicit repo-local skill names that the agent legitimately invokes.",
               "anyOf": [
                 { "type": "string", "enum": ["ask", "allow", "deny"] },
                 {

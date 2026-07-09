@@ -21,6 +21,9 @@ export const permissionSchema = z
     task: z
       .union([permissionActionSchema, z.record(z.string(), permissionActionSchema)])
       .optional(),
+    // Skills must use deny-default allow-list semantics. Do not set "*" to
+    // "allow" for skill permissions; each agent should explicitly allow only
+    // the repo-local skills it legitimately invokes.
     skill: z
       .union([permissionActionSchema, z.record(z.string(), permissionActionSchema)])
       .optional(),

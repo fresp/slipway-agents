@@ -30,9 +30,8 @@
           "caulker": "allow"
         },
         "skill": {
-          "*": "allow",
-          "superpowers*": "deny",
-          "subagent-driven-development*": "deny"
+          "*": "deny",
+          "learnings-capture": "allow"
         }
       }
     },
@@ -45,9 +44,7 @@
       "permission": {
         "task": "deny",
         "skill": {
-          "*": "allow",
-          "superpowers*": "deny",
-          "subagent-driven-development*": "deny"
+          "*": "deny"
         }
       }
     },
@@ -60,9 +57,7 @@
       "permission": {
         "task": "deny",
         "skill": {
-          "*": "allow",
-          "superpowers*": "deny",
-          "subagent-driven-development*": "deny"
+          "*": "deny"
         }
       }
     },
@@ -75,9 +70,9 @@
       "permission": {
         "task": "deny",
         "skill": {
-          "*": "allow",
-          "superpowers*": "deny",
-          "subagent-driven-development*": "deny"
+          "*": "deny",
+          "bootstrap-from-prd": "allow",
+          "session-log": "allow"
         }
       }
     },
@@ -91,9 +86,7 @@
         "edit": "deny",
         "task": "deny",
         "skill": {
-          "*": "allow",
-          "superpowers*": "deny",
-          "subagent-driven-development*": "deny"
+          "*": "deny"
         }
       },
       "ralph_loop": { "block_on_exhaustion": true }
@@ -107,9 +100,7 @@
       "permission": {
         "task": "deny",
         "skill": {
-          "*": "allow",
-          "superpowers*": "deny",
-          "subagent-driven-development*": "deny"
+          "*": "deny"
         }
       }
     },
@@ -122,9 +113,8 @@
       "permission": {
         "task": "deny",
         "skill": {
-          "*": "allow",
-          "superpowers*": "deny",
-          "subagent-driven-development*": "deny"
+          "*": "deny",
+          "groomer-complexity-audit": "allow"
         }
       }
     },
@@ -137,9 +127,8 @@
       "permission": {
         "task": "deny",
         "skill": {
-          "*": "allow",
-          "superpowers*": "deny",
-          "subagent-driven-development*": "deny"
+          "*": "deny",
+          "session-log": "allow"
         }
       }
     },
@@ -152,9 +141,9 @@
       "permission": {
         "task": "deny",
         "skill": {
-          "*": "allow",
-          "superpowers*": "deny",
-          "subagent-driven-development*": "deny"
+          "*": "deny",
+          "learnings-capture": "allow",
+          "session-log": "allow"
         }
       }
     },
@@ -167,9 +156,7 @@
       "permission": {
         "task": "deny",
         "skill": {
-          "*": "allow",
-          "superpowers*": "deny",
-          "subagent-driven-development*": "deny"
+          "*": "deny"
         }
       }
     },
@@ -183,9 +170,8 @@
         "webfetch": "ask",
         "task": "deny",
         "skill": {
-          "*": "allow",
-          "superpowers*": "deny",
-          "subagent-driven-development*": "deny"
+          "*": "deny",
+          "learnings-capture": "allow"
         },
         "bash": {
           "npm": "allow",
@@ -211,9 +197,8 @@
       "permission": {
         "task": "deny",
         "skill": {
-          "*": "allow",
-          "superpowers*": "deny",
-          "subagent-driven-development*": "deny"
+          "*": "deny",
+          "doc-merge-resolution": "allow"
         }
       }
     }
