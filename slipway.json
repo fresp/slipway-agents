@@ -31,6 +31,7 @@
         },
         "skill": {
           "*": "deny",
+          "docs-publish": "allow",
           "learnings-capture": "allow"
         }
       }

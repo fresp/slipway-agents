@@ -19,13 +19,18 @@ const SUBAGENTS = [
 const EXPECTED_AGENTS = ["slipway", ...SUBAGENTS];
 
 const APPROVED_SKILL_ALLOWLIST: Record<string, string[]> = {
-  slipway: ["learnings-capture"],
+  slipway: ["docs-publish", "learnings-capture"],
   chartmaker: [],
   cartographer: [],
   hullwright: ["bootstrap-from-prd", "session-log"],
   bosun: [],
   gunner: ["learnings-capture"],
-  coxswain: ["groomer-complexity-audit"],
+  coxswain: [
+    "groomer-complexity-audit",
+    "groomer-devops",
+    "groomer-lead-dev",
+    "groomer-qa",
+  ],
   rigger: [],
   shipwright: ["session-log"],
   chronicler: ["learnings-capture", "session-log"],

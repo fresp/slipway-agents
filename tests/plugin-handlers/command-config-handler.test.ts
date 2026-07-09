@@ -17,14 +17,14 @@ function makeSlipwayConfig(): NonNullable<Parameters<typeof applyCommandConfig>[
   };
 }
 
-test("injects the nine slipway runtime commands into an empty config", async () => {
+test("injects the ten slipway runtime commands into an empty config", async () => {
   const input: Config = {};
 
   await applyCommandConfig(input, makeSlipwayConfig());
 
-  assert.deepEqual(Object.keys(input.command ?? {}).sort(), ["slipway:agent-refresh", "slipway:doctor", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync"]);
+  assert.deepEqual(Object.keys(input.command ?? {}).sort(), ["slipway:agent-refresh", "slipway:docs-publish", "slipway:doctor", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync"]);
 
-  for (const name of ["slipway:agent-refresh", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync"] as const) {
+  for (const name of ["slipway:agent-refresh", "slipway:docs-publish", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync"] as const) {
     const command = input.command?.[name];
 
     assert.ok(command, `command ${name} should be defined`);
@@ -43,7 +43,7 @@ test("sets the resolved slipway model on each command", async () => {
 
   await applyCommandConfig(input, makeSlipwayConfig());
 
-  for (const name of ["slipway:agent-refresh", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync"] as const) {
+  for (const name of ["slipway:agent-refresh", "slipway:docs-publish", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync"] as const) {
     assert.equal(input.command?.[name]?.model, slipwayModel);
   }
 });
@@ -100,6 +100,44 @@ test("agent-refresh targets AGENTS.md and documents legacy migration", async () 
   assert.ok(command.template.includes(`latest hullwright ${currentArtifact} template`));
   assert.ok(command.template.includes(`Migrated: ${legacyArtifact} -> ${currentArtifact}`));
   assert.ok(command.template.includes("No migration needed."));
+});
+
+test("docs-publish command routes to slipway without embedding @slipway", async () => {
+  const input: Config = {};
+
+  await applyCommandConfig(input, makeSlipwayConfig());
+
+  const command = input.command?.["slipway:docs-publish"];
+  assert.ok(command, "slipway:docs-publish should be defined");
+  assert.equal(command.agent, "slipway");
+  assert.ok(command.description?.includes("TRD"));
+  assert.ok(command.template.includes("docs-publish mode"));
+  assert.ok(command.template.includes("Feature documentation request: $ARGUMENTS"));
+  assert.ok(command.template.includes("feature name"));
+  assert.ok(command.template.includes("FR-IDs"));
+  assert.ok(command.template.includes("docs-publish"));
+  assert.equal(command.template.includes("@slipway"), false);
+});
+
+test("slipway contract documents docs-publish mode and output boundary", () => {
+  const slipwayContract = readFileSync("subagents/slipway.md", "utf8");
+
+  assert.ok(
+    slipwayContract.includes("| Post-implementation: user says \"publish docs\", \"generate TRD\", \"create feature documentation\", \"document this feature\" | `docs-publish` | `slipway`"),
+    "Mode Detection should route docs-publish intent to slipway"
+  );
+  assert.ok(
+    slipwayContract.includes("Required input: feature name + FR-IDs"),
+    "docs-publish pipeline section should require feature name and FR-IDs"
+  );
+  assert.ok(
+    slipwayContract.includes("Never treat `/docs/<feature>/TRD.md` as authoritative"),
+    "docs-publish pipeline section should mark TRD as derived"
+  );
+  assert.ok(
+    slipwayContract.includes("Never let `docs-publish` mode write outside `/docs/<feature>/`"),
+    "Forbidden Behaviors should constrain docs-publish output path"
+  );
 });
 
 test("keeps slash command templates and plan-authoring guardrails Slipway-local", async () => {

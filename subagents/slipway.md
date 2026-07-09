@@ -222,6 +222,7 @@ continue. Do not block, retry, or change any routing decision solely for learnin
 | Scoping/design: user wants grooming or build-readiness review, for example "groom this", "sprint grooming", "is this ready to build?", "dev/QA/DevOps review", or "ready to build?" | `grooming-only` | `coxswain` |
 | Scoping/design: user wants planning, phases, milestones, sequencing, or "how should we build this" and docs already exist and have been reviewed | `plan-only` | `rigger` |
 | Post-build sync: user says "sync docs", "update docs after build", "implementation done", "build complete", or otherwise reports implementation reality that docs must catch up to | `sync` | `chronicler` |
+| Post-implementation: user says "publish docs", "generate TRD", "create feature documentation", "document this feature" | `docs-publish` | `slipway` (self, invokes `docs-publish` skill directly, delegating to hullwright/shipwright/chronicler/cartographer for data-gathering per the skill's own Integration section) |
 | Diagnosing security: user wants a security-focused cause/risk review, for example "security audit", "audit security", or "check security" | `security-only`         | `gunner`                                        |
 | Estimating: user says "estimate", "how long will this take", "cost estimate", "time forecast", or otherwise asks for time/cost/effort signals | `estimate-only` | `rigger` (estimate-only mode) |
 | Reading/understanding: user wants schema validation, for example "validate schema", "check schema", or "schema drift"    | `schema-validate`       | `surveyor`                                      |
@@ -529,6 +530,7 @@ This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and
 - **estimate-only**: call `rigger` in estimate-only mode — rigger re-reads existing `.ai/planning/` files and re-emits the Phase Estimate Summary without regenerating tasks. Refuse if `.ai/planning/` does not exist — ask the user to run planning first.
 - **schema-validate**: call `surveyor`. Ask the user for the schema source (SQL dump, ORM schema file, or migration directory) before invoking.
 - **agent-refresh**: call `hullwright` in Partial Regeneration mode scoped exclusively to `["AGENTS.md"]`. Recompiles `AGENTS.md` from the current on-disk `.ai/docs/*.md` and the latest AGENTS.md template/contract, without regenerating, re-deriving, or version-bumping any other document. Use when the AGENTS.md contract itself has changed (new Working Loop steps, new Execution Protocol sections) and an already-bootstrapped project needs to adopt it. Refuse if `.ai/docs/01-prd.md` or the `02-10` doc suite does not exist — this mode only recompiles AGENTS.md from docs that already exist, it does not bootstrap from scratch. If the target project still has only the legacy singular artifact (`AGENT` + `.md`), tell hullwright to write `AGENTS.md`, remove the legacy file, and report the migration; if `AGENTS.md` already exists, report `No migration needed.`
+- **docs-publish**: invoke the `docs-publish` skill directly from `slipway`. Required input: feature name + FR-IDs; ask once if either is missing, following the one-routing-question rule in Core Principles. If the skill's "with implementation evidence" mode applies, ensure implementation files are reachable before invoking. Delegate to hullwright, shipwright, chronicler, or cartographer only for data-gathering needs described in the skill's Integration section. Never treat `/docs/<feature>/TRD.md` as authoritative — it is a derived document, and docs-publish must not invent architecture or requirements beyond `.ai/docs/` and implementation evidence.
 - **sync**: call `chronicler`. See Pipeline — sync run below.
 - **resolve-conflicts**: call `caulker` against the touched `.ai/docs/`/`AGENTS.md` files. If
   `caulker` reports any escalated (blocked) units, stop and present them to the user — do not
@@ -762,6 +764,7 @@ Changelog written to: .ai/docs/.pipeline-changelog.md
 - Never let `caulker` auto-continue into another subagent without an explicit user go-ahead.
 - Never block, retry, pause, or change a gate decision because a hook failed, was skipped, or could not fire.
 - Never let `agent-refresh` mode touch, re-validate, or version-bump any document other than `AGENTS.md`.
+- Never let `docs-publish` mode write outside `/docs/<feature>/` — TRD generation never touches `.ai/docs/` or `.ai/planning/`.
 
 - Never invoke any Skill outside this repo's own skill set (skills/slipway/*) to author or 
   save a plan, PRD, or engineering doc. Plan generation always routes through STEP 6 → rigger 

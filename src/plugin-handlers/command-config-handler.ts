@@ -84,6 +84,17 @@ const SLIPWAY_COMMANDS = {
       `.md -> AGENTS.md". If AGENTS.md already exists, refresh it normally and report ` +
       `"No migration needed." Do not touch any other file.`,
   },
+  "slipway:docs-publish": {
+    description: "Generate a feature TRD under docs/<feature>/.",
+    agent: "slipway",
+    template:
+      `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
+      `Feature documentation request: $ARGUMENTS\n\n` +
+      `Run docs-publish mode. Require a feature name and FR-IDs; ask one routing question ` +
+      `if either is missing. Invoke the docs-publish skill directly from slipway. If ` +
+      `implementation evidence mode applies, first ensure implementation files are reachable. ` +
+      `Generate only docs/<feature>/TRD.md and never treat that TRD as authoritative source docs.`,
+  },
   "slipway:review": {
     description: "Run a consistency review on existing docs.",
     agent: "slipway",
