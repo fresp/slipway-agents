@@ -11,7 +11,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "description": "Config schema version. Current: 0.13.1",
+      "description": "Config schema version. Current: 0.13.4",
       "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
     "ralph_loop": {
@@ -131,6 +131,7 @@
           "properties": {
             "edit": { "type": "string", "enum": ["ask", "allow", "deny"] },
             "webfetch": {
+              "description": "Only the flat string form (\"ask\", \"allow\", \"deny\") is runtime-safe for webfetch. The object form is present for schema-compatibility only — it passes this repo's Zod validation but crashes OpenCode's native TUI runtime, which expects PermissionActionConfig | undefined for webfetch.",
               "anyOf": [
                 { "type": "string", "enum": ["ask", "allow", "deny"] },
                 {

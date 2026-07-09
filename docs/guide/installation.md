@@ -37,7 +37,7 @@ Typical output:
 ```text
 ℹ Installing slipway-agents...
 ✓ Added slipway-agents@latest to plugin array in ~/.config/opencode/opencode.json
-✓ Created slipway.json at ~/.config/opencode/slipway.json (v0.13.1)
+✓ Created slipway.json at ~/.config/opencode/slipway.json (v0.13.4)
 ℹ Plugin cache not found — nothing to clear.
 ✓ Done. Restart OpenCode to activate the agents.
 ℹ Config: ~/.config/opencode/slipway.json
@@ -60,7 +60,7 @@ bunx slipway-agents@latest status
 
 `status` prints the local install state, installed config version, `~/.config/opencode/slipway.json` path, configured agent count, and whether `~/.config/opencode/slipway.local.json` exists.
 
-Inside OpenCode, `/slipway:doctor` is a different diagnostic: it is an in-session, read-only pipeline check covering project config resolution, manifest health, pipeline state, agent files, declarative-only notes, and session reconciliation health.
+Inside OpenCode, `/slipway:doctor` is a different diagnostic: it is an in-session, read-only pipeline check covering project config resolution, manifest health, pipeline state, agent files, runtime-wired notes, and session reconciliation health.
 
 ## Manual install (fallback)
 
@@ -91,7 +91,7 @@ The installer writes `~/.config/opencode/slipway.json`. To customize model assig
 // slipway.local.json
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/main/slipway.schema.json",
-  "version": "0.13.1",
+  "version": "0.13.4",
   "agents": {
     "slipway":      { "model": "anthropic/claude-opus-4-8",   "fallback_model": "anthropic/claude-sonnet-5" },
     "chartmaker":   { "model": "anthropic/claude-sonnet-5", "fallback_model": "anthropic/claude-haiku-4-5" },
@@ -167,7 +167,7 @@ npx slipway-agents@latest update
 If `slipway.json` is already current and unchanged, the CLI prints:
 
 ```text
-✓ slipway.json already up to date (v0.13.1) — no change needed
+✓ slipway.json already up to date (v0.13.4) — no change needed
 ```
 
 For manual git-clone installs, update the checkout separately:
