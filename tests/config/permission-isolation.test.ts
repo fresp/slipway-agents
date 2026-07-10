@@ -19,7 +19,13 @@ const SUBAGENTS = [
 const EXPECTED_AGENTS = ["slipway", ...SUBAGENTS];
 
 const APPROVED_SKILL_ALLOWLIST: Record<string, string[]> = {
-  slipway: ["learnings-capture"],
+  slipway: [
+    "learnings-capture",
+    "pipeline-extend",
+    "pipeline-reverse-engineer",
+    "pipeline-doctor",
+    "pipeline-sync",
+  ],
   chartmaker: [],
   cartographer: [],
   hullwright: ["bootstrap-from-prd", "session-log", "docs-publish"],
@@ -41,6 +47,7 @@ const APPROVED_SKILL_ALLOWLIST: Record<string, string[]> = {
 function loadSlipwayConfig() {
   const raw = readFileSync("slipway.json", "utf8");
   return JSON.parse(raw) as {
+    version: string;
     agents: Record<
       string,
       {
@@ -141,6 +148,20 @@ test("no agent uses the old wildcard-allow skill permission shape", () => {
       `agent ${name} must not allow all skills by default`
     );
   }
+});
+
+test("slipway explicitly allows extracted pipeline skills", () => {
+  const config = loadSlipwayConfig();
+  const skill = config.agents.slipway?.permission?.skill;
+
+  assert.equal(typeof skill, "object", "slipway permission.skill should be an object");
+  assert.notEqual(skill, null, "slipway permission.skill should not be null");
+
+  const skillPermissions = skill as Record<string, string>;
+  assert.equal(skillPermissions["pipeline-extend"], "allow");
+  assert.equal(skillPermissions["pipeline-reverse-engineer"], "allow");
+  assert.equal(skillPermissions["pipeline-doctor"], "allow");
+  assert.equal(skillPermissions["pipeline-sync"], "allow");
 });
 
 test("slipway task permission allows exactly the 11 subagents and denies everything else", () => {
@@ -259,9 +280,8 @@ test("every agent has an explicit permission.edit key with the correct value", (
 test("slipway config version is synced to 0.13.7 before 0.13.8 changelog work", () => {
   const config = loadSlipwayConfig();
   assert.equal(
-    (config as any).version,
+    config.version,
     "0.13.7",
     "slipway.json version should be 0.13.7 after Phase 2 sync"
   );
 });
-

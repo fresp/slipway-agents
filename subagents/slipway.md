@@ -437,87 +437,13 @@ New feature during build → route to `shipwright` (extend mode).
 
 Triggered when core docs already exist and the user describes a new feature.
 
-### STEP E0 — Baseline Reconciliation Gate
-
-Runs before STEP E1 on every extend invocation. Ensures the existing doc suite is in a consistent, validated state before extension work begins.
-
-**Gate logic:**
-
-1. **Check `.ai/docs/.pipeline-state.md`** for a `Bosun last run` field and a `Bosun health score` field.
-2. **Skip condition:** If `Bosun last run` is not `"never"` AND `Bosun health score` ≥ 60, proceed directly to STEP E1 — the baseline docs are already validated.
-3. **Block condition:** If `Bosun last run` is `"never"` OR `Bosun health score` < 60 OR the pipeline-state file does not exist, STOP and report:
-
-```
-⚠ Baseline docs have not been validated by Bosun.
-Extension work cannot begin on inconsistent docs.
-→ Run `bosun` (STEP 3) first, then retry the extend request.
-```
-
-**Never bypass this gate.** Extension on unvalidated baseline docs produces unreliable downstream results — this is the lesson from `hullwright`'s Execution Protocol failing due to lack of a validation step.
-
----
-
-### STEP E1 — Extend
-
-Call `shipwright` directly. Brainstorm is not re-run from scratch — `shipwright` owns its own scoped Q&A for the new feature only.
-
-**Input:** New feature description (raw prompt or short PRD addendum) + all existing `.ai/docs/*.md` and `AGENTS.md`.
-
-**Output:** Updated `.ai/docs/01-prd.md` (new feature appended, not a rewrite) + list of impacted downstream docs.
-
-### STEP E2 — Targeted Rebuild
-
-Call `hullwright` in **partial regeneration** mode, passing only the impacted doc list from E1.
-
-### STEP E3 — Review
-
-Call `bosun`, scoped to impacted docs plus any doc that references them.
-
-### STEP E3.5 — Grooming (extend scope)
-
-Call `coxswain` with scope hint: "extend — feature: [feature name], impacted docs: [list from E1]". Coxswain focuses only on the new feature's additions — it does not re-review the entire existing architecture.
-
-### STEP E4 — Security Audit (extend scope)
-
-Call `gunner` scoped to the impacted docs. Focuses on security implications of the new feature only.
-
-### STEP E5 — Optimize Decision
-
-Same contract as STEP 4 in the full pipeline. Loop limit still applies, counter resets per extend run.
-
-### STEP E6 — Planning Update
-
-Call `rigger` in **incremental mode** — append new phases/tasks for the extended feature rather than regenerating the whole plan, unless the user explicitly asks for a full re-plan.
+Invoke skill `pipeline-extend` for the full step sequence (STEP E0 through STEP E6).
 
 ---
 
 ## Pipeline — reverse-engineer mode
 
-**Trigger:** `.ai/docs/` absent or empty AND root manifest file present at project root (`package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `composer.json`).
-
-This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and no docs are present, `reverse-engineer` takes priority.
-
-**Pipeline:**
-
-**STEP 1 — Cartographer**
-- Invoke: `cartographer`
-- Input: project root directory path
-- Gate: `CARTOGRAPHER COMPLETE` signal received
-- If `CARTOGRAPHER BLOCKED`: route to `chartmaker` for standard PRD intake instead
-
-**STEP 2 — Chartmaker (gap-fill mode)**
-- Invoke: `chartmaker` with cartographer's gap-fill briefing
-- Note: chartmaker asks only the gaps cartographer could not infer — not the full PRD intake flow
-- Gate: `01-prd.md` written to `.ai/docs/`
-
-**STEP 3 — Bosun (relaxed threshold)**
-- Invoke: `bosun`
-- Input: all `.ai/docs/` files, including cartographer-generated docs with confidence markers
-- Gate: bosun score ≥ 60 (not standard 70 — cartographer docs are expected to have [PARTIAL] sections)
-- Pass the 60-threshold override to bosun explicitly in the routing handoff
-
-**STEP 4 — Continue standard pipeline**
-- Route to `gunner` and continue from standard STEP 5 onward
+Triggered when `.ai/docs/` is absent or empty and a root manifest file is present. Invoke skill `pipeline-reverse-engineer` for the full execution sequence, including the explicit bosun score-threshold override of 60.
 
 ---
 
@@ -546,77 +472,7 @@ This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and
 
 ## Doctor mode
 
-Doctor mode is a read-only pre-flight diagnostic. It may run before a pipeline, after a failed pipeline, or standalone. It never invokes Chartmaker, Cartographer, Hull Builder, Bosun, Gunner, Coxswain, Rigger, Shipwright, Chronicler, Surveyor, or Caulker, and it never writes, edits, deletes, regenerates, or normalizes files.
-
-Run the checks below in order and print a structured report with clear section headers. Prefix every finding with one of:
-
-- `✓` healthy
-- `⚠` warning or non-blocking issue
-- `✗` error or blocking issue
-
-Never produce a wall of text. End with exactly one summary line: `N issues found (X errors, Y warnings)` or `All checks passed.`
-
-### 1. Config resolution
-
-- Locate the active `slipway.json`: project-root `slipway.json` first, then global `~/.config/opencode/slipway.json` fallback.
-- Report which file is being used, or report that defaults are in effect if no active config exists.
-- Validate the active config against `slipway.schema.json` when both files are readable. Report schema violations as `✗` findings.
-- For each agent in the active config, show the resolved summary: primary `model`, `fallback_model`, `category`, effective `ralph_loop` values after global plus sparse agent override merge, and a permission summary listing only which permission keys are set.
-
-### 2. Manifest health
-
-- If `.ai/docs/.manifest.md` exists, parse its Baseline and Extensions tables and report each listed document's status (`frozen`, `draft`, or `omitted`).
-- Flag any document listed as `frozen` or `draft` that is absent from disk as `✗`.
-- Flag any `.ai/docs/*.md` file on disk that is not listed in the manifest as `⚠` manifest drift requiring investigation.
-- If no manifest exists, report `⚠ no manifest found — legacy project or pre-bootstrap state.`
-
-### 3. Pipeline state
-
-- If `.ai/docs/.pipeline-state.md` exists, report the last completed step and current optimize counter value.
-- Compare the optimize counter with the effective `ralph_loop.max_iterations` for the Bosun loop.
-- If the counter equals `ralph_loop.max_iterations` and unresolved Critical findings are readable from the state file, report prominently: `✗ pipeline is in blocked state, manual resolution required before resuming.`
-- If no state file exists, report `⚠ no pipeline state — project not yet bootstrapped or state was cleared.`
-
-### 4. Agent file integrity
-
-- Verify the active runtime has the Slipway agents registered by the plugin. In a downstream project, do not require target-local `subagents/<name>.md` files; those prompt files are bundled with the plugin package. Report missing files as `✗` only when running from the plugin repository itself and the package-local file is absent.
-- Read the README Skills table and verify every referenced skill has a corresponding file under `skills/slipway/<skill>/SKILL.md`. Report missing skill files as `✗`.
-
-### 5. Runtime-wired features summary
-
-- Review `CHANGELOG.md` and the plugin source (`src/plugin-handlers/tool-config-handler.ts`, `src/plugin-handlers/agent-config-handler.ts`) to identify which config features are now runtime-enforced by OpenCode's native `AgentConfig.permission` passthrough.
-- Report any config feature that is still documented but not passed through to OpenCode at runtime. As of Batch 6, per-agent `permission` blocks (including `edit`, `webfetch`, `task`, `skill`, and `bash`) are wired.
-- If a feature is confirmed wired, do not report it as declarative-only.
-
-### 6. Session reconciliation health
-
-- List all `.ai/sessions/*.md` files. Report counts by status: `active` vs
-  `resolved`.
-- For any `active` session older than 3 days (compare `started` frontmatter
-  field to current date), flag as `⚠` — likely forgotten reconciliation.
-- Report the current `last_reconciled_sessions` list length from
-  `.ai/docs/.pipeline-state.md`, or `⚠ no reconciliation history` if absent.
-- This check is read-only — Doctor mode never triggers STEP 0 or calls
-  caulker. It only reports what it finds.
-
-### 7. Learnings Memory Health
-
-Read `.ai/learnings/memory.md` (if it exists) as a read-only check:
-
-- **Line count**: report the line count. Warn ⚠ if the file exceeds 90 lines; the hard max is
-  100 lines — if it reaches 100, report ⚠ and note the file must be pruned before the next
-  `learnings-capture` write.
-- **Entry counts**: report the number of entries with `status: pending`, `status: promoted`,
-  and `status: wont_fix`.
-- **wont_fix hygiene**: if any entries still carry `status: wont_fix` in `memory.md`, warn ⚠ —
-  these should have been moved to `archive.md` by the next `learnings-capture` cycle.
-- **Companion files**: confirm `.ai/learnings/archive.md` and `.ai/learnings/promoted.md` are
-  readable (or report ⚠ if absent/unreadable).
-
-This check is **strictly read-only** — it never invokes `learnings-capture`, `bosun`, `gunner`,
-or `chronicler`. It does not write, edit, or delete any file. Bosun-originated learnings
-checks in Doctor mode are diagnostic only and do not count toward
-`ralph_loop.block_on_exhaustion` — no behavior change, no gate impact.
+Invoke skill `pipeline-doctor` for the full read-only diagnostic sequence.
 
 ---
 
@@ -624,30 +480,7 @@ checks in Doctor mode are diagnostic only and do not count toward
 
 Triggered when the user signals that implementation is complete and docs need to be reconciled with reality.
 
-### STEP S1 — Sync
-
-If `.ai/implementation-state.md` exists and Status is not complete, warn the user that implementation may still be in progress before syncing docs; if Status is `blocked` or the latest Test Results show `Gate result: verify-blocked` or `Gate result: manual review required`, preserve that distinction in the warning and do not treat it as a completed build.
-
-Call `chronicler`.
-
-**Input:** `.ai/docs/` + `.ai/planning/` + scope hint from user (full build, specific phases, or specific feature).
-
-**Output expected back:**
-- Updated docs (targeted edits, version bumps)
-- Changelog entry in `.ai/docs/.pipeline-changelog.md`
-- List of DRIFT / INTENTIONAL / UNKNOWN items and their resolution
-
-**Gate:** `chronicler` always returns — even if there is zero drift, it confirms that. "No output" is not valid; retry once if empty.
-
-### STEP S2 — Post-Sync Review (optional)
-
-After chronicler completes, ask the user:
-
-```
-Sync complete. Run a review pass on the updated docs to confirm consistency? (yes / no)
-```
-
-If yes: invoke `bosun` scoped to the docs that `chronicler` changed. If no, stop.
+Invoke skill `pipeline-sync` for the full step sequence (STEP S1 through STEP S2).
 
 ---
 

@@ -32,7 +32,11 @@
         },
         "skill": {
           "*": "deny",
-          "learnings-capture": "allow"
+          "learnings-capture": "allow",
+          "pipeline-extend": "allow",
+          "pipeline-reverse-engineer": "allow",
+          "pipeline-doctor": "allow",
+          "pipeline-sync": "allow"
         }
       }
     },
