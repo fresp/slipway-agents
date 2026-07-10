@@ -6,6 +6,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [Unreleased]
+
+---
+## [0.14.0] — 2026-07-11
+
+### Added
+- **`/slipway:smart` runtime command:** New sibling of `/slipway:task` that covers both the `/slipway:init` case (no argument — Mode Detection routes from project state alone) and the `/slipway:task` case (any development request), while resolving the three convenience decision-gates (STEP 4 Should-fix/Note optimize-or-proceed, STEP 3.5 dynamic doc handling, STEP S2 post-sync review) autonomously when confidence is high, asking exactly one binary question per gate when it is not. Correctness/safety gates (Critical-finding re-review, security audit BLOCK, `ralph_loop.block_on_exhaustion`) remain hard gates in every interaction mode. Every auto-resolved decision and fallback-to-ask event is logged append-only to `.ai/docs/.pipeline-decisions.md`. The run's `Interaction mode: smart` is recorded in `.ai/docs/.pipeline-state.md` and picked up automatically by `/slipway:resume`; the full contract lives in the new "Smart Mode Decision Policy" section of `subagents/slipway.md`.
+- **`categories.smart` model tier:** New entry in `slipway.json`'s `categories` block (`anthropic/claude-opus-4-8`, fallback `anthropic/claude-sonnet-5`) that powers `/slipway:smart`'s autonomous decision-making — it must match or exceed the deep tier since it replaces user judgment calls.
+- **`resolveCategoryModel()`:** New exported function in `src/plugin-handlers/model-resolution-handler.ts` that resolves a model directly from a `categories` pool (model, then fallback_model), independent of any agent's own `category` field. Additive only — `resolveFallbackChain` and `resolveModel` are unchanged. `/slipway:smart` uses it to resolve its model from `categories.smart`, falling back to the slipway agent's own resolved model when `categories.smart` is absent.
+
+### Notes
+- **Q2 (cost/latency):** The ≤100-line HOT read of `.ai/learnings/memory.md` at `claude-haiku-4-5` tier is unmeasured — revisit if latency complaints surface.
+
 ## [0.13.8] — 2026-07-09
 
 ### Added
@@ -50,10 +63,6 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Updated stale example version strings ("v0.13.1") to current release version in `docs/guide/installation.md` and `slipway.schema.json`.
 - Added `description` to `permission.webfetch` in `slipway.schema.json` documenting that the object form is present for schema-compatibility only and must not be used for `webfetch` — the flat string is the only runtime-safe value.
 
-## [Unreleased]
-
-### Notes
-- **Q2 (cost/latency):** The ≤100-line HOT read of `.ai/learnings/memory.md` at `claude-haiku-4-5` tier is unmeasured — revisit if latency complaints surface.
 
 ## [0.13.3] — 2026-07-09
 
@@ -679,6 +688,8 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
+[Unreleased]: https://github.com/fresp/slipway-agents/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/fresp/slipway-agents/compare/v0.13.8...v0.14.0
 
 [0.13.6]: https://github.com/fresp/slipway-agents/compare/v0.13.5...v0.13.6
 [0.13.5]: https://github.com/fresp/slipway-agents/compare/v0.13.4...v0.13.5

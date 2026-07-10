@@ -8,7 +8,7 @@ const slipwayModel = "anthropic/claude-sonnet-5";
 
 function makeSlipwayConfig(): NonNullable<Parameters<typeof applyCommandConfig>[1]> {
   return {
-    version: "0.13.1",
+    version: "0.14.0",
     agents: {
       slipway: {
         model: slipwayModel,
@@ -17,14 +17,14 @@ function makeSlipwayConfig(): NonNullable<Parameters<typeof applyCommandConfig>[
   };
 }
 
-test("injects the eleven slipway runtime commands into an empty config", async () => {
+test("injects the twelve slipway runtime commands into an empty config", async () => {
   const input: Config = {};
 
   await applyCommandConfig(input, makeSlipwayConfig());
 
-  assert.deepEqual(Object.keys(input.command ?? {}).sort(), ["slipway:agent-refresh", "slipway:docs-publish", "slipway:doctor", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync", "slipway:task"]);
+  assert.deepEqual(Object.keys(input.command ?? {}).sort(), ["slipway:agent-refresh", "slipway:docs-publish", "slipway:doctor", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:smart", "slipway:status", "slipway:sync", "slipway:task"]);
 
-  for (const name of ["slipway:agent-refresh", "slipway:docs-publish", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync", "slipway:task"] as const) {
+  for (const name of ["slipway:agent-refresh", "slipway:docs-publish", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:smart", "slipway:status", "slipway:sync", "slipway:task"] as const) {
     const command = input.command?.[name];
 
     assert.ok(command, `command ${name} should be defined`);
@@ -43,7 +43,7 @@ test("sets the resolved slipway model on each command", async () => {
 
   await applyCommandConfig(input, makeSlipwayConfig());
 
-  for (const name of ["slipway:agent-refresh", "slipway:docs-publish", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync", "slipway:task"] as const) {
+  for (const name of ["slipway:agent-refresh", "slipway:docs-publish", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:smart", "slipway:status", "slipway:sync", "slipway:task"] as const) {
     assert.equal(input.command?.[name]?.model, slipwayModel);
   }
 });
@@ -143,6 +143,58 @@ test("slipway:task command runs full Mode Detection and stops before code execut
   assert.ok(command.template.includes("refactor this service"));
   assert.ok(command.template.includes("vague, a bug report, a feature idea"));
   assert.ok(command.template.includes("Sisyphus/omo.dev"));
+});
+
+test("slipway:smart command is registered with smart-mode template contract", async () => {
+  const input: Config = {};
+
+  await applyCommandConfig(input, makeSlipwayConfig());
+
+  const command = input.command?.["slipway:smart"];
+  assert.ok(command, "slipway:smart should be defined");
+  assert.equal(command.agent, "slipway");
+  assert.equal(command.template.includes("@slipway"), false);
+  assert.ok(command.template.includes("Smart request: $ARGUMENTS"));
+  assert.ok(command.template.includes("Interaction mode: smart"));
+  assert.ok(command.template.includes("Smart Mode Decision Policy"));
+  assert.ok(command.template.includes("do not branch on whether $ARGUMENTS is empty"));
+  assert.ok(command.template.includes("Never auto-resolve a correctness/safety gate"));
+  assert.ok(command.template.includes("ralph_loop.block_on_exhaustion"));
+});
+
+test("slipway:smart resolves model from categories.smart, not the slipway agent's own category", async () => {
+  const input: Config = {};
+  const smartCategoryModel = "anthropic/claude-opus-4-8";
+
+  const config: NonNullable<Parameters<typeof applyCommandConfig>[1]> = {
+    version: "0.14.0",
+    agents: {
+      slipway: {
+        model: slipwayModel,
+      },
+    },
+    categories: {
+      smart: {
+        model: smartCategoryModel,
+      },
+    },
+  };
+
+  await applyCommandConfig(input, config);
+
+  assert.equal(input.command?.["slipway:smart"]?.model, smartCategoryModel);
+  assert.equal(input.command?.["slipway:init"]?.model, slipwayModel);
+});
+
+test("slipway:smart falls back to the slipway agent's own resolved model when categories.smart is absent", async () => {
+  const input: Config = {};
+
+  await applyCommandConfig(input, makeSlipwayConfig());
+
+  assert.equal(
+    input.command?.["slipway:smart"]?.model,
+    input.command?.["slipway:init"]?.model
+  );
 });
 
 test("slipway contract documents docs-publish mode and output boundary", () => {

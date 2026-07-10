@@ -1,5 +1,5 @@
 import type { CommandDefinition, Config, SlipwayConfig } from "../config/types";
-import { resolveModel } from "./model-resolution-handler";
+import { resolveCategoryModel, resolveModel } from "./model-resolution-handler";
 
 /**
  * Bundled Slipway slash command definitions injected at runtime through the
@@ -63,6 +63,32 @@ const SLIPWAY_COMMANDS = {
       `with whatever artifact(s) resulted (PRD/doc changes, plan, findings, or estimate) ` +
       `and which Mode Detection category was matched; actual implementation is handed off ` +
       `to Sisyphus/omo.dev as a separate step.`,
+  },
+  "slipway:smart": {
+    description:
+      "Turn any development request into the right docs/plan artifact via full Mode Detection, resolving convenience decision-points autonomously instead of asking. Never executes code directly.",
+    agent: "slipway",
+    template:
+      `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
+      `Smart request: $ARGUMENTS\n\n` +
+      `Set interaction mode for this run to smart: write "Interaction mode: smart" to ` +
+      `.ai/docs/.pipeline-state.md before proceeding (see subagents/slipway.md's Smart Mode ` +
+      `Decision Policy section for the full contract). Run STEP 0, then run full Mode Detection ` +
+      `(Step A classification, Step B routing) exactly as /slipway:task does — do not assume a ` +
+      `specific intent category in advance, and do not branch on whether $ARGUMENTS is empty; ` +
+      `Mode Detection already routes correctly from project state alone, the same way ` +
+      `/slipway:init relies on it when given no specific request. At every convenience decision ` +
+      `point (STEP 4 Optimize Decision, STEP 3.5 dynamic doc handling, STEP S2 post-sync review), ` +
+      `apply the Smart Mode Decision Policy: estimate decision confidence from the signals already ` +
+      `present in the relevant subagent's output, auto-resolve and log the reasoning to ` +
+      `.ai/docs/.pipeline-decisions.md when confidence is high, or ask exactly one binary question ` +
+      `for that specific gate only when confidence is low — interaction mode stays smart for every ` +
+      `other gate in this run regardless of that one deferred answer. Never auto-resolve a ` +
+      `correctness/safety gate (Critical-finding re-review, security audit BLOCK, ` +
+      `ralph_loop.block_on_exhaustion) — those remain hard gates in every interaction mode. ` +
+      `Regardless of which category or subagent chain Mode Detection selects, stop at the ` +
+      `appropriate docs/plan/review artifact and never write, edit, or generate application/` +
+      `source code — implementation is Sisyphus/omo.dev's responsibility in a separate step.`,
   },
   "slipway:status": {
     description:
@@ -177,13 +203,17 @@ export async function applyCommandConfig(
   input.command ??= {};
 
   const slipwayModel = resolveModel("slipway", slipwayConfig);
+  const smartModel = resolveCategoryModel("smart", slipwayConfig) ?? slipwayModel;
 
   for (const [commandName, commandDefinition] of Object.entries(
     SLIPWAY_COMMANDS
   )) {
+    const resolvedModel =
+      commandName === "slipway:smart" ? smartModel : slipwayModel;
+
     input.command[commandName] = {
       ...commandDefinition,
-      ...(slipwayModel ? { model: slipwayModel } : {}),
+      ...(resolvedModel ? { model: resolvedModel } : {}),
     };
   }
 

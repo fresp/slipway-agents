@@ -368,6 +368,41 @@ Each optimize cycle:
 
 ---
 
+## Smart Mode Decision Policy
+
+This policy applies **only** when `.ai/docs/.pipeline-state.md` records `Interaction mode: smart` (written by `/slipway:smart`). Under `Interaction mode: interactive` — or when the field is absent — nothing in this section changes any behavior; every gate works exactly as documented in its own step.
+
+**Scope: exactly three convenience gates.**
+
+1. STEP 4 Optimize Decision — the Should-fix/Note `optimize / proceed` branch
+2. STEP 3.5 dynamic doc handling — the `yes / skip` question for coxswain-recommended docs
+3. STEP S2 post-sync review — the post-sync review pass question
+
+**Explicitly out of scope, in any interaction mode:** Critical-finding re-review (STEP 4), security audit BLOCK (STEP 5), and `ralph_loop.block_on_exhaustion`. These are correctness/safety gates and remain hard gates — smart mode never auto-resolves them.
+
+### Per-gate confidence estimation
+
+**STEP 4 (Should-fix/Note branch):** High confidence requires BOTH: every remaining Should-fix/Note finding's own bosun-written description explicitly calls it minor/cosmetic, AND `ralph_loop` cycles remaining > 1. Otherwise confidence is low. On high confidence, auto-decide: `proceed` if all findings are self-described minor, `optimize` otherwise. On low confidence, ask the existing binary question (`optimize / proceed`) once, then continue the rest of the run in smart mode.
+
+**STEP 3.5 (dynamic doc handling):** High confidence requires coxswain's `trigger:` text for a recommended doc to contain an exact keyword match to that doc's row in the dynamic-doc trigger table in `skills/slipway/bootstrap-from-prd/SKILL.md` and `subagents/coxswain.md`. Otherwise confidence is low. On high confidence, auto-generate the doc. On low confidence, ask the existing `yes / skip` question once, then continue in smart mode.
+
+**STEP S2 (post-sync review):** Read directly from chronicler's Sync Report — `UNKNOWN [0]` with all items DRIFT auto-skips the review pass; `UNKNOWN [N>0]` auto-runs it. This gate never needs to ask.
+
+### Logging
+
+Every auto-resolved decision and every fallback-to-ask event appends to `.ai/docs/.pipeline-decisions.md` in this format:
+
+```
+## [timestamp] — [STEP 4 | STEP 3.5 | STEP S2] — [decision]
+Confidence: [high | low → asked]
+Signal used: [specific finding text / trigger keyword / UNKNOWN count]
+Result: [what was decided or what the user answered]
+```
+
+This file is append-only, same convention as `.pipeline-changelog.md`.
+
+---
+
 ### STEP 5 — Security Audit
 
 Call `gunner`.
@@ -493,6 +528,7 @@ Maintain `.ai/docs/.pipeline-state.md` across the run and across sessions:
 
 Last updated: [timestamp]
 Current mode: [bootstrap-from-prompt | bootstrap-from-prd | extend | review-only | grooming-only | plan-only | sync | security-only | estimate-only | schema-validate]
+Interaction mode: [interactive | smart]
 Last completed step: [step name]
 Optimize cycles used: [N] / [ralph_loop.max_iterations]
 Bosun last run: [timestamp or "never"]
@@ -501,6 +537,8 @@ Security audit last result: [PASS | CONDITIONAL | BLOCK | "never"]
 Coxswain last result: [Ready to Plan | Conditional | Blocked | "never"]
 last_reconciled_sessions: []
 ```
+
+"Interaction mode" is written only by `/slipway:init`, `/slipway:task`, or `/slipway:smart` at the start of a run — `/slipway:init` and `/slipway:task` write `interactive`; `/slipway:smart` writes `smart`. `/slipway:resume` and `/slipway:status` only read this field, never write or override it. If absent (state file predates this feature), treat as `interactive` and log the fallback to `.ai/docs/.pipeline-decisions.md`.
 
 Read this file at the start of every invocation. If it shows an in-progress run, resume from `Last completed step` rather than restarting at STEP 1 — unless the user explicitly asks to start over.
 

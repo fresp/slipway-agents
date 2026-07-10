@@ -1,6 +1,6 @@
 # Slash Commands
 
-slipway-agents injects eleven slash commands into OpenCode at runtime through the plugin's `config` hook. These are convenience wrappers — they invoke the `slipway` orchestrator with a pre-filled intent, so you never need to remember the exact trigger phrase. No `.opencode/commands/*.md` files are required; the commands are registered automatically when the plugin loads.
+slipway-agents injects twelve slash commands into OpenCode at runtime through the plugin's `config` hook. These are convenience wrappers — they invoke the `slipway` orchestrator with a pre-filled intent, so you never need to remember the exact trigger phrase. No `.opencode/commands/*.md` files are required; the commands are registered automatically when the plugin loads.
 
 ---
 
@@ -40,6 +40,25 @@ Equivalent to typing a raw development request into `@slipway`, with an extra ex
 - Never writes, edits, or generates application/source code directly, regardless of how implementation-flavored the request sounds.
 
 **How it differs from `/slipway:init`:** `/slipway:init` also triggers Mode Detection, but it is framed narrowly as starting a new pipeline run from a prompt or existing PRD. `/slipway:task` is the broad entry point for any development-flavored prompt across all intent categories, with the no-code-execution boundary made explicit.
+
+---
+
+## `/slipway:smart`
+
+**What it does:** Same coverage as `/slipway:task` — turns any development request into the right docs, plan, review, findings, or estimate artifact through full Mode Detection — but sets `Interaction mode: smart` for the run, so the orchestrator resolves convenience decision-points autonomously instead of pausing to ask.
+
+Because Mode Detection routes from project state alone when no request is given, `/slipway:smart` with no argument also covers the `/slipway:init` case (bootstrapping a new project), and `/slipway:smart <request>` covers the `/slipway:task` case (any development request).
+
+**When to use vs `/slipway:task`:** Use `/slipway:task` when you want to be consulted at each convenience gate (optimize-or-proceed, generate-recommended-docs, post-sync review). Use `/slipway:smart` when you want the pipeline to run with minimal interruption and are comfortable letting the orchestrator make those judgment calls itself when the signals are clear.
+
+**Behavior:**
+- Writes `Interaction mode: smart` to `.ai/docs/.pipeline-state.md` at the start of the run, then runs STEP 0 and full Mode Detection exactly as `/slipway:task` does — covering both the `/slipway:init` case (no argument) and the `/slipway:task` case (any request).
+- Auto-resolves exactly three convenience gates when confidence is high, per the Smart Mode Decision Policy in `subagents/slipway.md`: the STEP 4 Should-fix/Note optimize-or-proceed branch, STEP 3.5 dynamic doc handling, and the STEP S2 post-sync review pass.
+- When confidence is low at one of those gates, asks exactly one binary question for that gate only — the rest of the run stays in smart mode.
+- Never touches correctness/safety gates: Critical-finding re-review, security audit BLOCK, and `ralph_loop.block_on_exhaustion` remain hard gates in every interaction mode.
+- Logs every auto-resolved decision and every fallback-to-ask event to `.ai/docs/.pipeline-decisions.md` (append-only).
+- `/slipway:resume` picks up `Interaction mode` from `.ai/docs/.pipeline-state.md` automatically — a resumed smart run stays smart without re-running `/slipway:smart`.
+- Never writes, edits, or generates application/source code, exactly like `/slipway:task`.
 
 ---
 

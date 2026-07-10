@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/dev/slipway.schema.json",
-  "version": "0.13.8",
+  "version": "0.14.0",
   "ralph_loop": {
     "enabled": true,
     "max_iterations": 2,
@@ -237,6 +237,11 @@
       "model": "anthropic/claude-opus-4-8",
       "fallback_model": "anthropic/claude-sonnet-5",
       "description": "Reasoning-heavy tasks — validation, security audit, orchestration"
+    },
+    "smart": {
+      "model": "anthropic/claude-opus-4-8",
+      "fallback_model": "anthropic/claude-sonnet-5",
+      "description": "Autonomous decision-making at convenience gates under /slipway:smart — must match or exceed deep tier, since it replaces user judgment calls, never substitutes a cheaper model for speed"
     }
   }
 }

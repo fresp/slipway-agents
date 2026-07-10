@@ -39,3 +39,11 @@ export function resolveFallbackChain(agentName: string, config: SlipwayConfig | 
 export function resolveModel(agentName: string, config: SlipwayConfig | null): string | undefined {
   return resolveFallbackChain(agentName, config)[0];
 }
+
+export function resolveCategoryModel(
+  categoryName: string,
+  config: SlipwayConfig | null
+): string | undefined {
+  const categoryConfig = config?.categories?.[categoryName];
+  return categoryConfig?.model ?? categoryConfig?.fallback_model;
+}
