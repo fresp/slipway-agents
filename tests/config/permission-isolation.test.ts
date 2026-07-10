@@ -277,11 +277,11 @@ test("every agent has an explicit permission.edit key with the correct value", (
 
 // ── Phase 2: Version sync test ──
 
-test("slipway config version is synced to 0.14.0", () => {
+test("slipway config version is synced to 0.15.0", () => {
   const config = loadSlipwayConfig();
   assert.equal(
     (config as any).version,
-    "0.14.0",
-    "slipway.json version should be 0.14.0"
+    "0.15.0",
+    "slipway.json version should be 0.15.0"
   );
 });

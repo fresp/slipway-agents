@@ -8,7 +8,7 @@ const slipwayModel = "anthropic/claude-sonnet-5";
 
 function makeSlipwayConfig(): NonNullable<Parameters<typeof applyCommandConfig>[1]> {
   return {
-    version: "0.14.0",
+    version: "0.15.0",
     agents: {
       slipway: {
         model: slipwayModel,
@@ -167,7 +167,7 @@ test("slipway:smart resolves model from categories.smart, not the slipway agent'
   const smartCategoryModel = "anthropic/claude-opus-4-8";
 
   const config: NonNullable<Parameters<typeof applyCommandConfig>[1]> = {
-    version: "0.14.0",
+    version: "0.15.0",
     agents: {
       slipway: {
         model: slipwayModel,
