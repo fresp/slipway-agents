@@ -110,7 +110,11 @@
         },
         "mode": {
           "type": "string",
-          "enum": ["primary", "subagent", "all"],
+          "enum": [
+            "primary",
+            "subagent",
+            "all"
+          ],
           "description": "OpenCode agent mode. primary = appears in @ picker as main agent. subagent = invoked by orchestrator only."
         },
         "description": {
@@ -129,43 +133,106 @@
           "type": "object",
           "description": "Scoped permissions for this agent. Absence of a key means no access to that action at all — this is NOT the same as setting it to 'deny' explicitly, though both result in no access. Most agents should have no permission block at all (doc-only agents never touch bash).",
           "properties": {
-            "edit": { "type": "string", "enum": ["ask", "allow", "deny"] },
+            "edit": {
+              "type": "string",
+              "enum": [
+                "ask",
+                "allow",
+                "deny"
+              ]
+            },
             "webfetch": {
               "description": "Only the flat string form (\"ask\", \"allow\", \"deny\") is runtime-safe for webfetch. The object form is present for schema-compatibility only — it passes this repo's Zod validation but crashes OpenCode's native TUI runtime, which expects PermissionActionConfig | undefined for webfetch.",
               "anyOf": [
-                { "type": "string", "enum": ["ask", "allow", "deny"] },
+                {
+                  "type": "string",
+                  "enum": [
+                    "ask",
+                    "allow",
+                    "deny"
+                  ]
+                },
                 {
                   "type": "object",
-                  "additionalProperties": { "type": "string", "enum": ["ask", "allow", "deny"] }
+                  "additionalProperties": {
+                    "type": "string",
+                    "enum": [
+                      "ask",
+                      "allow",
+                      "deny"
+                    ]
+                  }
                 }
               ]
             },
             "task": {
               "anyOf": [
-                { "type": "string", "enum": ["ask", "allow", "deny"] },
+                {
+                  "type": "string",
+                  "enum": [
+                    "ask",
+                    "allow",
+                    "deny"
+                  ]
+                },
                 {
                   "type": "object",
-                  "additionalProperties": { "type": "string", "enum": ["ask", "allow", "deny"] }
+                  "additionalProperties": {
+                    "type": "string",
+                    "enum": [
+                      "ask",
+                      "allow",
+                      "deny"
+                    ]
+                  }
                 }
               ]
             },
             "skill": {
               "description": "Skill permissions must be deny-default allow-lists. Keep the object form flexible for per-pattern ask/allow/deny entries, but do not set \"*\" to \"allow\" for skill because that permits harness-default or external skills to bypass Slipway mode gates. Use \"*\": \"deny\" plus explicit repo-local skill names that the agent legitimately invokes.",
               "anyOf": [
-                { "type": "string", "enum": ["ask", "allow", "deny"] },
+                {
+                  "type": "string",
+                  "enum": [
+                    "ask",
+                    "allow",
+                    "deny"
+                  ]
+                },
                 {
                   "type": "object",
-                  "additionalProperties": { "type": "string", "enum": ["ask", "allow", "deny"] }
+                  "additionalProperties": {
+                    "type": "string",
+                    "enum": [
+                      "ask",
+                      "allow",
+                      "deny"
+                    ]
+                  }
                 }
               ]
             },
             "bash": {
               "description": "Only agents that need shell access (currently: gunner, for vulnerability scanning) should set this. Prefer the object form to scope down to specific commands rather than blanket allow.",
               "anyOf": [
-                { "type": "string", "enum": ["ask", "allow", "deny"] },
+                {
+                  "type": "string",
+                  "enum": [
+                    "ask",
+                    "allow",
+                    "deny"
+                  ]
+                },
                 {
                   "type": "object",
-                  "additionalProperties": { "type": "string", "enum": ["ask", "allow", "deny"] }
+                  "additionalProperties": {
+                    "type": "string",
+                    "enum": [
+                      "ask",
+                      "allow",
+                      "deny"
+                    ]
+                  }
                 }
               ]
             }
@@ -182,9 +249,20 @@
       "type": "object",
       "description": "Retry-loop configuration for agents that run bounded optimization cycles (e.g. bosun's Critical-finding resolution loop, currently hardcoded to 2 cycles in the orchestrator). At the top level this is the global default; inside an agent entry it is a per-agent override — all fields optional, unset fields inherit the global value.",
       "properties": {
-        "enabled": { "type": "boolean" },
-        "max_iterations": { "type": "integer", "minimum": 1 },
-        "strategy": { "type": "string", "enum": ["reset", "continue"] },
+        "enabled": {
+          "type": "boolean"
+        },
+        "max_iterations": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "strategy": {
+          "type": "string",
+          "enum": [
+            "reset",
+            "continue"
+          ]
+        },
         "block_on_exhaustion": {
           "type": "boolean",
           "description": "If true, and Critical findings remain after max_iterations, halt the pipeline and require explicit user decision instead of silently proceeding to the next stage."
