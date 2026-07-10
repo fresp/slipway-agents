@@ -102,7 +102,7 @@ test("agent-refresh targets AGENTS.md and documents legacy migration", async () 
   assert.ok(command.template.includes("No migration needed."));
 });
 
-test("docs-publish command routes to slipway without embedding @slipway", async () => {
+test("docs-publish command delegates write ownership to hullwright when slipway cannot write through skills", async () => {
   const input: Config = {};
 
   await applyCommandConfig(input, makeSlipwayConfig());
@@ -116,6 +116,10 @@ test("docs-publish command routes to slipway without embedding @slipway", async 
   assert.ok(command.template.includes("feature name"));
   assert.ok(command.template.includes("FR-IDs"));
   assert.ok(command.template.includes("docs-publish"));
+  assert.ok(command.template.includes("Delegate the actual docs-publish skill write to hullwright"));
+  assert.ok(command.template.includes("slipway is edit: deny"));
+  assert.ok(command.template.includes("skill-mediated writes are blocked"));
+  assert.equal(command.template.includes("Invoke the docs-publish skill directly from slipway"), false);
   assert.equal(command.template.includes("@slipway"), false);
 });
 
@@ -123,8 +127,10 @@ test("slipway contract documents docs-publish mode and output boundary", () => {
   const slipwayContract = readFileSync("subagents/slipway.md", "utf8");
 
   assert.ok(
-    slipwayContract.includes("| Post-implementation: user says \"publish docs\", \"generate TRD\", \"create feature documentation\", \"document this feature\" | `docs-publish` | `slipway`"),
-    "Mode Detection should route docs-publish intent to slipway"
+    slipwayContract.includes("Post-implementation: user says \"publish docs\", \"generate TRD\", \"create feature documentation\", \"document this feature\"") &&
+      slipwayContract.includes("docs-publish") &&
+      slipwayContract.includes("hullwright"),
+    "Mode Detection should route docs-publish intent to slipway with hullwright delegation"
   );
   assert.ok(
     slipwayContract.includes("Required input: feature name + FR-IDs"),
@@ -311,3 +317,34 @@ test("slipway:doctor template does not imply CLI doctor behavior", async () => {
     );
   }
 });
+
+// ── Phase 4: Runtime preamble source-edit prohibition sync ──
+
+test("runtime preamble mirrors direct implementation source-edit prohibition", async () => {
+  const input: Config = {};
+  await applyCommandConfig(input, makeSlipwayConfig());
+
+  const preamble = input.command?.["slipway:init"]?.template ?? "";
+
+  assert.ok(
+    preamble.includes("Never write, edit, or generate application/source code directly"),
+    "runtime preamble must include direct source-edit prohibition"
+  );
+  assert.ok(
+    preamble.includes("refactor this") ||
+      preamble.includes("implement X") ||
+      preamble.includes("fix this bug"),
+    "runtime preamble must include implementation-phrasing examples"
+  );
+  assert.ok(
+    preamble.includes("Sisyphus/omo.dev") ||
+      preamble.includes("Sisyphus"),
+    "runtime preamble must name Sisyphus/omo.dev as implementation owner"
+  );
+  assert.ok(
+    preamble.includes("chartmaker/shipwright") ||
+      preamble.includes("chartmaker/shipwright → docs → rigger → plan"),
+    "runtime preamble must name the normal pipeline"
+  );
+});
+

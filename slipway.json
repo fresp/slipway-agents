@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/dev/slipway.schema.json",
-  "version": "0.13.6",
+  "version": "0.13.7",
   "ralph_loop": {
     "enabled": true,
     "max_iterations": 2,
@@ -32,7 +32,6 @@
         },
         "skill": {
           "*": "deny",
-          "docs-publish": "allow",
           "learnings-capture": "allow"
         }
       }
@@ -77,7 +76,8 @@
         "skill": {
           "*": "deny",
           "bootstrap-from-prd": "allow",
-          "session-log": "allow"
+          "session-log": "allow",
+          "docs-publish": "allow"
         }
       }
     },

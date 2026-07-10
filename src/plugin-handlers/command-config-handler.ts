@@ -24,7 +24,12 @@ const SLIPWAY_ORCHESTRATOR_PREAMBLE =
   "plans/, docs/plans/, or any " +
   "other harness-default skill output location). If a request could plausibly mean 'planning' " +
   "but does not clearly match a mode-detection trigger phrase, ask the user which mode applies " +
-  "— never fall back to a generic non-Slipway skill for plan authoring. Maintain all state under " +
+  "— never fall back to a generic non-Slipway skill for plan authoring. Never write, edit, or " +
+  "generate application/source code directly, regardless of how the request is phrased — including " +
+  "requests phrased as direct implementation asks ('refactor this', 'implement X', 'fix this bug'). " +
+  "Always route such requests through the normal pipeline (chartmaker/shipwright → docs → rigger → " +
+  "plan) and stop at the artifact stage. Actual code implementation is Sisyphus/omo.dev's " +
+  "responsibility in a separate step, never Slipway's. Maintain all state under " +
   ".ai/docs/ and .ai/sessions/ per the contract. Ask at most one routing question if the request " +
   "is underspecified; never invent engineering docs yourself — that is always delegated.";
 
@@ -91,7 +96,8 @@ const SLIPWAY_COMMANDS = {
       `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
       `Feature documentation request: $ARGUMENTS\n\n` +
       `Run docs-publish mode. Require a feature name and FR-IDs; ask one routing question ` +
-      `if either is missing. Invoke the docs-publish skill directly from slipway. If ` +
+      `if either is missing. Delegate the actual docs-publish skill write to hullwright, since ` +
+      `slipway is edit: deny and skill-mediated writes are blocked by permission.edit. If ` +
       `implementation evidence mode applies, first ensure implementation files are reachable. ` +
       `Generate only docs/<feature>/TRD.md and never treat that TRD as authoritative source docs.`,
   },

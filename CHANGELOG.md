@@ -6,6 +6,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+## [0.13.8] — 2026-07-09
+
+### Fixed
+- **docs-publish skill relocated from slipway to hullwright:** The `slipway` orchestrator had `permission.skill["docs-publish"] = "allow"` and `permission.skill["learnings-capture"] = "allow"`, contradicting the 0.13.7 CHANGELOG constraint that "any future docs-publish wiring must invoke hullwright, not the orchestrator, since slipway is edit: deny". Phase 1 empirical assumption: `permission.edit: deny` blocks skill-mediated writes (conservative interpretation aligned with OpenCode's permission model). Relocated `docs-publish` to `hullwright.permission.skill` since hullwright has `edit: allow` and can perform the skill-mediated write.
+- **Implementation routing wording strengthened:** Mode Detection Step A Bootstrapping and Changing-scope-or-behavior categories now explicitly state that requests phrased as direct implementation ("refactor this service", "implement X", "build Y") are classified by underlying requirement, not surface phrasing, and route through `chartmaker`/`shipwright` — never source code edits directly.
+- **Forbidden Behaviors: direct source code prohibition added:** New rule: "Never write, edit, or generate application/source code directly, regardless of how the request is phrased." Actual code implementation is Sisyphus/omo.dev's responsibility, never Slipway's.
+- **SLIPWAY_ORCHESTRATOR_PREAMBLE synchronized:** Runtime preamble now mirrors the Forbidden Behaviors source-edit prohibition, ensuring both `subagents/slipway.md` and the runtime prompt enforce the same constraint.
+
+### Changed
+- **`slipway.json` version synced:** Bumped from `0.13.6` to `0.13.7` to reflect the permission audit and routing fixes from the previous batch.
+
+### Notes
+- **Phase 1 empirical result:** Could not run the actual OpenCode runtime to empirically verify whether `permission.edit: deny` blocks skill-mediated writes. Assumed the conservative interpretation (blocks writes) based on the 0.13.7 CHANGELOG's own recorded constraint. If future runtime testing proves skill-mediated writes are independent of `permission.edit`, the `docs-publish` allow-list can be restored on slipway and this changelog entry corrected.
+- **Regression coverage:** `tests/config/permission-isolation.test.ts` updated: `APPROVED_SKILL_ALLOWLIST.slipway` now only contains `learnings-capture`; `APPROVED_SKILL_ALLOWLIST.hullwright` now contains `docs-publish` alongside existing `bootstrap-from-prd` and `session-log`. New tests verify version sync (0.13.7), implementation-phrasing routing, and Forbidden Behaviors source-edit prohibition.
+
+---
 ## [0.13.7] — 2026-07-09
 
 ### Fixed
