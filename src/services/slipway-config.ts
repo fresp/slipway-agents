@@ -164,7 +164,7 @@ export function removeSlipwayConfig(paths: SlipwayPaths): InstallSlipwayConfigRe
 
 export function readInstalledSlipwaySummary(
   paths: SlipwayPaths
-): { ok: true; version: string; agentCount: number; value: unknown } | { ok: false; message: string } {
+): { ok: true; version: string; agentCount: number; categoryCount: number; value: unknown } | { ok: false; message: string } {
   if (!pathExists(paths.slipwayConfigFile)) {
     return { ok: false, message: "slipway.json missing" };
   }
@@ -173,14 +173,15 @@ export function readInstalledSlipwaySummary(
   if (!parsed.ok) {
     return { ok: false, message: `slipway.json invalid JSON: ${parsed.error}` };
   }
-  if (!isRecord(parsed.value) || typeof parsed.value.version !== "string" || !isRecord(parsed.value.agents)) {
-    return { ok: false, message: "slipway.json does not contain version and agents object" };
+  if (!isRecord(parsed.value) || typeof parsed.value.version !== "string" || !isRecord(parsed.value.agents) || !isRecord(parsed.value.categories)) {
+    return { ok: false, message: "slipway.json does not contain version, agents, and categories object" };
   }
 
   return {
     ok: true,
     version: parsed.value.version,
     agentCount: Object.keys(parsed.value.agents).length,
+    categoryCount: Object.keys(parsed.value.categories).length,
     value: parsed.value,
   };
 }
@@ -196,7 +197,7 @@ export function validateInstalledSlipwayConfig(paths: SlipwayPaths): { ok: boole
     return { ok: false, message: "slipway.json failed schema validation" };
   }
 
-  return { ok: true, message: `slipway.json valid (v${summary.version}, ${summary.agentCount} agents)` };
+  return { ok: true, message: `slipway.json valid (v${summary.version}, ${summary.agentCount} agents, ${summary.categoryCount} categories)` };
 }
 
 function readVersionedConfig(
