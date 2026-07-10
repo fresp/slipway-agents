@@ -17,14 +17,14 @@ function makeSlipwayConfig(): NonNullable<Parameters<typeof applyCommandConfig>[
   };
 }
 
-test("injects the ten slipway runtime commands into an empty config", async () => {
+test("injects the eleven slipway runtime commands into an empty config", async () => {
   const input: Config = {};
 
   await applyCommandConfig(input, makeSlipwayConfig());
 
-  assert.deepEqual(Object.keys(input.command ?? {}).sort(), ["slipway:agent-refresh", "slipway:docs-publish", "slipway:doctor", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync"]);
+  assert.deepEqual(Object.keys(input.command ?? {}).sort(), ["slipway:agent-refresh", "slipway:docs-publish", "slipway:doctor", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync", "slipway:task"]);
 
-  for (const name of ["slipway:agent-refresh", "slipway:docs-publish", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync"] as const) {
+  for (const name of ["slipway:agent-refresh", "slipway:docs-publish", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync", "slipway:task"] as const) {
     const command = input.command?.[name];
 
     assert.ok(command, `command ${name} should be defined`);
@@ -43,7 +43,7 @@ test("sets the resolved slipway model on each command", async () => {
 
   await applyCommandConfig(input, makeSlipwayConfig());
 
-  for (const name of ["slipway:agent-refresh", "slipway:docs-publish", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync"] as const) {
+  for (const name of ["slipway:agent-refresh", "slipway:docs-publish", "slipway:groom", "slipway:init", "slipway:learnings-review", "slipway:resume", "slipway:review", "slipway:status", "slipway:sync", "slipway:task"] as const) {
     assert.equal(input.command?.[name]?.model, slipwayModel);
   }
 });
@@ -121,6 +121,28 @@ test("docs-publish command delegates write ownership to hullwright when slipway 
   assert.ok(command.template.includes("skill-mediated writes are blocked"));
   assert.equal(command.template.includes("Invoke the docs-publish skill directly from slipway"), false);
   assert.equal(command.template.includes("@slipway"), false);
+});
+
+test("slipway:task command runs full Mode Detection and stops before code execution", async () => {
+  const input: Config = {};
+
+  await applyCommandConfig(input, makeSlipwayConfig());
+
+  const command = input.command?.["slipway:task"];
+  assert.ok(command, "slipway:task should be defined");
+  assert.equal(command.agent, "slipway");
+  assert.equal(command.template.includes("@slipway"), false);
+  assert.ok(command.template.includes("Task request: $ARGUMENTS"));
+  assert.ok(command.template.includes("full Mode Detection (Step A classification, Step B routing)"));
+  assert.ok(command.template.includes("do not assume a specific intent category in advance"));
+  assert.ok(command.template.includes("whichever subagent(s) Mode Detection's own table specifies"));
+  assert.equal(command.template.includes("chartmaker/shipwright only"), false);
+  assert.ok(command.template.includes("Regardless of which category or subagent chain is selected"));
+  assert.ok(command.template.includes("stop at the appropriate docs/plan/review artifact"));
+  assert.ok(command.template.includes("never write, edit, or generate application/source code"));
+  assert.ok(command.template.includes("refactor this service"));
+  assert.ok(command.template.includes("vague, a bug report, a feature idea"));
+  assert.ok(command.template.includes("Sisyphus/omo.dev"));
 });
 
 test("slipway contract documents docs-publish mode and output boundary", () => {
@@ -347,4 +369,3 @@ test("runtime preamble mirrors direct implementation source-edit prohibition", a
     "runtime preamble must name the normal pipeline"
   );
 });
-

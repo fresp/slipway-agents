@@ -8,6 +8,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ---
 ## [0.13.8] — 2026-07-09
 
+### Added
+- **`/slipway:task` runtime command:** Added a general-purpose no-code-execution entry point that runs STEP 0 and full Mode Detection (Step A classification, Step B routing), then stops at the appropriate docs/plan/review/findings/estimate artifact before handing implementation to Sisyphus/omo.dev.
+
 ### Fixed
 - **docs-publish skill relocated from slipway to hullwright:** The `slipway` orchestrator had `permission.skill["docs-publish"] = "allow"` and `permission.skill["learnings-capture"] = "allow"`, contradicting the 0.13.7 CHANGELOG constraint that "any future docs-publish wiring must invoke hullwright, not the orchestrator, since slipway is edit: deny". Phase 1 empirical assumption: `permission.edit: deny` blocks skill-mediated writes (conservative interpretation aligned with OpenCode's permission model). Relocated `docs-publish` to `hullwright.permission.skill` since hullwright has `edit: allow` and can perform the skill-mediated write.
 - **Implementation routing wording strengthened:** Mode Detection Step A Bootstrapping and Changing-scope-or-behavior categories now explicitly state that requests phrased as direct implementation ("refactor this service", "implement X", "build Y") are classified by underlying requirement, not surface phrasing, and route through `chartmaker`/`shipwright` — never source code edits directly.

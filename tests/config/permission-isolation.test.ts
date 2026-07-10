@@ -54,25 +54,25 @@ function loadSlipwayConfig() {
         mode?: string;
         permission?: {
           webfetch?:
-            | "ask"
-            | "allow"
-            | "deny"
-            | Record<string, "ask" | "allow" | "deny">;
+          | "ask"
+          | "allow"
+          | "deny"
+          | Record<string, "ask" | "allow" | "deny">;
           task?:
-            | "ask"
-            | "allow"
-            | "deny"
-            | Record<string, "ask" | "allow" | "deny">;
+          | "ask"
+          | "allow"
+          | "deny"
+          | Record<string, "ask" | "allow" | "deny">;
           skill?:
-            | "ask"
-            | "allow"
-            | "deny"
-            | Record<string, "ask" | "allow" | "deny">;
+          | "ask"
+          | "allow"
+          | "deny"
+          | Record<string, "ask" | "allow" | "deny">;
           bash?:
-            | "ask"
-            | "allow"
-            | "deny"
-            | Record<string, "ask" | "allow" | "deny">;
+          | "ask"
+          | "allow"
+          | "deny"
+          | Record<string, "ask" | "allow" | "deny">;
         };
       }
     >;
@@ -277,11 +277,11 @@ test("every agent has an explicit permission.edit key with the correct value", (
 
 // ── Phase 2: Version sync test ──
 
-test("slipway config version is synced to 0.13.7 before 0.13.8 changelog work", () => {
+test("slipway config version is synced to 0.13.8", () => {
   const config = loadSlipwayConfig();
   assert.equal(
-    config.version,
-    "0.13.7",
-    "slipway.json version should be 0.13.7 after Phase 2 sync"
+    (config as any).version,
+    "0.13.8",
+    "slipway.json version should be 0.13.8"
   );
 });

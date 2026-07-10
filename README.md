@@ -181,6 +181,7 @@ slipway-agents registers OpenCode slash commands through the plugin `config` hoo
 | Command | Purpose |
 |---|---|
 | `/slipway:init` | Start a new pipeline run from a prompt or existing PRD. |
+| `/slipway:task` | Turn any development request into the right docs/plan artifact via full Mode Detection, without executing code. |
 | `/slipway:status` | Show current pipeline state without running a step. |
 | `/slipway:resume` | Continue from the last completed pipeline step. |
 | `/slipway:doctor` | Run read-only diagnostics for config, docs, state, agents, sessions, and learnings health. |
