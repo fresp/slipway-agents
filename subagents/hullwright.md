@@ -53,7 +53,12 @@ The base skill's STEP 5 (Cross-Document Validation) already defines this exact b
 
 ### Contract-Only Refresh (agent-refresh)
 
-Run when: the orchestrator invokes `agent-refresh` mode — the impacted doc list is exactly `["AGENTS.md"]`.
+Run when: the impacted doc list is exactly `["AGENTS.md"]`. This mode has two call sites:
+
+1. The standalone `agent-refresh` entry point, invoked by the orchestrator when the user asks to refresh the agent contract.
+2. STEP 2.5 of the reverse-engineer pipeline (`skills/slipway/pipeline-reverse-engineer/SKILL.md`), which compiles `AGENTS.md` from the cartographer-generated `02-10` docs before bosun scores the doc set.
+
+The same preconditions and the same Self-Check Before Handoff apply to both call sites.
 
 This is a narrower case than standard Partial Regeneration:
 1. Confirm `.ai/docs/01-prd.md` and the existing `02-10` doc suite are present and readable. If any required doc is missing, do not proceed — report back to the orchestrator that the precondition isn't met.
@@ -194,11 +199,22 @@ Regeneration, Contract-Only Refresh) that touches `AGENTS.md`.
 
 Check, in order:
 
-1. **Required sections present, in order**: Mission, Source Of Truth,
-   Operating Principles, Context Loading Strategy, Working Loop, Architecture
-   Guardrails, Service Ownership Rules, Development Strategy, Planning Rules,
-   Coding Rules, Runtime Capabilities, Escalation Protocol, Execution Protocol.
-   Missing or out-of-order section → fix before reporting.
+1. **Required sections present, in order**: at self-check time, read the
+   current `skills/slipway/bootstrap-from-prd/templates/AGENTS.md` and verify
+   the generated `AGENTS.md` contains every top-level `#` section the template
+   defines, in the template's order. Do not compare against a section list
+   from memory or from this file — the template is the source of truth and its
+   section set changes independently of this agent. Subsection (`##`) headings
+   the template defines must also be present — including `## Test Results
+   Format` under Working Loop — except headings the template's own GENERATION
+   RULE comments mark as conditional or removable (e.g. `## Frozen topology`
+   when `02-technical-architecture.md` defines no plane separation) and
+   placeholder headings like `## [service-name]`, which must instead appear
+   expanded once per actual service. Separately verify `## Execution Protocol`
+   is present after the last project-specific section — it is this subagent's
+   own appended section (see AGENTS.md Execution Protocol above) and does not
+   appear in the template. Missing or out-of-order section → fix before
+   reporting.
 
 2. **No placeholder residue** — scan for `[TBD]`, `[TODO]`, or any bracketed
    template text left unfilled. Every bracket must be replaced with real

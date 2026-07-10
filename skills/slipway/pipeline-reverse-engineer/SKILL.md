@@ -19,6 +19,12 @@ This condition is checked BEFORE `bootstrap-from-prompt`. If both a codebase and
 - Note: chartmaker asks only the gaps cartographer could not infer — not the full PRD intake flow
 - Gate: `01-prd.md` written to `.ai/docs/`
 
+**STEP 2.5 — Compile AGENTS.md**
+- Invoke: `hullwright`, Contract-Only Refresh mode (the same mode the standalone `agent-refresh` entry point uses)
+- Input: `.ai/docs/01-prd.md` (gap-filled in STEP 2) and the cartographer-generated `.ai/docs/02-*.md` through `10-*.md` from STEP 1
+- Gate: Contract-Only Refresh's own preconditions (`01-prd.md` and the `02-10` suite present and readable) — both are guaranteed satisfied at this point, since STEP 1 and STEP 2 just produced them
+- Output: `AGENTS.md` compiled and ready for bosun to score in STEP 3
+
 **STEP 3 — Bosun (relaxed threshold)**
 - Invoke: `bosun`
 - Input: all `.ai/docs/` files, including cartographer-generated docs with confidence markers

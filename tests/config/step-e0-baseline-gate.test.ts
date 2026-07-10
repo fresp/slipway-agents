@@ -11,6 +11,15 @@ const doctorPipelineContract = readFileSync(
   "skills/slipway/pipeline-doctor/SKILL.md",
   "utf8"
 );
+const reverseEngineerContract = readFileSync(
+  "skills/slipway/pipeline-reverse-engineer/SKILL.md",
+  "utf8"
+);
+const hullwrightContract = readFileSync("subagents/hullwright.md", "utf8");
+const agentsTemplateContract = readFileSync(
+  "skills/slipway/bootstrap-from-prd/templates/AGENTS.md",
+  "utf8"
+);
 
 function extractDoctorSectionN(n: number): string {
   const doctorSection = doctorPipelineContract.slice(
@@ -26,6 +35,14 @@ function extractDoctorSectionN(n: number): string {
       ? sectionStart + 5 + nextMatch.index
       : doctorSection.length;
   return doctorSection.slice(sectionStart, sectionEnd);
+}
+
+function extractHullwrightSelfCheckItem1(): string {
+  const item1Start = hullwrightContract.indexOf("1. **Required sections present");
+  if (item1Start === -1) return "";
+  const item1End = hullwrightContract.indexOf("\n2.", item1Start);
+  return hullwrightContract.slice(item1Start, item1End === -1 ? undefined : item1End)
+    .replace(/\s+/g, " ");
 }
 
 test("STEP E0 Baseline Reconciliation Gate exists in extend pipeline", async () => {
@@ -392,5 +409,74 @@ test("Forbidden Behaviors prohibit direct source edits and name Sisyphus omo.dev
     forbiddenBehaviors.includes("Sisyphus/omo.dev") ||
       forbiddenBehaviors.includes("Sisyphus"),
     "Forbidden Behaviors must name Sisyphus/omo.dev as implementation owner"
+  );
+});
+
+// ── Batch: reverse-engineer AGENTS.md gap + hullwright self-check sync ──
+
+test("reverse-engineer pipeline STEP 2.5 compiles AGENTS.md between chartmaker and bosun", async () => {
+  const step25Index = reverseEngineerContract.indexOf("STEP 2.5");
+  assert.ok(step25Index !== -1, "STEP 2.5 must exist in reverse-engineer skill");
+
+  const step25Block = reverseEngineerContract.slice(step25Index);
+  assert.ok(
+    step25Block.includes("Compile AGENTS.md"),
+    "STEP 2.5 must be titled 'Compile AGENTS.md'"
+  );
+
+  assert.ok(
+    step25Block.includes("hullwright"),
+    "STEP 2.5 must invoke hullwright"
+  );
+  assert.ok(
+    step25Block.includes("Contract-Only Refresh"),
+    "STEP 2.5 must use Contract-Only Refresh mode"
+  );
+
+  const step2Index = reverseEngineerContract.indexOf("STEP 2 —");
+  const step3Index = reverseEngineerContract.indexOf("STEP 3 —");
+  assert.ok(step2Index !== -1, "STEP 2 must exist in reverse-engineer skill");
+  assert.ok(step3Index !== -1, "STEP 3 must exist in reverse-engineer skill");
+  assert.ok(
+    step25Index > step2Index && step25Index < step3Index,
+    "STEP 2.5 must appear between STEP 2 (chartmaker) and STEP 3 (bosun)"
+  );
+});
+
+test("hullwright self-check item 1 defers section truth to the template file, not an in-file list", async () => {
+  const item1 = extractHullwrightSelfCheckItem1();
+  assert.ok(item1.length > 0, "Self-check item 1 must exist in hullwright");
+
+  assert.ok(
+    item1.includes("skills/slipway/bootstrap-from-prd/templates/AGENTS.md"),
+    "Self-check item 1 must reference the template file path"
+  );
+
+  assert.ok(
+    item1.includes("Do not compare against a section list from memory or from this file"),
+    "Self-check item 1 must forbid comparing against an in-file section list"
+  );
+
+  const templateHeadings = agentsTemplateContract.match(/^# .+$/gm) ?? [];
+  assert.ok(templateHeadings.length > 0, "AGENTS.md template must define top-level headings");
+  assert.ok(
+    item1.includes("read the current") && item1.includes("templates/AGENTS.md"),
+    "Self-check item 1 must instruct reading the current template at check time"
+  );
+});
+
+test("## Test Results Format appears in both the AGENTS.md template and hullwright self-check", async () => {
+  const heading = "## Test Results Format";
+
+  assert.ok(
+    agentsTemplateContract.includes(heading),
+    "AGENTS.md template must include '## Test Results Format'"
+  );
+
+  const item1 = extractHullwrightSelfCheckItem1();
+  assert.ok(item1.length > 0, "Self-check item 1 must exist in hullwright");
+  assert.ok(
+    item1.includes(heading),
+    "Self-check item 1 must explicitly mention '## Test Results Format'"
   );
 });
