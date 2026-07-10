@@ -43,6 +43,27 @@ const SLIPWAY_COMMANDS = {
       `Begin with STEP 0, then detect mode (bootstrap-from-prompt / reverse-engineer / ` +
       `review-only / groom-only / etc.) from the request above.`,
   },
+  "slipway:task": {
+    description:
+      "Turn any development request into the right docs/plan artifact via full Mode Detection. Never executes code directly, regardless of classification.",
+    agent: "slipway",
+    template:
+      `${SLIPWAY_ORCHESTRATOR_PREAMBLE}\n\n` +
+      `Task request: $ARGUMENTS\n\n` +
+      `Run STEP 0, then run full Mode Detection (Step A classification, Step B routing) ` +
+      `exactly as you normally would for any request — do not assume a specific intent ` +
+      `category in advance. The request may be phrased any way: vague, a bug report, a ` +
+      `feature idea, or an implementation-flavored ask (e.g. "refactor this service", ` +
+      `"add JWT session security", "make this reliable"). Classify it by its underlying ` +
+      `requirement per the existing intent categories, and route to whichever subagent(s) ` +
+      `Mode Detection's own table specifies for that category — this command does not ` +
+      `override or narrow that routing. Regardless of which category or subagent chain is ` +
+      `selected, the pipeline must stop at the appropriate docs/plan/review artifact for ` +
+      `that mode and never write, edit, or generate application/source code. Report back ` +
+      `with whatever artifact(s) resulted (PRD/doc changes, plan, findings, or estimate) ` +
+      `and which Mode Detection category was matched; actual implementation is handed off ` +
+      `to Sisyphus/omo.dev as a separate step.`,
+  },
   "slipway:status": {
     description:
       "Show current pipeline and implementation state without running anything.",

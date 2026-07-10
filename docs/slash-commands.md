@@ -1,6 +1,6 @@
 # Slash Commands
 
-slipway-agents injects nine slash commands into OpenCode at runtime through the plugin's `config` hook. These are convenience wrappers — they invoke the `slipway` orchestrator with a pre-filled intent, so you never need to remember the exact trigger phrase. No `.opencode/commands/*.md` files are required; the commands are registered automatically when the plugin loads.
+slipway-agents injects eleven slash commands into OpenCode at runtime through the plugin's `config` hook. These are convenience wrappers — they invoke the `slipway` orchestrator with a pre-filled intent, so you never need to remember the exact trigger phrase. No `.opencode/commands/*.md` files are required; the commands are registered automatically when the plugin loads.
 
 ---
 
@@ -16,6 +16,30 @@ Equivalent to typing `@slipway I want to build [idea]` or `@slipway bootstrap fr
 - If no `.ai/docs/01-prd.md` exists, routes to `chartmaker` (bootstrap-from-prompt mode).
 - If `.ai/docs/01-prd.md` exists but engineering docs are missing, routes to `hullwright` (bootstrap-from-prd mode).
 - If docs already exist, warns the user and asks whether to rebuild or extend.
+
+---
+
+## `/slipway:task`
+
+**What it does:** Turns any development-flavored prompt into the right docs, plan, review, findings, or estimate artifact through full Mode Detection, then stops before code execution.
+
+Equivalent to typing a raw development request into `@slipway`, with an extra explicit guarantee that the pipeline stops at the artifact boundary.
+
+**When to use:** Use this as the general-purpose entry point when the request could be a vague idea, a bug report, an implementation-phrased scoped change, a diagnostic question, an estimate, or any other development intent, but you want Slipway to produce planning/documentation output instead of executing code.
+
+**Example invocations:**
+- `/slipway:task I want a safer way for teams to invite contractors` → Mode Detection may classify this as Bootstrapping and route through the PRD/documentation path, such as `chartmaker` when starting from a vague idea.
+- `/slipway:task refactor this service to add JWT session security` → Mode Detection may classify this as Changing scope or behavior and route through the existing scoped-change path, such as `shipwright`, while still stopping at updated docs or plan artifacts.
+- `/slipway:task why is checkout reconciliation slow?` → Mode Detection may classify this as Diagnosing and route to the diagnostic path, returning findings or investigation artifacts rather than source-code changes.
+
+**Behavior:**
+- Always runs STEP 0 first, then full Mode Detection: Step A classification and Step B routing.
+- Does not assume a specific intent category in advance.
+- Does not restrict routing to `chartmaker` or `shipwright`; it follows whichever subagent chain the existing Mode Detection table selects.
+- Stops at the appropriate artifact for the matched mode: PRD/doc changes, plan, review, findings, or estimate.
+- Never writes, edits, or generates application/source code directly, regardless of how implementation-flavored the request sounds.
+
+**How it differs from `/slipway:init`:** `/slipway:init` also triggers Mode Detection, but it is framed narrowly as starting a new pipeline run from a prompt or existing PRD. `/slipway:task` is the broad entry point for any development-flavored prompt across all intent categories, with the no-code-execution boundary made explicit.
 
 ---
 
