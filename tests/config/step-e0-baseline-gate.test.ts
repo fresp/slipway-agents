@@ -3,10 +3,18 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 const slipwayContract = readFileSync("subagents/slipway.md", "utf8");
+const extendPipelineContract = readFileSync(
+  "skills/slipway/pipeline-extend/SKILL.md",
+  "utf8"
+);
+const doctorPipelineContract = readFileSync(
+  "skills/slipway/pipeline-doctor/SKILL.md",
+  "utf8"
+);
 
 function extractDoctorSectionN(n: number): string {
-  const doctorSection = slipwayContract.slice(
-    slipwayContract.indexOf("## Doctor mode")
+  const doctorSection = doctorPipelineContract.slice(
+    doctorPipelineContract.indexOf("## Doctor mode")
   );
   const sectionStart = doctorSection.indexOf(`### ${n}`);
   if (sectionStart === -1) return "";
@@ -23,16 +31,16 @@ function extractDoctorSectionN(n: number): string {
 test("STEP E0 Baseline Reconciliation Gate exists in extend pipeline", async () => {
   // Verify STEP E0 section exists
   assert.ok(
-    slipwayContract.includes("### STEP E0 — Baseline Reconciliation Gate"),
-    "STEP E0 section must exist in slipway.md"
+    extendPipelineContract.includes("### STEP E0 — Baseline Reconciliation Gate"),
+    "STEP E0 section must exist in pipeline-extend skill"
   );
 
   // Verify it's in the extend pipeline section (before STEP E1)
-  const extendPipelineStart = slipwayContract.indexOf("## Pipeline — extend run (`extend`)");
+  const extendPipelineStart = extendPipelineContract.indexOf("## Pipeline — extend run (`extend`)");
   assert.ok(extendPipelineStart !== -1, "Extend pipeline section must exist");
 
-  const stepE0Index = slipwayContract.indexOf("### STEP E0 — Baseline Reconciliation Gate");
-  const stepE1Index = slipwayContract.indexOf("### STEP E1 — Extend");
+  const stepE0Index = extendPipelineContract.indexOf("### STEP E0 — Baseline Reconciliation Gate");
+  const stepE1Index = extendPipelineContract.indexOf("### STEP E1 — Extend");
 
   assert.ok(stepE0Index > extendPipelineStart, "STEP E0 must be in the extend pipeline section");
   assert.ok(stepE0Index < stepE1Index, "STEP E0 must come before STEP E1");
@@ -41,27 +49,72 @@ test("STEP E0 Baseline Reconciliation Gate exists in extend pipeline", async () 
 test("STEP E0 gate logic is load-bearing with clear skip and block conditions", async () => {
   // Verify gate logic exists with skip condition
   assert.ok(
-    slipwayContract.includes("Bosun last run") && slipwayContract.includes("Bosun health score"),
+    extendPipelineContract.includes("Bosun last run") && extendPipelineContract.includes("Bosun health score"),
     "STEP E0 must reference Bosun validation state"
   );
 
   // Verify skip condition exists
   assert.ok(
-    slipwayContract.includes("Skip condition"),
+    extendPipelineContract.includes("Skip condition"),
     "STEP E0 must define a skip condition"
   );
 
   // Verify block condition exists
   assert.ok(
-    slipwayContract.includes("Block condition"),
+    extendPipelineContract.includes("Block condition"),
     "STEP E0 must define a block condition"
   );
 
   // Verify gate cannot be bypassed
   assert.ok(
-    slipwayContract.includes("Never bypass this gate"),
+    extendPipelineContract.includes("Never bypass this gate"),
     "STEP E0 must explicitly state it cannot be bypassed"
   );
+});
+
+test("rarely used pipeline execution details are extracted from slipway", async () => {
+  const sections = [
+    {
+      heading: "## Pipeline — extend run (`extend`)",
+      inlineDetail: "### STEP E0 — Baseline Reconciliation Gate",
+      skill: "pipeline-extend",
+    },
+    {
+      heading: "## Pipeline — reverse-engineer mode",
+      inlineDetail: "**STEP 1 — Cartographer**",
+      skill: "pipeline-reverse-engineer",
+    },
+    {
+      heading: "## Doctor mode",
+      inlineDetail: "### 1. Config resolution",
+      skill: "pipeline-doctor",
+    },
+    {
+      heading: "## Pipeline — sync run (`sync`)",
+      inlineDetail: "### STEP S1 — Sync",
+      skill: "pipeline-sync",
+    },
+  ] as const;
+
+  for (const section of sections) {
+    const headingIndex = slipwayContract.indexOf(section.heading);
+    assert.ok(headingIndex !== -1, `${section.heading} pointer should remain in slipway.md`);
+
+    const nextSectionIndex = slipwayContract.indexOf("\n## ", headingIndex + section.heading.length);
+    const pointerSection = slipwayContract.slice(
+      headingIndex,
+      nextSectionIndex === -1 ? undefined : nextSectionIndex
+    );
+
+    assert.ok(
+      pointerSection.includes(`Invoke skill \`${section.skill}\``),
+      `${section.heading} should point to ${section.skill}`
+    );
+    assert.ok(
+      !pointerSection.includes(section.inlineDetail),
+      `${section.heading} must not keep full execution details inline`
+    );
+  }
 });
 
 test("Forbidden Behaviors enforce STEP E0 gate", async () => {
@@ -341,4 +394,3 @@ test("Forbidden Behaviors prohibit direct source edits and name Sisyphus omo.dev
     "Forbidden Behaviors must name Sisyphus/omo.dev as implementation owner"
   );
 });
-
