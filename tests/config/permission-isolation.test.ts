@@ -305,6 +305,15 @@ test("every agent has an explicit permission.bash key (absent resolves to permis
         "gunner permission.bash should be a scoped object allow-list, not a flat value"
       );
       assert.notEqual(bash, null, "gunner permission.bash should not be null");
+      // Lens 6's doc-mentioned package scanning queries the OSV.dev API via
+      // curl (gunner.md, since v0.17.0). The runtime allow-list must include it
+      // so the declarative contract and enforced permissions stay in sync.
+      const gunnerBash = bash as Record<string, string>;
+      assert.equal(
+        gunnerBash["curl"],
+        "allow",
+        "gunner permission.bash must allow curl (required for direct OSV.dev API queries in Lens 6)"
+      );
     } else {
       assert.equal(
         bash,

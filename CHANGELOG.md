@@ -9,6 +9,11 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ---
+## [0.18.2] — 2026-07-11
+
+### Fixed
+- **`gunner`'s `permission.bash` was missing `curl`:** Since v0.17.0, `subagents/gunner.md` has required `curl` (scoped to `https://api.osv.dev/*`) as the mechanism for Lens 6's doc-mentioned package scanning — direct HTTP queries to `https://api.osv.dev/v1/query` — but the runtime-enforced `permission.bash` object for `gunner` in `slipway.json` never listed `curl`, leaving the declarative contract and the enforced permission config out of sync. Added `"curl": "allow"`. OpenCode's object-form `permission.bash` scopes by command name only (the "unverified command-allowlist semantics" gap already recorded in `src/config/schema.ts` and prior changelogs), so the domain restriction to `https://api.osv.dev/*` remains a prose-level constraint in `gunner.md`, consistent with the rest of Lens 6's declarative bash enforcement. The gunner-specific case in `tests/config/permission-isolation.test.ts` now asserts the `curl` key is present and `"allow"` so this cannot silently regress.
+
 ## [0.18.1] — 2026-07-11
 
 ### Fixed
@@ -735,7 +740,8 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
-[Unreleased]: https://github.com/fresp/slipway-agents/compare/v0.18.1...HEAD
+[Unreleased]: https://github.com/fresp/slipway-agents/compare/v0.18.2...HEAD
+[0.18.2]: https://github.com/fresp/slipway-agents/compare/v0.18.1...v0.18.2
 [0.18.1]: https://github.com/fresp/slipway-agents/compare/v0.18.0...v0.18.1
 [0.18.0]: https://github.com/fresp/slipway-agents/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/fresp/slipway-agents/compare/v0.16.0...v0.17.0

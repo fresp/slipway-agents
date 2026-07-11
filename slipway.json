@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/fresp/slipway-agents/refs/heads/dev/slipway.schema.json",
-  "version": "0.18.1",
+  "version": "0.18.2",
   "ralph_loop": {
     "enabled": true,
     "max_iterations": 2,
@@ -216,6 +216,7 @@
           "trivy": "allow",
           "grype": "allow",
           "osv-scanner": "allow",
+          "curl": "allow",
           "docker": "ask",
           "command": "allow"
         }
