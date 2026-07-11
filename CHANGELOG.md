@@ -6,7 +6,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
+
 ## [Unreleased]
+
+### Removed
+- **`managed-waba` example removed:** Deleted the `skills/slipway/bootstrap-from-prd/examples/managed-waba/` reference example. The BSP/WhatsApp Business Calling domain carried real-project leak risk through project-specific names and vendor-specific configuration details, so the example is gone rather than sanitized.
+
+### Added
+- **`saas-billing` example added:** New reference example at `skills/slipway/bootstrap-from-prd/examples/saas-billing/`, generated from a privacy-safe subscription-billing PRD. The example produces 10 files: `AGENTS.md`, `.ai/docs/.manifest.md`, and numbered docs `01` through `08` plus `10-planning-rules.md`. `09-topology-and-architecture-diagrams.md` is omitted by the manifest for this single-service scope; no dynamic docs were generated.
+
+### Fixed
+- **README and example reference cleanup:** Updated the root `README.md` example link to point to `saas-billing/`, rewrote `skills/slipway/bootstrap-from-prd/examples/README.md` to document the new example, and standardized on `AGENTS.md` plural in live user-facing documentation. No historical release entries were rewritten.
+
 
 ---
 ## [0.18.2] — 2026-07-11

@@ -208,9 +208,9 @@ See [Override models](docs/guide/installation.md#override-models) for examples.
 
 ## Example Output
 
-The repository includes a full generated example for a multi-tenant WhatsApp Business Calling service:
+A generated example for a subscription-billing SaaS: plans, usage metering, invoices, payment retry/dunning, and single-service scope.
 
-- [`skills/slipway/bootstrap-from-prd/examples/managed-waba/`](skills/slipway/bootstrap-from-prd/examples/managed-waba)
+- [`skills/slipway/bootstrap-from-prd/examples/saas-billing/`](skills/slipway/bootstrap-from-prd/examples/saas-billing)
 
 Use it as a reference for the shape and depth of generated docs, not as a template to copy blindly into every project.
 
