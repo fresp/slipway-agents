@@ -86,7 +86,12 @@ const SLIPWAY_COMMANDS = {
       `other gate in this run regardless of that one deferred answer. Every OTHER step-to-step ` +
       `"Continue to [next step]? (yes/no)" progression prompt is auto-continued per slipway.md's ` +
       `Continuation rules "Smart mode override" — do not stop for those; advance immediately and ` +
-      `log the auto-continue to .ai/docs/.pipeline-decisions.md. Never auto-resolve a ` +
+      `log the auto-continue to .ai/docs/.pipeline-decisions.md. A subagent's own required Q&A or ` +
+      `interview with the user (chartmaker's brainstorm/gap-fill questions, shipwright's conflict ` +
+      `resolution prompts, caulker's interactive escalation) is NOT a progression prompt and is NOT ` +
+      `a convenience gate: always relay it to the user and await their answer regardless of ` +
+      `interaction mode, smart included — never auto-answer it and never treat a subagent pausing ` +
+      `to ask its own required question as a failure or trigger the retry-then-abort path. Never auto-resolve a ` +
       `correctness/safety gate (Critical-finding re-review, security audit BLOCK, ` +
       `ralph_loop.block_on_exhaustion) — those remain hard gates in every interaction mode. ` +
       `Regardless of which category or subagent chain Mode Detection selects, stop at the ` +

@@ -253,6 +253,51 @@ test("Continuation rules document a smart mode override that auto-continues gene
       continuationSection.includes("Smart Mode Decision Policy"),
     "Smart mode override bullet must exclude STEP 4/STEP E5 and the three named gates from its scope"
   );
+  // The override must never suppress a subagent's own required Q&A with the user.
+  assert.ok(
+    continuationSection.includes("chartmaker") &&
+      (continuationSection.includes("Q&A") || continuationSection.includes("interview")) &&
+      continuationSection.includes("relayed to the user"),
+    "Smart mode override bullet must exclude subagent-initiated Q&A (e.g. chartmaker) by name"
+  );
+});
+
+test("Error Recovery distinguishes empty/crashed output from a subagent's required question", () => {
+  const slipwayContract = readFileSync("subagents/slipway.md", "utf8");
+
+  const errorHeadingIndex = slipwayContract.indexOf("## Error Recovery and Retry");
+  assert.ok(errorHeadingIndex !== -1, "slipway.md should have an Error Recovery and Retry section");
+
+  const errorSection = slipwayContract.slice(
+    errorHeadingIndex,
+    slipwayContract.indexOf("## STEP 0", errorHeadingIndex)
+  );
+
+  assert.ok(
+    errorSection.includes("required question is not a failure") ||
+      errorSection.includes("A required question is not a failure"),
+    "Error Recovery must state a required question is not a failure"
+  );
+  assert.ok(
+    errorSection.includes("crashed") &&
+      errorSection.includes("required question") &&
+      errorSection.includes("chartmaker"),
+    "Error Recovery must distinguish empty/crashed output from a subagent's in-contract question, citing chartmaker"
+  );
+});
+
+test("/slipway:smart template requires subagent Q&A to be relayed and awaited, not auto-answered", async () => {
+  const input: Config = {};
+
+  await applyCommandConfig(input, makeSlipwayConfig());
+
+  const template = input.command?.["slipway:smart"]?.template ?? "";
+  assert.ok(
+    template.includes("chartmaker") &&
+      (template.includes("relay it to the user") || template.includes("relay it to the user and await")) &&
+      template.includes("never auto-answer"),
+    "smart template must require subagent Q&A to be relayed and awaited, not auto-answered"
+  );
 });
 
 test("keeps slash command templates and plan-authoring guardrails Slipway-local", async () => {
