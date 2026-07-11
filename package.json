@@ -1,6 +1,6 @@
 {
   "name": "slipway-agents",
-  "version": "0.18.0",
+  "version": "0.18.1",
   "description": "AI agent orchestration framework for OpenCode — PRD to engineering docs pipeline",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -22,7 +22,7 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "tsc -p tsconfig.test.json && node --test dist-test/tests/plugin-handlers/command-config-handler.test.js dist-test/tests/plugin-handlers/agent-config-handler.test.js dist-test/tests/plugin-handlers/gate-assertion-handler.test.js dist-test/tests/config/step-e0-baseline-gate.test.js dist-test/tests/config/permission-isolation.test.js",
+    "test": "tsc -p tsconfig.test.json && node --test dist-test/tests/plugin-handlers/command-config-handler.test.js dist-test/tests/plugin-handlers/agent-config-handler.test.js dist-test/tests/plugin-handlers/gate-assertion-handler.test.js dist-test/tests/config/step-e0-baseline-gate.test.js dist-test/tests/config/permission-isolation.test.js dist-test/tests/config/dynamic-doc-numbering.test.js",
     "prepublishOnly": "npm run build",
     "clean": "rm -rf dist dist-test"
   },

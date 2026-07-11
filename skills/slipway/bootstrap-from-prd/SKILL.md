@@ -301,14 +301,15 @@ Run this scan before compiling `AGENTS.md`:
 
 | Signal in PRD | Implied additional doc | Number |
 |---|---|---|
-| Keywords: "dashboard", "portal", "UI", "Figma", "design system", "user interface", "screen", "page layout" | `[N]-ui-spec.md` — UI/UX specification with screen flows, component list, state transitions | 11+ |
-| Keywords: "migration", "existing system", "migrate data", "legacy", "cutover", "data transfer from" | `[N]-migration-plan.md` — migration strategy, rollback plan, data mapping | 11+ |
-| Keywords: "WhatsApp API", "payment gateway", "Stripe", "Midtrans", "Twilio", "third-party", "webhook from", "external API" with complex bidirectional flows | `[N]-integration-spec.md` — external system integration contracts, error handling, retry policies | 11+ |
-| Keywords: "staging", "sandbox", "per-tenant", "multi-environment", "UAT", "preview environment" | `[N]-environment-config.md` — environment topology, config per environment, secrets management | 11+ |
-| Domain with 10+ distinct business terms that need precise definition (e.g. WABA, MSISDN, billing cycle, tenant, reseller) | `[N]-glossary.md` — canonical term definitions used by all docs | 11+ |
+| Keywords: "dashboard", "portal", "UI", "Figma", "design system", "user interface", "screen", "page layout" | `[N]-ui-spec.md` — UI/UX specification with screen flows, component list, state transitions | 12+ |
+| Keywords: "migration", "existing system", "migrate data", "legacy", "cutover", "data transfer from" | `[N]-migration-plan.md` — migration strategy, rollback plan, data mapping | 12+ |
+| Keywords: "WhatsApp API", "payment gateway", "Stripe", "Midtrans", "Twilio", "third-party", "webhook from", "external API" with complex bidirectional flows | `[N]-integration-spec.md` — external system integration contracts, error handling, retry policies | 12+ |
+| Keywords: "staging", "sandbox", "per-tenant", "multi-environment", "UAT", "preview environment" | `[N]-environment-config.md` — environment topology, config per environment, secrets management | 12+ |
+| Domain with 10+ distinct business terms that need precise definition (e.g. WABA, MSISDN, billing cycle, tenant, reseller) | `[N]-glossary.md` — canonical term definitions used by all docs | 12+ |
 
 **Rules for dynamic docs:**
-- Number sequentially starting at 11 (or continuing from the highest existing supplementary PRD number).
+- Number sequentially starting at 12. The number 11 is permanently reserved for gunner's `11-security-audit.md` and must never be assigned to a dynamic doc, even if gunner has not run yet in this pipeline pass. When assigning a number, read `.ai/docs/.manifest.md`'s Extensions table first and use the highest existing number + 1 (starting the search floor at 12), so multiple dynamic docs in the same run still number sequentially without collision.
+- **Never assign the number 11 to any document other than gunner's security audit report (`11-security-audit.md`), regardless of pipeline mode or run order.** The 11 slot is gunner's fixed, hardcoded output path; a dynamic doc that lands on 11 collides with it in `.ai/docs/.manifest.md`.
 - Do not generate a dynamic doc if the PRD only mentions the trigger keyword briefly or in an example — the signal must be a material requirement.
 - Apply the same per-document completion contracts philosophy: the dynamic doc must be self-consistent and traceable to FR-IDs.
 - Add every generated dynamic doc to `10-planning-rules.md`'s source-of-truth list, to `AGENTS.md`'s Source Of Truth section, and as a row in `.manifest.md`'s Baseline table. The `bosun` subagent validates this list — if it's hardcoded to `02–10`, it will miss dynamic docs.

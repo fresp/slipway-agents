@@ -201,11 +201,13 @@ If grooming surfaces a need for additional documentation beyond the standard `02
 
 | Signal in docs | Recommended doc |
 |---|---|
-| "design system", "Figma", "UI", "dashboard" | `11-design-spec.md` |
-| Complex third-party integration (payments, messaging) | `11-integration-spec.md` |
-| "existing system", "migration", "legacy" | `11-migration-plan.md` |
-| Multi-environment (staging, prod, sandbox per tenant) | `11-environment-config.md` |
-| Domain with many specialized business terms | `11-glossary.md` |
+| "design system", "Figma", "UI", "dashboard" | `12-design-spec.md` |
+| Complex third-party integration (payments, messaging) | `12-integration-spec.md` |
+| "existing system", "migration", "legacy" | `12-migration-plan.md` |
+| Multi-environment (staging, prod, sandbox per tenant) | `12-environment-config.md` |
+| Domain with many specialized business terms | `12-glossary.md` |
+
+The `12-` filenames above are illustrative previews only — coxswain recommends docs by topic, not by number. Hullwright / `bootstrap-from-prd` assigns the real sequential number at generation time (dynamic docs start at 12; 11 is permanently reserved for gunner's `11-security-audit.md`).
 
 ---
 

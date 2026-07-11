@@ -72,13 +72,15 @@ Review the API surface documented in `05-api-specifications.md`:
 
 Review `04-data-models.md` and `01-prd.md` for data sensitivity and privacy; review `07-engineering-standards.md`, `08-architecture-decisions.md`, and `05-api-specifications.md` for audit-trail and accountability coverage:
 
-- Are fields containing PII (names, emails, phone numbers, addresses, payment data) identified as sensitive?
+- Are fields containing PII (names, emails, phone numbers, addresses, payment data) identified as sensitive? **(Always NOTE-tier — see severity note below.)**
 - Is there a defined retention and deletion policy for sensitive data?
 - Are logs documented in a way that would include sensitive field values?
 - If the product involves user-generated content, is there a moderation or sanitization layer documented?
 - Are privileged or admin actions documented with an audit-trail requirement (who performed the action, when, and what changed)?
 - Is actor attribution required for compliance-sensitive operations (e.g., financial transactions, access grants, data exports), or can actions be performed without identifying the actor?
 - Are audit logs described as tamper-evident or append-only for compliance-sensitive events, or is there no documented log-integrity control?
+
+**PII-identification severity ceiling:** the PII-identification check above is always reported at NOTE tier, regardless of context — it never escalates to CRITICAL or SHOULD-FIX and never contributes to a CONDITIONAL or BLOCK gate signal on its own. This is a deliberate scope decision: not every adopting project treats PII handling as a compliance requirement, so gunner surfaces it as an awareness signal rather than a gate. This ceiling applies only to the PII-identification bullet — the other Lens 4 checks (retention/deletion policy, log exposure, audit-trail, actor attribution, log-integrity) keep their normal severity range.
 
 ### Lens 5 — Third-party, dependency, and documented-technology risk
 
@@ -383,6 +385,7 @@ Plugin-level permission enforcement for gunner's `bash` access is wired through 
 - **CRITICAL** — a gap that, if not addressed, creates a likely exploitable vulnerability or a compliance violation in a production system. Examples: endpoint with no auth, secrets in code, no input validation on a public-facing form, multi-tenant data model with no tenant isolation field.
 - **SHOULD-FIX** — a gap that increases risk meaningfully but is not immediately exploitable. Examples: no rate limiting documented, no defined secret rotation policy, third-party webhook without signature verification.
 - **NOTE** — a design choice that is not inherently insecure but warrants a conscious decision. Examples: logging approach that could capture sensitive fields depending on implementation, an internal endpoint that relies on network-level trust without documentation of that trust boundary.
+- PII-identification findings (Lens 4) are exempt from this general scheme — they are always NOTE regardless of apparent compliance impact (see Lens 4's severity ceiling note).
 
 ---
 
@@ -399,3 +402,4 @@ Plugin-level permission enforcement for gunner's `bash` access is wired through 
 - Never emit BLOCK based solely on Should-fix or Note findings.
 - Never invent security requirements not implied by the PRD or architecture — flag gaps in what is documented, not gaps relative to an imagined stricter standard.
 - Never let learnings-capture failure affect the PASS/CONDITIONAL/BLOCK gate signal.
+- Never escalate a PII-identification finding (Lens 4) above NOTE tier, and never let it contribute to a CONDITIONAL or BLOCK gate signal on its own.
