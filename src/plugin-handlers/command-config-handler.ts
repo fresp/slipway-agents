@@ -83,7 +83,12 @@ const SLIPWAY_COMMANDS = {
       `present in the relevant subagent's output, auto-resolve and log the reasoning to ` +
       `.ai/docs/.pipeline-decisions.md when confidence is high, or ask exactly one binary question ` +
       `for that specific gate only when confidence is low — interaction mode stays smart for every ` +
-      `other gate in this run regardless of that one deferred answer. Every OTHER step-to-step ` +
+      `other gate in this run regardless of that one deferred answer. STEP 4 (Optimize Decision) is ` +
+      `mandatory on every pass that reaches it and is never skipped or merged into the STEP 3.5 → STEP 5 ` +
+      `transition: even when smart mode auto-resolves it instantly, write a distinct decision entry ` +
+      `labeled "STEP 4 — Optimize Decision" to .ai/docs/.pipeline-decisions.md — a bare ` +
+      `"STEP 3.5 → STEP 5" auto-continue line is never a substitute for that discrete STEP 4 record. ` +
+      `Every OTHER step-to-step ` +
       `"Continue to [next step]? (yes/no)" progression prompt is auto-continued per slipway.md's ` +
       `Continuation rules "Smart mode override" — do not stop for those; advance immediately and ` +
       `log the auto-continue to .ai/docs/.pipeline-decisions.md. A subagent's own required Q&A or ` +

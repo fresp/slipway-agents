@@ -347,6 +347,8 @@ If yes: re-invoke `hullwright` for these specific docs only, then re-run `bosun`
 
 ### STEP 4 — Optimize Decision
 
+**STEP 4 is mandatory on every pipeline pass that reaches it.** Whenever STEP 3.5 (Sprint Grooming) returns `Ready to Plan` or `Conditional` and hands off forward, the pipeline enters STEP 4 as a discrete, first-class step — it is never skipped, collapsed into STEP 3.5, or merged with the STEP 3.5 → STEP 5 transition, regardless of interaction mode (interactive or smart). A pipeline pass that advances from STEP 3.5 directly to STEP 5 without STEP 4 having been evaluated and recorded is non-compliant. In smart mode this step is auto-resolved rather than asked, but it is still evaluated and still logged discretely (see Smart Mode Decision Policy → Logging).
+
 This is the only step where the orchestrator talks to the user directly before continuing.
 
 Present the Bosun findings, then ask exactly one routing question — always as a binary choice:
@@ -384,6 +386,8 @@ This policy applies **only** when `.ai/docs/.pipeline-state.md` records `Interac
 ### Per-gate confidence estimation
 
 **STEP 4 (Should-fix/Note branch):** High confidence requires BOTH: every remaining Should-fix/Note finding's own bosun-written description explicitly calls it minor/cosmetic, AND `ralph_loop` cycles remaining > 1. Otherwise confidence is low. On high confidence, auto-decide: `proceed` if all findings are self-described minor, `optimize` otherwise. On low confidence, ask the existing binary question (`optimize / proceed`) once, then continue the rest of the run in smart mode.
+
+**STEP 4 always produces a discrete decision record.** When the STEP 4 gate is reached and confidence is high enough to auto-resolve, the orchestrator must still write a **distinct** decision entry to `.ai/docs/.pipeline-decisions.md` labeled as STEP 4 specifically (e.g. `## [timestamp] — STEP 4 — Optimize Decision`), stating which STEP 4 branch applied (Critical auto-route back to the relevant subagent, or Should-fix/Note auto-resolved to `optimize` / `proceed`) and the confidence signal used. This entry is required even when smart mode resolves STEP 4 instantly and advances to STEP 5 in the same turn. A transition log entry that only names adjacent steps (e.g. `auto-continue — STEP 3.5 → STEP 5`) is **not** a substitute for the discrete STEP 4 record and must never appear in place of it — smart mode's generic `auto-continue` step-to-step logging (Continuation rules → "Smart mode override") never covers STEP 4, because STEP 4 is a convenience gate, not a plain step transition.
 
 **STEP 3.5 (dynamic doc handling):** High confidence requires coxswain's `trigger:` text for a recommended doc to contain an exact keyword match to that doc's row in the dynamic-doc trigger table in `skills/slipway/bootstrap-from-prd/SKILL.md` and `subagents/coxswain.md`. Otherwise confidence is low. On high confidence, auto-generate the doc. On low confidence, ask the existing `yes / skip` question once, then continue in smart mode.
 
@@ -626,6 +630,7 @@ Changelog written to: .ai/docs/.pipeline-changelog.md
 - Never generate PRD content, engineering docs, review findings, security findings, estimates, or plans directly in the orchestrator — always delegate.
 - Never write, edit, or generate application/source code directly, regardless of how the request is phrased — including requests phrased as direct implementation asks ("refactor this", "implement X", "fix this bug"). Always route such requests through the normal pipeline (chartmaker/shipwright → docs → rigger → plan) and stop at the artifact stage. Actual code implementation is Sisyphus/omo.dev's responsibility in a separate step, never Slipway's, no matter how the request is worded or how small the change seems.
 - Never proceed past STEP 4 / STEP E5 with unresolved Critical findings from Bosun.
+- Never advance from STEP 3.5 to STEP 5 without a discrete STEP 4 decision record in `.ai/docs/.pipeline-decisions.md`, even when smart mode auto-resolves it instantly. A combined `STEP 3.5 → STEP 5` transition log entry with no separate STEP 4 record is non-compliant.
 - Never run `rigger` without Gunner returning PASS or CONDITIONAL first.
 - Never exceed the resolved `ralph_loop.max_iterations` optimize loop limit. If `block_on_exhaustion: false`, require an explicit user override; if `block_on_exhaustion: true`, hard-block without offering an override.
 - Never run `rigger` against docs that have not passed `bosun` in the current pipeline history.

@@ -9,6 +9,16 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ---
+## [0.17.0] — 2026-07-11
+
+### Fixed
+- **STEP 4 (Optimize Decision) could be silently skipped in smart mode:** In a real smart-mode bootstrap run, the orchestrator jumped straight from STEP 3.5 (grooming) to STEP 5 (security audit), logging only a single `auto-continue — STEP 3.5 → STEP 5` line to `.ai/docs/.pipeline-decisions.md` with **no** STEP 4 decision record at all — not even an auto-resolved one — while Bosun still showed Should-fix/Note findings. This violated the Smart Mode Decision Policy requirement that every convenience gate either ask the user or auto-resolve *with logged reasoning*. `subagents/slipway.md` now states STEP 4 is mandatory on every pass that reaches it (never skipped, collapsed, or merged into the STEP 3.5 → STEP 5 transition), requires a **distinct** `STEP 4 — Optimize Decision` entry in `.ai/docs/.pipeline-decisions.md` even when smart mode auto-resolves it instantly, and adds a Forbidden Behavior forbidding advancement from STEP 3.5 to STEP 5 without that discrete record. The `slipway:smart` runtime template (`SLIPWAY_ORCHESTRATOR_PREAMBLE` sibling in `src/plugin-handlers/command-config-handler.ts`) was updated in sync to spell out the always-log-STEP-4-discretely requirement. The STEP 4 binary-question logic itself (Critical → auto-route, Should-fix/Note → optimize/proceed) is unchanged.
+- **Gunner Lens 6 conflated OSV.dev API calls with local scanner tool-availability probes:** In the same run, every doc-mentioned package (Go, React, TypeScript, Vite, Tailwind, mongo-driver) was reported as `[NOTE] Scan skipped: ... — osv-scanner/trivy not found`, even though doc-mentioned package checks hit the `https://api.osv.dev/v1/query` HTTP API directly and require no local binary. `subagents/gunner.md` now disambiguates the doc-mentioned package (OSV.dev API) path from the local-scanner paths: the OSV.dev query is a direct `curl` HTTP request that must never be gated behind `command -v osv-scanner` / `command -v trivy`; the "Tool availability probe" applies only to `trivy image` and the filesystem ecosystem-detection scanners; and the skip message for the API path may only be `[NOTE] Scan skipped: [package]@[version] — OSV.dev API unreachable` (on a failed `curl`), never `... not found`. `curl` scoped to `https://api.osv.dev/*` only was added to both the Lens 6 "Commands this lens may run" and the "Bash self-enforcement (Lens 6)" allowlists. Trivy image scanning, the filesystem ecosystem detection table, and severity mapping are unchanged.
+
+### Notes
+- **Deferred — manifest doc `Status` (`draft` vs `frozen`) not transitioning after review (unresolved):** Investigation only in this batch; no behavior change shipped. In the same run, `.ai/docs/.manifest.md` showed docs 02–10 as `Status: draft` after Bosun passed at 88/100. An existing rule *does* exist at `skills/slipway/bootstrap-from-prd/SKILL.md` ("once STEP 5 cross-document validation passes, the skill sets every generated doc to `frozen`"), and the observed state appears to violate it — but the transition trigger is the **skill's own STEP 5 validation** (during hullwright's run), *not* a passing Bosun review, so the correct fix depends on a product decision about whether Bosun's pass should also gate/confirm the transition. Left open for the maintainer; not marked fixed. See the PR "Open Question" for the full framing.
+- **`slipway.json` gunner `bash` allowlist intentionally unchanged:** Per the Fix 2 instruction not to broaden bash access, `curl` was added only to the `gunner.md` behavioral allowlists, not to `agents.gunner.permission.bash` in `slipway.json`. The domain-scoping to `https://api.osv.dev/*` is a behavioral constraint (the object-form bash permission cannot express per-domain scoping). If runtime enforcement blocks the OSV.dev `curl` call, wiring it through the runtime permission surface is a separate follow-up.
+
 ## [0.16.0] — 2026-07-11
 
 ### Changed
@@ -704,7 +714,8 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
-[Unreleased]: https://github.com/fresp/slipway-agents/compare/v0.16.0...HEAD
+[Unreleased]: https://github.com/fresp/slipway-agents/compare/v0.17.0...HEAD
+[0.17.0]: https://github.com/fresp/slipway-agents/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/fresp/slipway-agents/compare/v0.14.0...v0.16.0
 [0.14.0]: https://github.com/fresp/slipway-agents/compare/v0.13.8...v0.14.0
 

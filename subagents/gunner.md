@@ -132,13 +132,23 @@ trivy image --image-src remote <ref>
 
 The `--image-src remote` flag forces trivy to pull metadata and layers directly from the registry via the OCI Distribution API, bypassing the local Docker daemon and the `docker: "ask"` permission gate. No Dockerfile, `docker-compose.yml`, or pre-pulled local image is required. If trivy is unavailable, report `[NOTE] Scan skipped: image <ref> — trivy not found`.
 
-**Doc-mentioned package scanning.** For every package mention extracted by Lens 5 that maps to a known OSV ecosystem, query `https://api.osv.dev/v1/query` with a single-version request:
+**Doc-mentioned package scanning.** For every package mention extracted by Lens 5 that maps to a known OSV ecosystem, query the OSV.dev API directly. **This is a direct HTTP request to `https://api.osv.dev/v1/query` — it requires no local binary and must NEVER be gated behind `command -v osv-scanner`, `command -v trivy`, or any other local scanner-availability probe.** The "Tool availability probe" logic below does not apply to this path at all; a missing local scanner is irrelevant here because no local scanner is used. Issue the request with `curl`:
+
+```
+curl -s -X POST https://api.osv.dev/v1/query \
+  -H "Content-Type: application/json" \
+  -d '{ "package": { "name": "<name>", "ecosystem": "<ecosystem>" }, "version": "<version>" }'
+```
+
+The request body is a single-version query:
 
 ```json
 { "package": { "name": "<name>", "ecosystem": "<ecosystem>" }, "version": "<version>" }
 ```
 
 Do not put the version in both a `purl` and the top-level `version` field — that returns `400 Bad Request`. Parse the response for `.vulns[].id`, `.vulns[].aliases[]` (CVE IDs), `.vulns[].summary`, and severity from `.vulns[].severity[].score` or `.vulns[].affected[].ecosystem_specific.severity`. An empty response `{"vulns": []}` means no known vulnerabilities for that version.
+
+**Skip-message contract (doc-mentioned package path only).** A doc-mentioned package check may report `[NOTE] Scan skipped: [package]@[version] — OSV.dev API unreachable` **only** when the `curl` call itself fails: a network error, a timeout after one retry, or a non-2xx HTTP response. Never report `... not found` for this path — that message is reserved for missing local scanners, and no local tool is ever involved in an OSV.dev API query.
 
 **Filesystem ecosystem detection.** Only scan an ecosystem if its manifest is actually present on disk — never assume an ecosystem exists.
 
@@ -150,7 +160,7 @@ Do not put the version in both a `purl` and the top-level `version` field — th
 | `Cargo.toml` | Rust | `osv-scanner` or `trivy fs` |
 | `Dockerfile`, `docker-compose.yml`/`compose.yml` | Container images | `trivy image <ref>` per image named in a `FROM` line |
 
-**Tool availability probe.** Before running any scanner, probe for it (e.g. `command -v trivy`). If no scanner is available for a detected ecosystem or image, do not fail the lens — report it as a `NOTE`-tier finding: `[NOTE] Scan skipped: [ecosystem/image] — [tool] not found`. A missing tool is a gap in the audit environment, not a security finding about the project.
+**Tool availability probe.** This probe applies **only** to paths that actually invoke a local binary: (a) `trivy image` / `trivy image --image-src remote` for doc-mentioned image references, and (b) the Filesystem ecosystem detection table below (`npm audit`, `pip-audit`, `osv-scanner` / `trivy fs` for actual on-disk manifests). It **never** applies to the doc-mentioned package (OSV.dev API) path above, which is a direct HTTP request with no local binary — do not run `command -v osv-scanner` / `command -v trivy` before an OSV.dev API query. For the local-binary paths only: before running any scanner, probe for it (e.g. `command -v trivy`). If no scanner is available for a detected ecosystem or image, do not fail the lens — report it as a `NOTE`-tier finding: `[NOTE] Scan skipped: [ecosystem/image] — [tool] not found`. A missing tool is a gap in the audit environment, not a security finding about the project.
 
 **Not applicable.** If Lens 5 found no doc-mentioned scannable references AND the project has no dependency manifests, no lockfiles, and no `Dockerfile`/compose files at all (a pure documentation or planning-only project), Lens 6 reports `Lens 6 — not applicable: no dependency manifests, container images, or doc-mentioned scannable references detected` and does not affect the gate.
 
@@ -163,6 +173,7 @@ Every finding must cite: package/image name, installed or mentioned version, CVE
 
 **Commands this lens may run** (read-only probes and scans only):
 - `command -v <tool>` (availability probing)
+- `curl` scoped to `https://api.osv.dev/*` only (the doc-mentioned package OSV.dev API query — read-only POST to `https://api.osv.dev/v1/query`, no other host)
 - `npm audit --json`
 - `pip-audit`
 - `trivy fs .`, `trivy image <ref>`, `trivy image --image-src remote <ref>`
@@ -361,7 +372,7 @@ Gate signal:   [PASS | CONDITIONAL | BLOCK]
 
 Plugin-level permission enforcement for gunner's `bash` access is wired through OpenCode's native `AgentConfig.permission` passthrough (Batch 6). This section remains a hard behavioral constraint for Lens 6 — the model must still respect the allowlist even if the runtime enforces it.
 
-**Allowed commands, exactly:** `command -v <tool>`, `npm audit --json`, `pip-audit`, `trivy fs .`, `trivy image <ref>`, `trivy image --image-src remote <ref>`, `osv-scanner`, `grype`. Nothing else.
+**Allowed commands, exactly:** `command -v <tool>`, `curl` scoped to `https://api.osv.dev/*` only (the doc-mentioned package OSV.dev API query), `npm audit --json`, `pip-audit`, `trivy fs .`, `trivy image <ref>`, `trivy image --image-src remote <ref>`, `osv-scanner`, `grype`. Nothing else. The `curl` allowance is strictly domain-scoped to `https://api.osv.dev/*` — it must never be used to reach any other host.
 
 **Never run, under any circumstance, even if a scanner CLI offers it:** any install/upgrade command (`npm install`, `pip install`, `go get`, `cargo add`, `poetry add`, etc.), any auto-fix flag (`npm audit fix`, `--fix`), `docker build`, `docker pull` outside what `trivy image` invokes internally, or any command that writes to a lockfile, manifest, or image. Lens 6 reads; it never mutates.
 
