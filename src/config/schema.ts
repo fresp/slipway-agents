@@ -27,6 +27,13 @@ export const permissionSchema = z
     skill: z
       .union([permissionActionSchema, z.record(z.string(), permissionActionSchema)])
       .optional(),
+    // Absence of a `bash` key resolves to permissive/full-allow at OpenCode
+    // runtime — this is the OPPOSITE of safe. Every agent must set an explicit
+    // `bash` value (`ask`/`allow`/`deny`, or a scoped object) if it should not
+    // have unrestricted bash access. Do not rely on omission. This field is
+    // still schema-optional (the plugin only passes through what is present),
+    // but `tests/config/permission-isolation.test.ts` enforces that every
+    // bundled agent declares one explicitly.
     bash: z
       .union([permissionActionSchema, z.record(z.string(), permissionActionSchema)])
       .optional(),
@@ -72,11 +79,23 @@ export const agentConfigSchema = z
   })
   .strict();
 
+export const gateAssertionsConfigSchema = z
+  .object({
+    // Opt-in plugin-level enforcement of pipeline gate preconditions. Default
+    // false / absent = disabled. Currently governs exactly one hardcoded
+    // assertion: STEP 4 (Optimize Decision) must have a discrete decision
+    // record in .ai/docs/.pipeline-decisions.md before the orchestrator may
+    // delegate to gunner (STEP 5). Not a user-definable rule engine.
+    enabled: z.boolean().optional(),
+  })
+  .strict();
+
 export const slipwayConfigSchema = z
   .object({
     $schema: z.string().optional(),
     version: z.string().regex(/^\d+\.\d+\.\d+$/),
     ralph_loop: ralphLoopConfigSchema.optional(),
+    gate_assertions: gateAssertionsConfigSchema.optional(),
     agents: z.record(z.string(), agentConfigSchema),
     categories: z.record(z.string(), categoryConfigSchema).optional(),
   })

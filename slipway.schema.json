@@ -11,11 +11,14 @@
   "properties": {
     "version": {
       "type": "string",
-      "description": "Config schema version. Current: 0.17.0",
+      "description": "Config schema version. Current: 0.18.0",
       "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
     "ralph_loop": {
       "$ref": "#/definitions/ralphLoopConfig"
+    },
+    "gate_assertions": {
+      "$ref": "#/definitions/gateAssertionsConfig"
     },
     "agents": {
       "type": "object",
@@ -131,7 +134,7 @@
         },
         "permission": {
           "type": "object",
-          "description": "Scoped permissions for this agent. Absence of a key means no access to that action at all — this is NOT the same as setting it to 'deny' explicitly, though both result in no access. Most agents should have no permission block at all (doc-only agents never touch bash).",
+          "description": "Scoped permissions for this agent. Absence of a `bash` key resolves to permissive/full-allow at OpenCode runtime — this is the OPPOSITE of safe, and is NOT equivalent to 'deny'. Every agent must set an explicit `bash` value ('ask'/'allow'/'deny', or a scoped object) if it should not have unrestricted bash access; do not rely on omission. The same caution applies to any action key whose omission the runtime treats as permissive.",
           "properties": {
             "edit": {
               "type": "string",
@@ -276,6 +279,17 @@
         "block_on_exhaustion": {
           "type": "boolean",
           "description": "If true, and Critical findings remain after max_iterations, halt the pipeline and require explicit user decision instead of silently proceeding to the next stage."
+        }
+      },
+      "additionalProperties": false
+    },
+    "gateAssertionsConfig": {
+      "type": "object",
+      "description": "Opt-in plugin-level enforcement of pipeline gate preconditions. Disabled unless `enabled` is true. Currently governs exactly one hardcoded assertion: STEP 4 (Optimize Decision) must have a discrete decision record in .ai/docs/.pipeline-decisions.md before the orchestrator delegates to gunner (STEP 5). This is defense-in-depth on top of the prompt-level STEP 4 logging requirement, not a user-definable rule engine.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "When true, the plugin blocks a task delegation to gunner unless a discrete STEP 4 decision record exists after the most recent STEP 3.5 entry in .ai/docs/.pipeline-decisions.md. Default false / absent = disabled."
         }
       },
       "additionalProperties": false

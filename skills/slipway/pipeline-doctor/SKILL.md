@@ -40,8 +40,10 @@ Never produce a wall of text. End with exactly one summary line: `N issues found
 
 ### 5. Runtime-wired features summary
 
-- Review `CHANGELOG.md` and the plugin source (`src/plugin-handlers/tool-config-handler.ts`, `src/plugin-handlers/agent-config-handler.ts`) to identify which config features are now runtime-enforced by OpenCode's native `AgentConfig.permission` passthrough.
+- Review `CHANGELOG.md` and the plugin source (`src/plugin-handlers/tool-config-handler.ts`, `src/plugin-handlers/agent-config-handler.ts`, `src/plugin-handlers/gate-assertion-handler.ts`) to identify which config features are now runtime-enforced by OpenCode's native `AgentConfig.permission` passthrough and by plugin hooks.
 - Report any config feature that is still documented but not passed through to OpenCode at runtime. As of Batch 6, per-agent `permission` blocks (including `edit`, `webfetch`, `task`, `skill`, and `bash`) are wired.
+- Every agent should declare an explicit `permission.bash` value in `slipway.json` — an **absent** `bash` key resolves to unrestricted bash access at OpenCode runtime, not to "no access." Flag any agent missing an explicit `bash` key as `⚠`.
+- The opt-in STEP 4 Gate Assertion is runtime-wired via the plugin's `tool.execute.before` hook when `gate_assertions.enabled` is `true`. Report whether it is enabled or disabled (default: disabled) — when enabled it blocks a `task` delegation to `gunner` until a discrete STEP 4 record exists in `.ai/docs/.pipeline-decisions.md` after the latest STEP 3.5 entry.
 - If a feature is confirmed wired, do not report it as declarative-only.
 
 ### 6. Session reconciliation health

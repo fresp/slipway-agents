@@ -275,6 +275,46 @@ test("every agent has an explicit permission.edit key with the correct value", (
   }
 });
 
+test("every agent has an explicit permission.bash key (absent resolves to permissive in OpenCode runtime)", () => {
+  const config = loadSlipwayConfig();
+
+  const missing: string[] = [];
+  for (const name of EXPECTED_AGENTS) {
+    const agent = config.agents[name];
+    assert.ok(agent, `agent ${name} should exist`);
+    assert.ok(agent.permission, `agent ${name} should have a permission block`);
+    if (!("bash" in agent.permission)) {
+      missing.push(name);
+    }
+  }
+
+  assert.deepEqual(
+    missing,
+    [],
+    `these agents are missing an explicit permission.bash key (absent = unrestricted bash at runtime): ${missing.join(", ")}`
+  );
+
+  // Every agent except gunner denies bash outright; gunner keeps a scoped
+  // object allow-list for its Lens 6 vulnerability scanners.
+  for (const name of EXPECTED_AGENTS) {
+    const bash = config.agents[name]!.permission!.bash;
+    if (name === "gunner") {
+      assert.equal(
+        typeof bash,
+        "object",
+        "gunner permission.bash should be a scoped object allow-list, not a flat value"
+      );
+      assert.notEqual(bash, null, "gunner permission.bash should not be null");
+    } else {
+      assert.equal(
+        bash,
+        "deny",
+        `agent ${name} permission.bash should be exactly "deny" (no documented legitimate bash use)`
+      );
+    }
+  }
+});
+
 // ── Phase 2: Version sync test ──
 
 test("slipway config version is synced to package.json", () => {

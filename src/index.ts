@@ -3,6 +3,7 @@ import { loadSlipwayConfig } from "./config/loader";
 import { applyAgentConfig } from "./plugin-handlers/agent-config-handler";
 import { applyCommandConfig } from "./plugin-handlers/command-config-handler";
 import { registerPipelineHooks } from "./hooks/pipeline-hooks";
+import { registerGateAssertions } from "./plugin-handlers/gate-assertion-handler";
 import { Hooks, PluginInput } from "./config/types";
 
 export default {
@@ -25,6 +26,7 @@ export default {
         await applyCommandConfig(input, slipwayConfig);
       },
       ...registerPipelineHooks(),
+      ...registerGateAssertions(projectRoot, slipwayConfig),
     };
   },
 };

@@ -9,6 +9,19 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ---
+## [0.18.0] — 2026-07-11
+
+### Fixed
+- **`permission.bash` absence gap on the `slipway` orchestrator (and every other agent):** An **absent** `permission.bash` key resolves to full, silent, unrestricted bash access at OpenCode runtime — the opposite of safe, and not equivalent to `deny`. The `slipway` orchestrator had no `bash` key, contradicting its "never touch source code, always delegate" mandate; ten other agents (`chartmaker`, `cartographer`, `hullwright`, `bosun`, `rigger`, `coxswain`, `shipwright`, `chronicler`, `surveyor`, `caulker`) were in the same state. All eleven now set `"bash": "deny"` explicitly in `slipway.json`. `gunner` is unchanged — it already carries a scoped `bash` object allow-list for its Lens 6 vulnerability scanners. Scope was strictly the `bash` key; no `edit`/`webfetch`/`task`/`skill` values changed.
+- **Corrected the misleading `bash`-absence documentation:** The `slipway.schema.json` permission description previously claimed "Absence of a key means no access to that action at all"; it now states that absence resolves to permissive/full-allow and that every agent must set an explicit `bash` value. A matching accurate comment was added above the `bash` field in `src/config/schema.ts`.
+- **Generalized `tests/config/permission-isolation.test.ts`:** a new assertion requires every one of the 12 agents to declare an explicit `permission.bash` key (mirroring the existing `permission.edit` pattern), failing with the names of any agents missing it, and asserts `deny` for all agents except `gunner`'s scoped object.
+
+### Added
+- **Opt-in STEP 4 Gate Assertion (`gate_assertions.enabled`, default `false`):** A thin, non-polling, no-new-state plugin check (`src/plugin-handlers/gate-assertion-handler.ts`, wired via `tool.execute.before`) that blocks the orchestrator from delegating to `gunner` (STEP 5) unless a discrete STEP 4 (Optimize Decision) record already exists in `.ai/docs/.pipeline-decisions.md` after the most recent STEP 3.5 entry. This is defense-in-depth on top of the prompt-level STEP 4 logging requirement shipped in v0.17.0 — not a replacement. When the precondition is unmet the hook throws an error that (1) names the missing record, (2) gives the concrete corrective action (write the STEP 4 record, then retry the same `task` call), and (3) explicitly forbids the orchestrator from doing gunner's work itself via `bash`/`read`/`grep`/`edit` or any other tool. If the decisions file is absent or no STEP 3.5 entry exists yet, the assertion is not applicable and allows the call through. New optional top-level `gate_assertions` config in `slipway.json` / `slipway.schema.json` and the Zod schema; a focused unit test covers the pure assertion function and the hook wiring.
+
+### Notes
+- **Gate Assertion scope:** The single hardcoded assertion covers only the STEP 4 → gunner transition. STEP 3.5 dynamic doc handling and STEP S2 post-sync review remain prompt-level gates only; this is deliberately not a generic, user-definable rule engine.
+
 ## [0.17.0] — 2026-07-11
 
 ### Fixed
@@ -714,7 +727,8 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
-[Unreleased]: https://github.com/fresp/slipway-agents/compare/v0.17.0...HEAD
+[Unreleased]: https://github.com/fresp/slipway-agents/compare/v0.18.0...HEAD
+[0.18.0]: https://github.com/fresp/slipway-agents/compare/v0.17.0...v0.18.0
 [0.17.0]: https://github.com/fresp/slipway-agents/compare/v0.16.0...v0.17.0
 [0.16.0]: https://github.com/fresp/slipway-agents/compare/v0.14.0...v0.16.0
 [0.14.0]: https://github.com/fresp/slipway-agents/compare/v0.13.8...v0.14.0
