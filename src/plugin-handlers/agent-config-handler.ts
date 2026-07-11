@@ -1,5 +1,5 @@
 import { AgentDefinition, Config, SlipwayConfig } from "../config/types";
-import { resolveFallbackChain, resolveModel } from "./model-resolution-handler";
+import { resolveModel } from "./model-resolution-handler";
 import { applyPromptConfig } from "./prompt-handler";
 import { applyToolConfig } from "./tool-config-handler";
 
@@ -32,14 +32,6 @@ export async function applyAgentConfig(
 
     if (resolvedModel) {
       agentDef.model = resolvedModel;
-    }
-
-    const fallbackChain = resolveFallbackChain(agentName, slipwayConfig);
-    if (fallbackChain.length > 0) {
-      agentDef.options = {
-        ...agentDef.options,
-        slipway_fallback_chain: fallbackChain,
-      };
     }
 
     if (agentConfig?.mode) {
