@@ -1,5 +1,5 @@
 import type { CommandDefinition, Config, SlipwayConfig } from "../config/types";
-import { resolveCategoryModel, resolveModel } from "./model-resolution-handler";
+import { resolveAgentSmartModel, resolveModel } from "./model-resolution-handler";
 
 /**
  * Bundled Slipway slash command definitions injected at runtime through the
@@ -211,7 +211,7 @@ export async function applyCommandConfig(
   input.command ??= {};
 
   const slipwayModel = resolveModel("slipway", slipwayConfig);
-  const smartModel = resolveCategoryModel("smart", slipwayConfig) ?? slipwayModel;
+  const smartModel = resolveAgentSmartModel("slipway", slipwayConfig) ?? slipwayModel;
 
   for (const [commandName, commandDefinition] of Object.entries(
     SLIPWAY_COMMANDS

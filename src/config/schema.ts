@@ -60,6 +60,15 @@ export const agentConfigSchema = z
     prompt_append: z.string().optional(),
     permission: permissionSchema.optional(),
     ralph_loop: ralphLoopConfigSchema.optional(),
+    // Model used for autonomous decision-making at convenience gates under
+    // /slipway:smart when this agent is invoked via that command. Currently
+    // only meaningful for the slipway agent.
+    smart: z
+      .object({
+        model: z.string().optional(),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 

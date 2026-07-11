@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { applyCommandConfig } from "../../src/plugin-handlers/command-config-handler";
+import { resolveAgentSmartModel } from "../../src/plugin-handlers/model-resolution-handler";
 import type { Config } from "../../src/config/types";
 
 const slipwayModel = "anthropic/claude-sonnet-5";
@@ -162,31 +163,48 @@ test("slipway:smart command is registered with smart-mode template contract", as
   assert.ok(command.template.includes("ralph_loop.block_on_exhaustion"));
 });
 
-test("slipway:smart resolves model from categories.smart, not the slipway agent's own category", async () => {
+test("slipway:smart resolves model from agents.slipway.smart.model, not the slipway agent's own model", async () => {
   const input: Config = {};
-  const smartCategoryModel = "anthropic/claude-opus-4-8";
+  const smartModel = "anthropic/claude-opus-4-8";
 
   const config: NonNullable<Parameters<typeof applyCommandConfig>[1]> = {
-    version: "0.15.0",
+    version: "0.16.0",
     agents: {
       slipway: {
         model: slipwayModel,
-      },
-    },
-    categories: {
-      smart: {
-        model: smartCategoryModel,
+        smart: {
+          model: smartModel,
+        },
       },
     },
   };
 
   await applyCommandConfig(input, config);
 
-  assert.equal(input.command?.["slipway:smart"]?.model, smartCategoryModel);
+  assert.equal(input.command?.["slipway:smart"]?.model, smartModel);
   assert.equal(input.command?.["slipway:init"]?.model, slipwayModel);
 });
 
-test("slipway:smart falls back to the slipway agent's own resolved model when categories.smart is absent", async () => {
+test("resolveAgentSmartModel reads the nested agents.<name>.smart.model field", () => {
+  const config: NonNullable<Parameters<typeof applyCommandConfig>[1]> = {
+    version: "0.16.0",
+    agents: {
+      slipway: {
+        model: slipwayModel,
+        smart: {
+          model: "anthropic/claude-opus-4-8",
+        },
+      },
+    },
+  };
+
+  assert.equal(resolveAgentSmartModel("slipway", config), "anthropic/claude-opus-4-8");
+  // Absent nested smart config resolves to undefined.
+  assert.equal(resolveAgentSmartModel("slipway", makeSlipwayConfig()), undefined);
+  assert.equal(resolveAgentSmartModel("slipway", null), undefined);
+});
+
+test("slipway:smart falls back to the slipway agent's own resolved model when agents.slipway.smart is absent", async () => {
   const input: Config = {};
 
   await applyCommandConfig(input, makeSlipwayConfig());

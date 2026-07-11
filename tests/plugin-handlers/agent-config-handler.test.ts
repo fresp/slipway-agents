@@ -26,11 +26,11 @@ const slipwayConfigInputs: Array<SlipwayConfig | null> = [
       slipway: {
         model: "anthropic/claude-sonnet-5",
         fallback_model: "anthropic/claude-opus-4-8",
-        category: "smart",
+        category: "deep",
       },
     },
     categories: {
-      smart: {
+      deep: {
         model: "anthropic/claude-opus-4-8",
         fallback_model: "anthropic/claude-sonnet-5",
       },

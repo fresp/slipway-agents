@@ -9,6 +9,22 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ---
+## [0.16.0] — 2026-07-11
+
+### Changed
+- **BREAKING — smart-mode model config relocated:** The model that powers `/slipway:smart`'s autonomous decision-making moved from the shared `categories.smart` pool to a nested per-agent field, `agents.slipway.smart.model`. This mirrors the nested-per-agent pattern (a tier nested inside the agent that uses it) rather than a separate shared category pool. The `smart` entry was removed from the top-level `categories` block in both `slipway.json` and `slipway.schema.json`; `categories` now holds `quick`/`standard`/`deep` only.
+- **Migration note:** Existing `slipway.json` / `slipway.local.json` files that set `categories.smart` must manually move that model value into `agents.slipway.smart.model`. No automatic migration is performed by the plugin or the CLI. Because `categories` remains an open record, a leftover `categories.smart` entry still validates but is now ignored for smart-mode resolution.
+
+### Added
+- **`resolveAgentSmartModel(agentName, config)`:** New exported function in `src/plugin-handlers/model-resolution-handler.ts` that reads the smart-tier model directly from `agents.<name>.smart.model`. `/slipway:smart` uses `resolveAgentSmartModel("slipway", config)`, falling back to the slipway agent's own resolved model when `agents.slipway.smart` is absent — same fallback semantics as before, new source.
+- **`agentConfig.smart` schema field:** Optional `{ "model": string }` object added to the `agentConfig` definition in `slipway.schema.json` and the Zod `agentConfigSchema`. `AgentConfig` in `src/config/types.ts` is derived via `z.infer`, so no manual type addition was needed.
+
+### Removed
+- **`resolveCategoryModel()`:** Removed from `src/plugin-handlers/model-resolution-handler.ts` — it was used only by `/slipway:smart`'s model resolution, which now uses `resolveAgentSmartModel()`. `resolveFallbackChain` and `resolveModel` are unchanged.
+
+### Notes
+- **`variant` NOT implemented:** No `variant` (or effort/reasoning-tier) field is added in this release. `agents.slipway.smart` currently carries only `model`. Adding a `variant` field requires first verifying that OpenCode's native `AgentConfig` actually supports such a field before threading it through `agentDef.options` — passing an unproven parameter risks the same "Unknown parameter" provider-rejection bug previously fixed for `slipway_fallback_chain`. Flagged for separate verification in a future batch.
+
 ## [0.14.0] — 2026-07-11
 
 ### Added
@@ -688,7 +704,8 @@ Initial release of slipway-agents.
 **Examples**
 - `skills/slipway/bootstrap-from-prd/examples/managed-waba/` — full pipeline output for a multi-tenant WhatsApp Business Calling service.
 
-[Unreleased]: https://github.com/fresp/slipway-agents/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/fresp/slipway-agents/compare/v0.16.0...HEAD
+[0.16.0]: https://github.com/fresp/slipway-agents/compare/v0.14.0...v0.16.0
 [0.14.0]: https://github.com/fresp/slipway-agents/compare/v0.13.8...v0.14.0
 
 [0.13.6]: https://github.com/fresp/slipway-agents/compare/v0.13.5...v0.13.6

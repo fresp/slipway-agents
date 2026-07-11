@@ -11,7 +11,7 @@
   "properties": {
     "version": {
       "type": "string",
-      "description": "Config schema version. Current: 0.15.7",
+      "description": "Config schema version. Current: 0.16.0",
       "pattern": "^\\d+\\.\\d+\\.\\d+$"
     },
     "ralph_loop": {
@@ -77,10 +77,6 @@
         "deep": {
           "$ref": "#/definitions/categoryConfig",
           "description": "Reasoning-heavy tasks — validation, security audit, orchestration."
-        },
-        "smart": {
-          "$ref": "#/definitions/categoryConfig",
-          "description": "Autonomous decision-making at convenience gates under /slipway:smart — must match or exceed deep tier, since it replaces user judgment calls, never substitutes a cheaper model for speed."
         }
       },
       "additionalProperties": {
@@ -245,6 +241,16 @@
         },
         "ralph_loop": {
           "$ref": "#/definitions/ralphLoopConfig"
+        },
+        "smart": {
+          "type": "object",
+          "properties": {
+            "model": {
+              "type": "string",
+              "description": "Model used for autonomous decision-making at convenience gates under /slipway:smart when this agent is invoked via that command. Currently only meaningful for the slipway agent."
+            }
+          },
+          "additionalProperties": false
         }
       },
       "additionalProperties": false

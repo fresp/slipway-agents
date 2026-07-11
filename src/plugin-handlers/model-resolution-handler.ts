@@ -40,10 +40,9 @@ export function resolveModel(agentName: string, config: SlipwayConfig | null): s
   return resolveFallbackChain(agentName, config)[0];
 }
 
-export function resolveCategoryModel(
-  categoryName: string,
+export function resolveAgentSmartModel(
+  agentName: string,
   config: SlipwayConfig | null
 ): string | undefined {
-  const categoryConfig = config?.categories?.[categoryName];
-  return categoryConfig?.model ?? categoryConfig?.fallback_model;
+  return config?.agents[agentName]?.smart?.model;
 }
