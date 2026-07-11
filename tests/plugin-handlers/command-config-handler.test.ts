@@ -220,6 +220,41 @@ test("slipway contract documents docs-publish mode and output boundary", () => {
   );
 });
 
+test("Continuation rules document a smart mode override that auto-continues generic step prompts", () => {
+  const slipwayContract = readFileSync("subagents/slipway.md", "utf8");
+
+  const continuationHeadingIndex = slipwayContract.indexOf("**Continuation rules:**");
+  assert.ok(
+    continuationHeadingIndex !== -1,
+    "slipway.md should have a Continuation rules subsection"
+  );
+
+  // Scope the assertions to the Continuation rules subsection only (up to the
+  // next end-of-pipeline block), so the override bullet is verified in place.
+  const continuationSection = slipwayContract.slice(
+    continuationHeadingIndex,
+    slipwayContract.indexOf("At the end of a full pipeline run", continuationHeadingIndex)
+  );
+
+  assert.ok(
+    continuationSection.includes("Smart mode override"),
+    "Continuation rules should contain a Smart mode override bullet"
+  );
+  assert.ok(
+    continuationSection.includes("auto-continue") &&
+      continuationSection.includes(".ai/docs/.pipeline-decisions.md"),
+    "Smart mode override bullet must auto-continue and log to .ai/docs/.pipeline-decisions.md"
+  );
+  // The override must exclude STEP 4/STEP E5 and the three named convenience gates,
+  // distinguishing it from the Smart Mode Decision Policy's confidence-based logic.
+  assert.ok(
+    continuationSection.includes("does NOT apply to STEP 4 / STEP E5") &&
+      continuationSection.includes("three convenience gates") &&
+      continuationSection.includes("Smart Mode Decision Policy"),
+    "Smart mode override bullet must exclude STEP 4/STEP E5 and the three named gates from its scope"
+  );
+});
+
 test("keeps slash command templates and plan-authoring guardrails Slipway-local", async () => {
   const input: Config = {};
 

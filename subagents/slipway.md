@@ -372,7 +372,7 @@ Each optimize cycle:
 
 This policy applies **only** when `.ai/docs/.pipeline-state.md` records `Interaction mode: smart` (written by `/slipway:smart`). Under `Interaction mode: interactive` — or when the field is absent — nothing in this section changes any behavior; every gate works exactly as documented in its own step.
 
-**Scope: exactly three convenience gates.**
+**Scope: exactly three convenience gates.** These three gates are the only DECISION points smart mode evaluates for confidence; all other plain step-to-step progression is separately auto-continued per the Continuation rules' "Smart mode override" bullet (under "Reporting to the User"), which is a distinct rule and never runs confidence estimation. Do not conflate the two behaviors: confidence-based auto-resolution here applies only to the three gates below, while generic "Continue?" progression checkpoints are handled by that override.
 
 1. STEP 4 Optimize Decision — the Should-fix/Note `optimize / proceed` branch
 2. STEP 3.5 dynamic doc handling — the `yes / skip` question for coxswain-recommended docs
@@ -598,6 +598,7 @@ Continue to [next step name]? (yes / no)
 - If the user replies `yes`, immediately invoke the next subagent — no further input needed.
 - If the user replies `no`, pause and summarize current pipeline state from `.ai/docs/.pipeline-state.md`. Tell the user which step to resume from next time.
 - Never require the user to re-type a subagent name, step number, or command. The only valid inputs after each step are the options shown.
+- **Smart mode override:** When `Interaction mode: smart` (`.ai/docs/.pipeline-state.md`), skip this yes/no prompt entirely for every step transition — auto-continue to the next step immediately. Log one line to `.ai/docs/.pipeline-decisions.md`: `## [timestamp] — auto-continue — [from step] → [to step]`. This override does NOT apply to STEP 4 / STEP E5 (Optimize Decision) or to the three convenience gates covered by the Smart Mode Decision Policy (STEP 4 Optimize Decision, STEP 3.5 dynamic doc handling, STEP S2 post-sync review) — those keep their own confidence-based logic exactly as documented in that section, unaffected by this bullet.
 
 At the end of a full pipeline run:
 

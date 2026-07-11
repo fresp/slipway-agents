@@ -83,7 +83,10 @@ const SLIPWAY_COMMANDS = {
       `present in the relevant subagent's output, auto-resolve and log the reasoning to ` +
       `.ai/docs/.pipeline-decisions.md when confidence is high, or ask exactly one binary question ` +
       `for that specific gate only when confidence is low — interaction mode stays smart for every ` +
-      `other gate in this run regardless of that one deferred answer. Never auto-resolve a ` +
+      `other gate in this run regardless of that one deferred answer. Every OTHER step-to-step ` +
+      `"Continue to [next step]? (yes/no)" progression prompt is auto-continued per slipway.md's ` +
+      `Continuation rules "Smart mode override" — do not stop for those; advance immediately and ` +
+      `log the auto-continue to .ai/docs/.pipeline-decisions.md. Never auto-resolve a ` +
       `correctness/safety gate (Critical-finding re-review, security audit BLOCK, ` +
       `ralph_loop.block_on_exhaustion) — those remain hard gates in every interaction mode. ` +
       `Regardless of which category or subagent chain Mode Detection selects, stop at the ` +
