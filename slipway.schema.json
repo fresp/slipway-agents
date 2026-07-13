@@ -20,6 +20,9 @@
     "gate_assertions": {
       "$ref": "#/definitions/gateAssertionsConfig"
     },
+    "relay_consultation": {
+      "$ref": "#/definitions/relayConsultationConfig"
+    },
     "agents": {
       "type": "object",
       "description": "Model assignments per agent. Keys must match agent names exactly.",
@@ -290,6 +293,17 @@
         "enabled": {
           "type": "boolean",
           "description": "When true, the plugin blocks a task delegation to gunner unless a discrete STEP 4 decision record exists after the most recent STEP 3.5 entry in .ai/docs/.pipeline-decisions.md. Default false / absent = disabled."
+        }
+      },
+      "additionalProperties": false
+    },
+    "relayConsultationConfig": {
+      "type": "object",
+      "description": "Opt-in orchestrator-level STEP 4 enrichment. Disabled unless `enabled` is true. When enabled, a low-confidence STEP 4 Should-fix/Note branch first invokes hullwright's Consultative Assessment mode to classify the ambiguous findings before asking the user, enriching (never replacing) the existing optimize/proceed question.",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "When true, low-confidence STEP 4 Should-fix/Note branches run the Relay Consultation procedure (subagents/slipway.md) before asking the user. Default false / absent = disabled — STEP 4 behaves exactly as documented with no relay call."
         }
       },
       "additionalProperties": false

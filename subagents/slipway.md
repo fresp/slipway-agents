@@ -385,7 +385,16 @@ This policy applies **only** when `.ai/docs/.pipeline-state.md` records `Interac
 
 ### Per-gate confidence estimation
 
-**STEP 4 (Should-fix/Note branch):** High confidence requires BOTH: every remaining Should-fix/Note finding's own bosun-written description explicitly calls it minor/cosmetic, AND `ralph_loop` cycles remaining > 1. Otherwise confidence is low. On high confidence, auto-decide: `proceed` if all findings are self-described minor, `optimize` otherwise. On low confidence, ask the existing binary question (`optimize / proceed`) once, then continue the rest of the run in smart mode.
+**STEP 4 (Should-fix/Note branch):** High confidence requires BOTH: every remaining Should-fix/Note finding's own bosun-written description explicitly calls it minor/cosmetic, AND `ralph_loop` cycles remaining > 1. Otherwise confidence is low. On high confidence, auto-decide: `proceed` if all findings are self-described minor, `optimize` otherwise. On low confidence: if `relay_consultation.enabled` is `true` in the effective config, run the Relay Consultation procedure below before asking; otherwise (flag absent or `false`) ask the existing binary question (`optimize / proceed`) once immediately, then continue the rest of the run in smart mode.
+
+**Relay Consultation (opt-in, `relay_consultation.enabled: true` only):** This procedure only ever enriches the `optimize / proceed` question below — it never answers it and never auto-resolves STEP 4 on its own.
+
+1. Enumerate the current `.ai/docs/` file set (`Glob`) and read the full content of every file in it plus `AGENTS.md` (`Read`). Retain each file's content as the "before" snapshot. `slipway`'s own `bash` and `edit` permissions are both `deny`, so this snapshot is a plain content read via `Glob` + `Read` — not a computed hash — and the comparison in step 4 is a direct content/membership diff.
+2. Invoke `hullwright` in Consultative Assessment mode, passing the current run's Should-fix/Note findings list.
+3. When the call returns, re-enumerate (`Glob`) and re-read (`Read`) the same file set for an "after" snapshot.
+4. Compare "before" and "after": if every file's content is unchanged and the file set (added/removed) is identical, no drift was detected — proceed to step 5. If anything differs, discard the relay's classification entirely, log `DISCARDED — unexpected file write detected` naming the changed/added/removed path(s), and go straight to asking the existing binary question unenriched. Do not retry the relay call.
+5. If the relay returned only `unclear` classifications, or the call crashed/produced empty output, log the inconclusive result and ask the existing binary question unenriched.
+6. Otherwise, ask the existing binary question (`optimize / proceed`), presenting the relay's per-finding classifications and justifications alongside the findings as additional context for the user's decision. The question and its two allowed answers are unchanged — only the surrounding context is richer.
 
 **STEP 4 always produces a discrete decision record.** When the STEP 4 gate is reached and confidence is high enough to auto-resolve, the orchestrator must still write a **distinct** decision entry to `.ai/docs/.pipeline-decisions.md` labeled as STEP 4 specifically (e.g. `## [timestamp] — STEP 4 — Optimize Decision`), stating which STEP 4 branch applied (Critical auto-route back to the relevant subagent, or Should-fix/Note auto-resolved to `optimize` / `proceed`) and the confidence signal used. This entry is required even when smart mode resolves STEP 4 instantly and advances to STEP 5 in the same turn. A transition log entry that only names adjacent steps (e.g. `auto-continue — STEP 3.5 → STEP 5`) is **not** a substitute for the discrete STEP 4 record and must never appear in place of it — smart mode's generic `auto-continue` step-to-step logging (Continuation rules → "Smart mode override") never covers STEP 4, because STEP 4 is a convenience gate, not a plain step transition.
 
@@ -402,7 +411,10 @@ Every auto-resolved decision and every fallback-to-ask event appends to `.ai/doc
 Confidence: [high | low → asked]
 Signal used: [specific finding text / trigger keyword / UNKNOWN count]
 Result: [what was decided or what the user answered]
+Relay: [not-invoked | enriched-ask | discarded-write | crashed | inconclusive]
 ```
+
+`Relay` applies only to STEP 4 entries and is only ever meaningful when `relay_consultation.enabled` is `true`; write `not-invoked` for every STEP 4 entry where the flag is absent/`false`, where confidence was high (no relay needed), or where the gate is STEP 3.5/STEP S2 (the relay procedure applies only to STEP 4).
 
 This file is append-only, same convention as `.pipeline-changelog.md`.
 

@@ -71,6 +71,26 @@ This is a narrower case than standard Partial Regeneration:
 
 ---
 
+### Consultative Assessment
+
+Run when: `slipway`'s STEP 4 (Optimize Decision) reaches its Should-fix/Note branch with **low confidence** per the Smart Mode Decision Policy, and `relay_consultation.enabled` is `true` in the effective config. This mode enriches the STEP 4 `optimize/proceed` question — it never replaces it, and it never resolves STEP 4 on its own.
+
+**Input:** the current run's Should-fix/Note findings list, exactly as `bosun` produced it, handed off by the orchestrator.
+
+**Allowed to read:** only the specific docs each finding's `Location:` field names, plus `.ai/docs/.manifest.md` for status context. Do not read the full `.ai/docs/` tree beyond what the findings reference.
+
+**Must return:** a per-finding classification — `self-contained-minor`, `requires-regeneration`, or `unclear` — with a one-line justification each. No file output, no report artifact, no version bump.
+
+**This mode never does any of the following, regardless of what the finding seems to call for:**
+- Never invoke the `bootstrap-from-prd` skill.
+- Never write, edit, or otherwise modify any file under `.ai/docs/` or `AGENTS.md`. This holds even though this agent's own `edit` permission is `allow` at the config level — that permission is agent-wide and cannot be scoped down per-mode by the runtime, so the constraint here is behavioral only, and violating it is always wrong regardless of what a specific finding seems to justify.
+- Never treat this as Partial Regeneration or Contract-Only Refresh, and never reuse either mode's write behavior "just to check."
+- If a finding cannot be classified without an actual regeneration, return `unclear` for it rather than writing anything to verify.
+
+Report back only the per-finding classification list — do not attempt the standard skill completion report format used by the other four modes, since no skill invocation and no file changes occur in this mode.
+
+---
+
 ---
 
 ## Input Contract
@@ -94,6 +114,7 @@ If the required input is missing or the PRD fails the completeness checklist, do
 | Full Bootstrap | `.ai/docs/.manifest.md` + the selected docs from `02`–`10` + `AGENTS.md`, all at `Version: 1.0` |
 | Full Rebuild | Same files, major version incremented |
 | Partial Regeneration | Only the impacted files, minor version incremented; all others untouched |
+| Consultative Assessment | Per-finding classification + justification only; no files touched, no versions changed |
 
 Always relay the skill's own structured report (per `bootstrap-from-prd/SKILL.md` STEP 6) verbatim in structure:
 
@@ -264,6 +285,7 @@ above — it only gates what quality gets reported as "done."
 - Never regenerate documents outside the requested scope in Partial Regeneration mode without explicitly reporting the scope expansion.
 - Never proceed if `.ai/docs/01-prd.md` is missing Functional Requirements or Goals — relay this blocker back to the orchestrator instead of attempting to generate around it.
 - Never relay a completion report for a mode that generated or recompiled `AGENTS.md` without first running the Self-Check Before Handoff steps.
+- Never write, edit, or invoke the `bootstrap-from-prd` skill while operating in Consultative Assessment mode — that mode is classification-only, regardless of what a finding seems to call for.
 
 ## Session Logging
 

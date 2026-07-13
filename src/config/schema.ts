@@ -90,12 +90,24 @@ export const gateAssertionsConfigSchema = z
   })
   .strict();
 
+export const relayConsultationConfigSchema = z
+  .object({
+    // Opt-in orchestrator-level STEP 4 enrichment. Default false/absent =
+    // disabled — STEP 4 low-confidence behaves exactly as documented with
+    // no relay call. When enabled, a low-confidence STEP 4 Should-fix/Note
+    // branch first invokes hullwright's Consultative Assessment mode to
+    // enrich (never replace) the existing optimize/proceed question.
+    enabled: z.boolean().optional(),
+  })
+  .strict();
+
 export const slipwayConfigSchema = z
   .object({
     $schema: z.string().optional(),
     version: z.string().regex(/^\d+\.\d+\.\d+$/),
     ralph_loop: ralphLoopConfigSchema.optional(),
     gate_assertions: gateAssertionsConfigSchema.optional(),
+    relay_consultation: relayConsultationConfigSchema.optional(),
     agents: z.record(z.string(), agentConfigSchema),
     categories: z.record(z.string(), categoryConfigSchema).optional(),
   })
