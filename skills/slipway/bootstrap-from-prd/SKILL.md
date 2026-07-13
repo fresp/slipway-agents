@@ -374,6 +374,11 @@ Verify:
 - ✓ Every doc listed `frozen` or `draft` in `.manifest.md` exists on disk; no doc exists on disk that the manifest lists as `omitted`
 - ✓ Source Of Truth lists in `10` and `AGENTS.md` contain exactly the manifest's non-`omitted` docs (plus extension docs per the insertion rule in `templates/AGENTS.md`)
 
+**If validation passes:**
+- For every doc in the current generation/regeneration scope, set its `.manifest.md` Baseline row `Status` to `frozen` and update `Last Reviewed` to the generation date.
+- Set that same doc's own header `Status:` field to `frozen` to match.
+- Both writes happen together — never one without the other.
+
 **If validation fails:**
 - Identify the affected documents
 - Increment the minor version on each affected document

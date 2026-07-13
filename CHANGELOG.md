@@ -17,6 +17,7 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 - **README and example reference cleanup:** Updated the root `README.md` example link to point to `saas-billing/`, rewrote `skills/slipway/bootstrap-from-prd/examples/README.md` to document the new example, and standardized on `AGENTS.md` plural in live user-facing documentation. No historical release entries were rewritten.
+- **Manifest doc `Status` now transitions draft → frozen on STEP 5 pass:** Resolves the `0.17.0` "Deferred — manifest doc Status not transitioning" note. `bootstrap-from-prd/SKILL.md` STEP 5 now has an explicit "If validation passes" instruction: set the `.manifest.md` Baseline row and the doc's own header `Status:` field to `frozen` together, for every doc in the current generation/regeneration scope (full bootstrap, full rebuild, and partial regeneration all share this STEP 5 path). Decision: **Option A** — STEP 5 alone gates the transition; a passing Bosun review has no effect on manifest status and Bosun remains read-only. `bosun.md`, `subagents/slipway.md`'s STEP 3/3.5 gate logic, and `.ai/docs/.pipeline-state.md`'s Bosun health-score field are unchanged.
 
 
 ---
