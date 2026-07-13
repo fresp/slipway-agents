@@ -9,6 +9,8 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.19.0] — 2026-07-13
+
 ### Removed
 - **`managed-waba` example removed:** Deleted the `skills/slipway/bootstrap-from-prd/examples/managed-waba/` reference example. The BSP/WhatsApp Business Calling domain carried real-project leak risk through project-specific names and vendor-specific configuration details, so the example is gone rather than sanitized.
 
